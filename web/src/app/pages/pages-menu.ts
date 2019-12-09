@@ -8,7 +8,7 @@ export const MENU_ITEMS: NbMenuItem[] = [
     home: true,
   },
   {
-    title: 'Actors',
+    title: 'Components',
     icon: 'keypad-outline',
     link: '/pages/dashboard',
     home: false,
