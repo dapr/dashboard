@@ -48,7 +48,7 @@ Done! point your browser to http://localhost:8080.
 
 ### Kubernetes
 
-Running the dashboard in Kubernetes will let you view and manage the the Dapr instances running in your cluster.
+Running the dashboard in Kubernetes will let you view and manage the Dapr instances running in your cluster.
 
 1. Deploy the dashboard:
 
@@ -81,7 +81,7 @@ npm i @angular/cli
 Build the website and the Go web server into the `/release` dir:
 
 ```
-./buid.sh
+./build.sh
 ```
 
 ### Building a Docker image
