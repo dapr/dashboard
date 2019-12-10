@@ -4,13 +4,15 @@ export const MENU_ITEMS: NbMenuItem[] = [
   {
     title: 'Dashboard',
     icon: 'home-outline',
-    link: '/pages/dashboard',
+    link: '/dashboard',
     home: true,
   },
-  {
-    title: 'Components',
-    icon: 'keypad-outline',
-    link: '/pages/dashboard',
-    home: false,
-  }
 ];
+
+export const COMPONENTS_MENU_ITEM = {
+  title: 'Components',
+  icon: 'keypad-outline',
+  link: '/components',
+  home: false,
+  name: 'components'
+}

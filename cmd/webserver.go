@@ -7,8 +7,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/dapr/dashboard/pkg/components"
 	"github.com/dapr/dashboard/pkg/instances"
+	"github.com/dapr/dashboard/pkg/kube"
+	"github.com/gorilla/mux"
 )
 
 const (
@@ -33,23 +35,46 @@ var etagHeaders = []string{
 	"If-Unmodified-Since",
 }
 
-var inst = instances.NewInstances()
+var inst instances.Instances
+var comps components.Components
+
+const port = 8080
 
 // RunWebServer starts the web server that serves the Dapr UI dashboard and the API
 func RunWebServer() {
+	kubeClient, daprClient, _ := kube.Clients()
+	inst = instances.NewInstances(kubeClient)
+	comps = components.NewComponents(daprClient)
+
 	r := mux.NewRouter()
+	r.HandleFunc("/api/features", getFeaturesHandler)
 	r.HandleFunc("/api/instances", getInstancesHandler)
 	r.HandleFunc("/api/instances/{id}", deleteInstancesHandler).Methods("DELETE")
 	r.HandleFunc("/api/instances/{id}/logs", getLogsHandler)
+	r.HandleFunc("/api/components", getComponentsHandler)
 	r.PathPrefix("/").Handler(noCache(http.StripPrefix("/", http.FileServer(http.Dir(dir)))))
 
-	fmt.Println("Dapr Dashboard running on http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", r))
+	fmt.Println(fmt.Sprintf("Dapr Dashboard running on http://localhost:%v", port))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), r))
 }
 
 func getInstancesHandler(w http.ResponseWriter, r *http.Request) {
 	resp := inst.Get()
 	respondWithJSON(w, 200, resp)
+}
+
+func getComponentsHandler(w http.ResponseWriter, r *http.Request) {
+	resp := comps.Get()
+	respondWithJSON(w, 200, resp)
+}
+
+func getFeaturesHandler(w http.ResponseWriter, r *http.Request) {
+	features := []string{}
+
+	if comps.Supported() {
+		features = append(features, "components")
+	}
+	respondWithJSON(w, 200, features)
 }
 
 func getLogsHandler(w http.ResponseWriter, r *http.Request) {
@@ -103,6 +128,5 @@ func noCache(h http.Handler) http.Handler {
 
 		h.ServeHTTP(w, r)
 	}
-
 	return http.HandlerFunc(fn)
 }

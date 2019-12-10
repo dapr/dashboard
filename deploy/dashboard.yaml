@@ -3,8 +3,8 @@ kind: ClusterRole
 metadata:
   name: deployment-reader
 rules:
-- apiGroups: ["", "apps", "extensions"]
-  resources: ["deployments", "pods", "pods/log"]
+- apiGroups: ["", "dapr.io", "apps", "extensions"]
+  resources: ["deployments", "pods", "pods/log", "components"]
   verbs: ["get", "list"]
 
 ---
@@ -52,7 +52,7 @@ spec:
     spec:
       containers:
       - name: dapr-dashboard
-        image: yaron2/daprui
+        image: yaron2/daprdashboard
         ports:
         - containerPort: 8080
         imagePullPolicy: Always

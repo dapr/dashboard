@@ -13,7 +13,7 @@ This repo is under heavy development, all devs and web developers in particular 
 * List Dapr sidecars with metadata (Self hosted, Kubernetes)
 * Stop a running sidecar (Self hosted)
 * View sidecar logs (Kubernetes)
-* View components in the cluster (Kubernetes, coming soon)
+* View components in the cluster (Kubernetes)
 
 ## Getting started
 

@@ -8,7 +8,6 @@ import (
 
 	"github.com/dapr/cli/pkg/age"
 	"github.com/dapr/cli/pkg/standalone"
-	"github.com/dapr/dashboard/pkg/kube"
 	v1 "k8s.io/api/core/v1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -29,15 +28,15 @@ type instances struct {
 }
 
 // NewInstances returns an Instances implementation
-func NewInstances() Instances {
+func NewInstances(kubeClient *kubernetes.Clientset) Instances {
 	i := instances{}
 
-	kubeClient, err := kube.Client()
-	if err != nil {
-		i.getInstancesFn = i.getStandaloneInstances
-	} else {
+	if kubeClient != nil {
 		i.getInstancesFn = i.getKubernetesInstances
 		i.kubeClient = kubeClient
+	} else {
+		i.getInstancesFn = i.getStandaloneInstances
+
 	}
 	return &i
 }

@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/dapr/cli v0.2.0
+	github.com/dapr/dapr v0.1.0
 	github.com/gorilla/mux v1.7.3
 	golang.org/x/crypto v0.0.0-20191202143827-86a70503ff7e // indirect
 	golang.org/x/net v0.0.0-20191126235420-ef20fe5d7933 // indirect
