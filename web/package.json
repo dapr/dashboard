@@ -22,7 +22,6 @@
     "release:changelog": "npm run conventional-changelog -- -p angular -i CHANGELOG.md -s"
   },
   "dependencies": {
-    "@agm/core": "^1.0.0-beta.5",
     "@angular/animations": "^8.0.0",
     "@angular/cdk": "^8.0.0",
     "@angular/common": "^8.0.0",
@@ -82,7 +81,6 @@
     "stylelint": "7.13.0",
     "ts-node": "3.2.2",
     "tslint": "^5.7.0",
-    "tslint-language-service": "^0.9.9",
     "typescript": "3.4.5"
   }
 }
