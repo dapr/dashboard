@@ -13,8 +13,8 @@ import {
   templateUrl: './logs.component.html'
 })
 export class LogsComponent implements OnInit {
-  private logs: string;
-  private id: string;
+  logs: string;
+  id: string;
   constructor(private route: ActivatedRoute, private instances: InstanceService, private toastrService: NbToastrService) { }
 
   ngOnInit() {

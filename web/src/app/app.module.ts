@@ -5,8 +5,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { ThemeModule } from './@theme/theme.module';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { DataTableModule } from 'ng-angular8-datatable';
 import { NbLayoutModule, } from '@nebular/theme';
+import { ExtraOptions, RouterModule, Routes } from '@angular/router';
 
 import {
   NbDatepickerModule,
@@ -15,8 +15,9 @@ import {
   NbSidebarModule,
   NbToastrModule,
   NbWindowModule,
-  NbCardModule
+  NbCardModule,
 } from '@nebular/theme';
+import { PagesModule } from './pages/pages.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -25,18 +26,17 @@ import {
     BrowserAnimationsModule,
     HttpClientModule,
     AppRoutingModule,
-    DataTableModule,
     NbLayoutModule,
     NbCardModule,
-
-    ThemeModule.forRoot(),
-
+    ThemeModule,
     NbSidebarModule.forRoot(),
     NbMenuModule.forRoot(),
     NbDatepickerModule.forRoot(),
     NbDialogModule.forRoot(),
     NbWindowModule.forRoot(),
     NbToastrModule.forRoot(),
+    RouterModule,
+    PagesModule
   ],
   bootstrap: [AppComponent]
 })

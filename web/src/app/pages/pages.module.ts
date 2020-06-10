@@ -7,6 +7,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { ComponentsModule } from './components/components.module';
 import { LogsModule } from './logs/logs.module';
 import { PagesRoutingModule } from './pages-routing.module';
+import { ExtraOptions, RouterModule, Routes, Router } from '@angular/router';
 
 @NgModule({
   imports: [
@@ -16,7 +17,8 @@ import { PagesRoutingModule } from './pages-routing.module';
     DashboardModule,
     ComponentsModule,
     LogsModule,
-    NbCardModule
+    NbCardModule,
+    RouterModule
   ],
   declarations: [
     PagesComponent,

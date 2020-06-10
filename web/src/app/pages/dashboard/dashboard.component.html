@@ -7,7 +7,7 @@
   </nb-card-header>
 
   <nb-card-body>
-    <table class="table table-striped" [svData]="data" #sv="svDataTable">
+    <table>
       <thead>
         <tr>
           <th>App ID</th>
@@ -24,7 +24,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let item of sv.data">
+        <tr *ngFor="let item of data">
           <td>{{ item.appID }}</td>
           <td>{{ item.appPort }}</td>
           <td>{{ item.httpPort }}</td>
