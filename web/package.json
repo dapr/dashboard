@@ -22,15 +22,15 @@
     "release:changelog": "npm run conventional-changelog -- -p angular -i CHANGELOG.md -s"
   },
   "dependencies": {
-    "@angular/animations": "^8.0.0",
+    "@angular/animations": "^8.2.14",
     "@angular/cdk": "^8.0.0",
-    "@angular/common": "^8.0.0",
-    "@angular/compiler": "^8.0.0",
-    "@angular/core": "^8.0.0",
-    "@angular/forms": "^8.0.0",
-    "@angular/platform-browser": "^8.0.0",
-    "@angular/platform-browser-dynamic": "^8.0.0",
-    "@angular/router": "^8.0.0",
+    "@angular/common": "^8.2.14",
+    "@angular/compiler": "^8.2.14",
+    "@angular/core": "^8.2.14",
+    "@angular/forms": "^8.2.14",
+    "@angular/platform-browser": "^8.2.14",
+    "@angular/platform-browser-dynamic": "^8.2.14",
+    "@angular/router": "^8.2.14",
     "@nebular/auth": "4.1.2",
     "@nebular/eva-icons": "4.1.2",
     "@nebular/security": "4.1.2",
@@ -48,7 +48,7 @@
     "normalize.css": "6.0.0",
     "pace-js": "1.0.2",
     "roboto-fontface": "0.8.0",
-    "rxjs": "6.5.2",
+    "rxjs": "6.5.5",
     "rxjs-compat": "6.3.0",
     "socicon": "3.0.5",
     "typeface-exo": "0.0.22",
@@ -56,10 +56,10 @@
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~0.800.2",
-    "@angular/cli": "^8.0.2",
-    "@angular/compiler-cli": "^8.0.0",
-    "@angular/language-service": "8.0.0",
+    "@angular-devkit/build-angular": "~0.803.26",
+    "@angular/cli": "^8.3.26",
+    "@angular/compiler-cli": "^8.2.14",
+    "@angular/language-service": "8.2.14",
     "@compodoc/compodoc": "1.0.1",
     "@types/jasmine": "2.5.54",
     "@types/jasminewd2": "2.0.3",
@@ -81,6 +81,6 @@
     "stylelint": "7.13.0",
     "ts-node": "3.2.2",
     "tslint": "^5.7.0",
-    "typescript": "3.4.5"
+    "typescript": "3.5.3"
   }
 }
