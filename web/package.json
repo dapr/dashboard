@@ -43,7 +43,7 @@
     "intl": "1.2.5",
     "ionicons": "2.0.1",
     "nebular-icons": "1.1.0",
-    "ng-angular8-datatable": "^0.9.11",
+    "ng-angular9-datatable": "^0.9.13",
     "node-sass": "^4.12.0",
     "normalize.css": "6.0.0",
     "pace-js": "1.0.2",
