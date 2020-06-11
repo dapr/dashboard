@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { NbCardModule, NbLayoutModule, NbButtonModule, NbCheckboxModule } from '@nebular/theme';
+import { NbCardModule, NbLayoutModule, NbButtonModule, NbCheckboxModule, NbTabsetModule } from '@nebular/theme';
 
 import { ThemeModule } from '../../@theme/theme.module';
 import { DetailComponent } from '../detail/detail.component';
@@ -12,6 +12,7 @@ import { DetailComponent } from '../detail/detail.component';
     NbLayoutModule,
     NbButtonModule,
     NbCheckboxModule,
+    NbTabsetModule,
   ],
   declarations: [
     DetailComponent,

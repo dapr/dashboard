@@ -1,3 +1,13 @@
-<ul *ngFor="let yam of yaml">
-  <p style="color: black; white-space: pre-wrap;"> {{yam}}</p>
-</ul>
+<nb-tabset>
+  <nb-tab tabTitle="Summary">
+    <p>Summary</p>
+  </nb-tab>
+  <nb-tab tabTitle="Metadata">
+    <p>Metadata</p>
+  </nb-tab>
+  <nb-tab tabTitle="YAML">
+    <ul *ngFor="let yam of yaml">
+      <p style="color: black; white-space: pre-wrap;"> {{yam}}</p>
+    </ul>
+  </nb-tab>
+</nb-tabset>
