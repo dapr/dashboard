@@ -2,7 +2,8 @@ import { NgModule } from '@angular/core';
 import { NbCardModule, NbLayoutModule, NbButtonModule, NbCheckboxModule } from '@nebular/theme';
 
 import { ThemeModule } from '../../@theme/theme.module';
-import { LogsComponent } from './logs.component';
+import { DetailComponent } from '../detail/detail.component';
+
 
 @NgModule({
   imports: [
@@ -10,10 +11,10 @@ import { LogsComponent } from './logs.component';
     ThemeModule,
     NbLayoutModule,
     NbButtonModule,
-    NbCheckboxModule
+    NbCheckboxModule,
   ],
   declarations: [
-    LogsComponent,
+    DetailComponent,
   ]
 })
-export class LogsModule { }
+export class DetailModule { }
