@@ -10,6 +10,7 @@ import {
 @Component({
   selector: 'ngx-dashboard',
   templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss']
 })
 
 export class DashboardComponent implements OnDestroy {
@@ -39,6 +40,10 @@ export class DashboardComponent implements OnDestroy {
     }, error => {
       this.showToast('danger', 'Operation failed', 'Failed to remove Dapr instance with ID ' + id)
     });
+  }
+
+  getStatus(id: string): string {
+    return "running";
   }
 
   private showToast(type: NbComponentStatus, title: string, body: string) {
