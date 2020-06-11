@@ -22,7 +22,12 @@
             "assets": [
               "src/assets",
               "src/favicon.ico",
-              "src/favicon.png"
+              "src/favicon.png",
+              {
+                "glob": "**/*",
+                "input": "node_modules/monaco-editor/min/vs",
+                "output": "/lib/vs"
+              }
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",

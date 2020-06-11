@@ -5,6 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { NbLayoutModule, } from '@nebular/theme';
+import { MonacoEditorModule, MonacoProviderService } from 'ng-monaco-editor';
 
 import {
   NbDialogModule,
@@ -32,7 +33,16 @@ import { ThemeModule } from './@theme/theme.module';
     NbToastrModule.forRoot(),
     NbSidebarModule.forRoot(),
     NbLayoutModule,
-    NbCardModule
+    NbCardModule,
+    MonacoEditorModule.forRoot({
+      baseUrl: 'lib',
+      defaultOptions: {},
+    }),
+  ],
+  providers: [
+    {
+      provide: MonacoProviderService,
+    },
   ],
   bootstrap: [AppComponent]
 })

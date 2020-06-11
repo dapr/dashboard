@@ -6,8 +6,11 @@
     <p>Metadata</p>
   </nb-tab>
   <nb-tab tabTitle="YAML">
-    <ul *ngFor="let yam of yaml">
-      <p style="color: black; white-space: pre-wrap;"> {{yam}}</p>
-    </ul>
+    <ng-monaco-editor
+      style="height: 300px"
+      modelUri="file:text.yaml"
+      [options]="options"
+      [(ngModel)]="model"
+    ></ng-monaco-editor>
   </nb-tab>
 </nb-tabset>

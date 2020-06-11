@@ -10,20 +10,27 @@ import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 export class DetailComponent implements OnInit {
   private id: string;
 
-  yaml: string[];
+  model: string;
+  options: Object;
 
   constructor(
     private route: ActivatedRoute, 
-    private instances: InstanceService
-    ) {  }
+    private instances: InstanceService) {}
 
   ngOnInit() {
     this.id = this.route.snapshot.params.id;
-    this.getYAML(this.id)
+    this.getYAML(this.id);
+    this.options = {
+      folding: true,
+      minimap: { enabled: true },
+      readOnly: false,
+      language: 'yaml',
+    };
   }
 
-
   getYAML(id: string): void {
-    this.yaml = this.instances.getYAMLArray(id)
+    this.instances.getYAML(id).subscribe((data: string) => {
+      this.model = data;
+    });
   }
 }
