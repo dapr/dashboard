@@ -6,12 +6,12 @@ import 'style-loader!angular2-toaster/toaster.css';
 import {
   NbComponentStatus,
   NbGlobalPhysicalPosition,
-  NbToastrService
+  NbToastrService,
 } from '@nebular/theme';
 import { Log } from './log';
 
 @Component({
-  selector: 'app-logs',
+  selector: 'ngx-logs',
   templateUrl: './logs.component.html',
 })
 
@@ -67,7 +67,7 @@ export class LogsComponent implements OnInit {
   toggleError(checked: boolean) {
     this.errorChecked = checked;
   }
-  
+
   toggleFatal(checked: any) {
     this.fatalChecked = checked;
   }
@@ -82,8 +82,8 @@ export class LogsComponent implements OnInit {
       preventDuplicates: false,
     };
     this.toastrService.show(
-      "Logs refreshed",
-      "Status",
+      'Logs refreshed',
+      'Status',
       config);
   }
 

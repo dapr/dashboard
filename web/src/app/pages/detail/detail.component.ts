@@ -3,7 +3,7 @@ import { InstanceService } from '../../instances/instance.service';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-detail',
+  selector: 'ngx-detail',
   templateUrl: './detail.component.html',
   styleUrls: ['./detail.component.scss'],
 })

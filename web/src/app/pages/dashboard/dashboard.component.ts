@@ -18,10 +18,10 @@ export class DashboardComponent implements OnDestroy {
   private intervalHandler;
 
   constructor(
-    private instanceService: InstanceService, 
+    private instanceService: InstanceService,
     private toastrService: NbToastrService) {
     this.getInstances();
-    this.intervalHandler = setInterval(() => { this.getInstances() }, 3000);
+    this.intervalHandler = setInterval(() => { this.getInstances(); }, 3000);
   }
 
   getInstances() {

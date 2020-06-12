@@ -10,7 +10,7 @@ import { FeaturesService } from '../features/features.service';
     <nb-menu [items]="menu"></nb-menu>
     <router-outlet></router-outlet>
   </ngx-one-column-layout>
-  `
+  `,
 })
 export class PagesComponent {
   menu = MENU_ITEMS;
