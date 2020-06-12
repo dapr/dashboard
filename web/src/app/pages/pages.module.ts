@@ -20,7 +20,7 @@ import { DetailModule } from './detail/detail.module';
     NbCardModule,
   ],
   declarations: [
-    PagesComponent
+    PagesComponent,
   ],
 })
 export class PagesModule {}

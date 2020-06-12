@@ -1,18 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { InstanceService } from '../../instances/instance.service';
 import 'style-loader!angular2-toaster/toaster.css';
 import {
   NbComponentStatus,
   NbGlobalPhysicalPosition,
-  NbToastrService,
+  NbToastrService
 } from '@nebular/theme';
-import { Log } from './log'
+import { Log } from './log';
 
 @Component({
-  selector: 'logs',
-  templateUrl: './logs.component.html'
+  selector: 'app-logs',
+  templateUrl: './logs.component.html',
 })
 
 export class LogsComponent implements OnInit {
@@ -25,8 +25,8 @@ export class LogsComponent implements OnInit {
   fatalChecked = false;
 
   constructor(
-    private route: ActivatedRoute, 
-    private instances: InstanceService, 
+    private route: ActivatedRoute,
+    private instances: InstanceService,
     private toastrService: NbToastrService,
     private location: Location) { }
 
@@ -39,16 +39,16 @@ export class LogsComponent implements OnInit {
     this.logs = this.instances.getLogsArray(this.id);
 
     if (showMessage) {
-      this.showToast("info")
+      this.showToast('info');
     }
   }
 
   isActive(level: string): boolean {
-    if (level === "info") return this.infoChecked;
-    if (level === "debug") return this.debugChecked;
-    if (level === "warning") return this.warningChecked;
-    if (level === "error") return this.errorChecked;
-    if (level === "fatal") return this.fatalChecked;
+    if (level === 'info') return this.infoChecked;
+    if (level === 'debug') return this.debugChecked;
+    if (level === 'warning') return this.warningChecked;
+    if (level === 'error') return this.errorChecked;
+    if (level === 'fatal') return this.fatalChecked;
     return false;
   }
 

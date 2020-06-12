@@ -13,10 +13,10 @@ import { ComponentsComponent } from './components.component';
     NbIconModule,
     NbDialogModule,
     NbAccordionModule,
-    RouterModule
+    RouterModule,
   ],
   declarations: [
     ComponentsComponent,
-  ]
+  ],
 })
 export class ComponentsModule { }

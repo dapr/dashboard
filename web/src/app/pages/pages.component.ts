@@ -21,9 +21,9 @@ export class PagesComponent {
 
   getFeatures() {
     this.features.get().subscribe((data: string[]) => {
-      for (let feature of data) {
-        if (feature == COMPONENTS_MENU_ITEM.name) {
-          this.menu.push(COMPONENTS_MENU_ITEM)
+      for (const feature of data) {
+        if (feature === COMPONENTS_MENU_ITEM.name) {
+          this.menu.push(COMPONENTS_MENU_ITEM);
         }
       }
     });

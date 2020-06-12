@@ -1,40 +1,40 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Log } from '../pages/logs/log'
+import { Log } from '../pages/logs/log';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class InstanceService {
 
   constructor(private http: HttpClient) { }
 
   getInstances() {
-    return this.http.get("/api/instances");
+    return this.http.get('/api/instances');
   }
 
   deleteInstance(id: string) {
-    return this.http.delete("/api/instances/" + id)
+    return this.http.delete('/api/instances/' + id);
   }
 
   getLogs(id: string) {
-    return this.http.get("/api/instances/" + id + "/logs", {responseType: 'text'})
+    return this.http.get('/api/instances/' + id + '/logs', {responseType: 'text'});
   }
 
   getYAML(id: string) {
-    return this.http.get("/api/yaml/" + id, {responseType: 'text'})
+    return this.http.get('/api/yaml/' + id, {responseType: 'text'});
   }
 
   getLogsArray(id: string): Log[] {
-    var output = [];
-    this.http.get("/api/instances/" + id + "/logs", {responseType: 'text'}).subscribe((logData: string) => {
+    const output = [];
+    this.http.get('/api/instances/' + id + '/logs', {responseType: 'text'}).subscribe((logData: string) => {
       logData.split('\n').forEach(log => {
-        var regEx = RegExp('(?<=level=).*?(?=\s)', '');
-        var level: string[] = regEx.exec(log);
+        const regEx = RegExp('(?<=level=).*?(?=\s)', '');
+        const level: string[] = regEx.exec(log);
         if (level != null && level.length > 0) {
-          var currentLog: Log = {
+          const currentLog: Log = {
             level: level[0].replace(' m', ''),
-            log: log
+            log: log,
           };
           output.push(currentLog);
         }
@@ -44,8 +44,8 @@ export class InstanceService {
   }
 
   getYAMLArray(id: string): string[] {
-    var output = [];
-    this.http.get("/api/yaml/" + id, {responseType: 'text'}).subscribe((yamlData: string) => {
+    const output = [];
+    this.http.get('/api/yaml/' + id, {responseType: 'text'}).subscribe((yamlData: string) => {
       yamlData.split('\n').forEach(line => {
         output.push(line);
       });

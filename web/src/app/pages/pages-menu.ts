@@ -14,5 +14,5 @@ export const COMPONENTS_MENU_ITEM = {
   icon: 'keypad-outline',
   link: '/components',
   home: false,
-  name: 'components'
-}
+  name: 'components',
+};

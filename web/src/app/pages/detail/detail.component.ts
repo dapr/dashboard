@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { InstanceService } from '../../instances/instance.service';
-import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'detail',
+  selector: 'app-detail',
   templateUrl: './detail.component.html',
-  styleUrls: ['./detail.component.scss']
+  styleUrls: ['./detail.component.scss'],
 })
 export class DetailComponent implements OnInit {
   private id: string;
@@ -14,7 +14,7 @@ export class DetailComponent implements OnInit {
   options: Object;
 
   constructor(
-    private route: ActivatedRoute, 
+    private route: ActivatedRoute,
     private instances: InstanceService) {}
 
   ngOnInit() {

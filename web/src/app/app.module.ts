@@ -4,7 +4,7 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { NbLayoutModule, } from '@nebular/theme';
+import { NbLayoutModule } from '@nebular/theme';
 import { MonacoEditorModule, MonacoProviderService } from 'ng-monaco-editor';
 
 import {
@@ -14,7 +14,7 @@ import {
   NbToastrModule,
   NbWindowModule,
   NbCardModule,
-  NbThemeModule
+  NbThemeModule,
 } from '@nebular/theme';
 import { ThemeModule } from './@theme/theme.module';
 
@@ -44,7 +44,7 @@ import { ThemeModule } from './@theme/theme.module';
       provide: MonacoProviderService,
     },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule {
 }

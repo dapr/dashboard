@@ -24,7 +24,7 @@ const routes: Routes = [{
       component: LogsComponent,
     },
     {
-      path: 'detail/:id', 
+      path: 'detail/:id',
       component: DetailComponent,
     },
     {

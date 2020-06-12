@@ -11,10 +11,10 @@ import { DashboardComponent } from './dashboard.component';
     NbLayoutModule,
     NbIconModule,
     RouterModule,
-    NbDialogModule.forRoot()
+    NbDialogModule.forRoot(),
   ],
   declarations: [
     DashboardComponent,
-  ]
+  ],
 })
 export class DashboardModule { }

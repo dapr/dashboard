@@ -4,13 +4,13 @@ import 'style-loader!angular2-toaster/toaster.css';
 import {
   NbComponentStatus,
   NbGlobalPhysicalPosition,
-  NbToastrService
+  NbToastrService,
 } from '@nebular/theme';
 
 @Component({
   selector: 'ngx-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
 })
 
 export class DashboardComponent implements OnDestroy {
@@ -36,9 +36,9 @@ export class DashboardComponent implements OnDestroy {
 
   delete(id: string) {
     this.instanceService.deleteInstance(id).subscribe(() => {
-      this.showToast('success', 'Operation succeeded', 'Deleted Dapr instance with ID ' + id)
+      this.showToast('success', 'Operation succeeded', 'Deleted Dapr instance with ID ' + id);
     }, error => {
-      this.showToast('danger', 'Operation failed', 'Failed to remove Dapr instance with ID ' + id)
+      this.showToast('danger', 'Operation failed', 'Failed to remove Dapr instance with ID ' + id);
     });
   }
 
