@@ -42,10 +42,6 @@ export class DashboardComponent implements OnDestroy {
     });
   }
 
-  getStatus(id: string): string {
-    return "running";
-  }
-
   private showToast(type: NbComponentStatus, title: string, body: string) {
     const config = {
       status: type,

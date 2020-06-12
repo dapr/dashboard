@@ -19,7 +19,7 @@
       <tbody>
         <tr *ngFor="let item of data">
           <td><a routerLink="/detail/{{item.appID}}">{{ item.appID }}</a></td>
-          <td>{{ getStatus(item.appID) }}</td>
+          <td>{{ item.status }}</td>
           <td>{{ item.age }}</td>
           <td>
               <nb-icon title="remove" *ngIf="item.supportsDeletion" (click)="delete(item.appID)" style="cursor: pointer;" icon="trash-2-outline"></nb-icon>
