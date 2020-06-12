@@ -1,22 +1,25 @@
 import { Component, OnDestroy } from '@angular/core';
-import { NbDialogService } from '@nebular/theme';
 import { InstanceService } from '../../instances/instance.service';
-
 import 'style-loader!angular2-toaster/toaster.css';
 import {
   NbComponentStatus,
   NbGlobalPhysicalPosition,
-  NbToastrService,
+  NbToastrService
 } from '@nebular/theme';
+
 @Component({
   selector: 'ngx-dashboard',
-  templateUrl: './dashboard.component.html'
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss']
 })
+
 export class DashboardComponent implements OnDestroy {
   public data: any[];
   private intervalHandler;
 
-  constructor(private instanceService: InstanceService, private toastrService: NbToastrService, private dialogService: NbDialogService) {
+  constructor(
+    private instanceService: InstanceService, 
+    private toastrService: NbToastrService) {
     this.getInstances();
     this.intervalHandler = setInterval(() => { this.getInstances() }, 3000);
   }

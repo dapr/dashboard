@@ -1,0 +1,16 @@
+<nb-tabset>
+  <nb-tab tabTitle="Summary">
+    <p>Summary</p>
+  </nb-tab>
+  <nb-tab tabTitle="Metadata">
+    <p>Metadata</p>
+  </nb-tab>
+  <nb-tab tabTitle="YAML">
+    <ng-monaco-editor
+      style="height: 300px"
+      modelUri="file:text.yaml"
+      [options]="options"
+      [(ngModel)]="model"
+    ></ng-monaco-editor>
+  </nb-tab>
+</nb-tabset>

@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { NbCardModule, NbLayoutModule, NbButtonModule } from '@nebular/theme';
+import { NbCardModule, NbLayoutModule, NbButtonModule, NbCheckboxModule } from '@nebular/theme';
 
 import { ThemeModule } from '../../@theme/theme.module';
 import { LogsComponent } from './logs.component';
@@ -9,7 +9,8 @@ import { LogsComponent } from './logs.component';
     NbCardModule,
     ThemeModule,
     NbLayoutModule,
-    NbButtonModule
+    NbButtonModule,
+    NbCheckboxModule
   ],
   declarations: [
     LogsComponent,
