@@ -1,0 +1,18 @@
+<h3>Logs for Dapr Instance: {{id}}</h3>
+<br>
+<button (click)="getLogs(true)" nbButton status="primary">Refresh</button>
+<br>
+<br>
+<h6>Level:</h6>
+<nb-checkbox status="primary" (checkedChange)="toggleInfo($event)">Info</nb-checkbox>
+<nb-checkbox status="primary" (checkedChange)="toggleDebug($event)">Debug</nb-checkbox>
+<nb-checkbox status="warning" (checkedChange)="toggleWarning($event)">Warning</nb-checkbox>
+<nb-checkbox status="danger" (checkedChange)="toggleError($event)">Error</nb-checkbox>
+<nb-checkbox status="danger" (checkedChange)="toggleFatal($event)">Fatal</nb-checkbox>
+<br>
+<br>
+<div style="background: white;">
+  <ul *ngFor="let log of logs">
+    <p *ngIf="isActive(log.level)" style="color: black; white-space: pre-wrap;"> {{ log.log }}</p>
+  </ul>
+</div>

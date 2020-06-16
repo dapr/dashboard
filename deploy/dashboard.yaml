@@ -52,7 +52,7 @@ spec:
     spec:
       containers:
       - name: dapr-dashboard
-        image: yaron2/daprdashboard
+        image: willdavsmith/dashboard:latest
         ports:
         - containerPort: 8080
         imagePullPolicy: Always

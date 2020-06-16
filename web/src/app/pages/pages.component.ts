@@ -6,10 +6,10 @@ import { FeaturesService } from '../features/features.service';
   selector: 'ngx-pages',
   styleUrls: ['pages.component.scss'],
   template: `
-    <ngx-one-column-layout>
-      <nb-menu [items]="menu"></nb-menu>
-      <router-outlet></router-outlet>
-    </ngx-one-column-layout>
+  <ngx-one-column-layout>
+    <nb-menu [items]="menu"></nb-menu>
+    <router-outlet></router-outlet>
+  </ngx-one-column-layout>
   `,
 })
 export class PagesComponent {
@@ -21,9 +21,9 @@ export class PagesComponent {
 
   getFeatures() {
     this.features.get().subscribe((data: string[]) => {
-      for (let feature of data) {
-        if (feature == COMPONENTS_MENU_ITEM.name) {
-          this.menu.push(COMPONENTS_MENU_ITEM)
+      for (const feature of data) {
+        if (feature === COMPONENTS_MENU_ITEM.name) {
+          this.menu.push(COMPONENTS_MENU_ITEM);
         }
       }
     });

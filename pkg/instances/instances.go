@@ -13,6 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"
 	"k8s.io/client-go/kubernetes"
+	"sigs.k8s.io/yaml"
 )
 
 // Instances is an interface to interact with running Dapr instances in Kubrernetes or Standalone modes
@@ -20,12 +21,19 @@ type Instances interface {
 	Get() []Instance
 	Delete(id string) error
 	Logs(id string) string
+	Configuration(id string) string
 }
 
 type instances struct {
 	kubeClient     *kubernetes.Clientset
 	getInstancesFn func() []Instance
 }
+
+const (
+	daprEnabledAnnotation = "dapr.io/enabled"
+	daprIDAnnotation      = "dapr.io/id"
+	daprPortAnnotation    = "dapr.io/port"
+)
 
 // NewInstances returns an Instances implementation
 func NewInstances(kubeClient *kubernetes.Clientset) Instances {
@@ -52,8 +60,8 @@ func (i *instances) Logs(id string) string {
 	}
 
 	for _, d := range resp.Items {
-		if d.Spec.Template.Annotations["dapr.io/enabled"] != "" {
-			daprID := d.Spec.Template.Annotations["dapr.io/id"]
+		if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
+			daprID := d.Spec.Template.Annotations[daprIDAnnotation]
 			if daprID == id {
 				pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(meta_v1.ListOptions{
 					LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
@@ -88,6 +96,47 @@ func (i *instances) Logs(id string) string {
 	return ""
 }
 
+func (i *instances) Configuration(id string) string {
+	resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
+	if err != nil || len(resp.Items) == 0 {
+		return ""
+	}
+
+	for _, d := range resp.Items {
+		if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
+			daprID := d.Spec.Template.Annotations[daprIDAnnotation]
+			if daprID == id {
+				nspace := d.ObjectMeta.Namespace
+				restClient := i.kubeClient.CoreV1().RESTClient()
+				if err != nil {
+					log.Println(err)
+					return ""
+				}
+
+				url := fmt.Sprintf("/apis/apps/v1/namespaces/%s/deployments/%s", nspace, id)
+				data, err := restClient.Get().RequestURI(url).Stream()
+				if err != nil {
+					log.Println(err)
+					return ""
+				}
+
+				buf := new(bytes.Buffer)
+				buf.ReadFrom(data)
+				dataStr := buf.String()
+				j := []byte(dataStr)
+				y, err := yaml.JSONToYAML(j)
+				if err != nil {
+					log.Println(err)
+					return ""
+				}
+
+				return string(y)
+			}
+		}
+	}
+	return ""
+}
+
 func (i *instances) Delete(id string) error {
 	return standalone.Stop(id)
 }
@@ -101,8 +150,8 @@ func (i *instances) getKubernetesInstances() []Instance {
 	}
 
 	for _, d := range resp.Items {
-		if d.Spec.Template.Annotations["dapr.io/enabled"] != "" {
-			id := d.Spec.Template.Annotations["dapr.io/id"]
+		if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
+			id := d.Spec.Template.Annotations[daprIDAnnotation]
 			i := Instance{
 				AppID:            id,
 				HTTPPort:         3500,
@@ -115,9 +164,10 @@ func (i *instances) getKubernetesInstances() []Instance {
 				SupportsDeletion: false,
 				SupportsLogs:     true,
 				Address:          fmt.Sprintf("%s-dapr:80", id),
+				Status:           fmt.Sprintf("%d/%d", d.Status.ReadyReplicas, d.Status.Replicas),
 			}
 
-			if val, ok := d.Spec.Template.Annotations["dapr.io/port"]; ok {
+			if val, ok := d.Spec.Template.Annotations[daprPortAnnotation]; ok {
 				appPort, err := strconv.Atoi(val)
 				if err == nil {
 					i.AppPort = appPort
