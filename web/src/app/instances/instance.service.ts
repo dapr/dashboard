@@ -21,8 +21,8 @@ export class InstanceService {
     return this.http.get('/api/instances/' + id + '/logs', {responseType: 'text'});
   }
 
-  getYAML(id: string) {
-    return this.http.get('/api/yaml/' + id, {responseType: 'text'});
+  getConfiguration(id: string) {
+    return this.http.get('/api/configuration/' + id, {responseType: 'text'});
   }
 
   getLogsArray(id: string): Log[] {
@@ -38,16 +38,6 @@ export class InstanceService {
           };
           output.push(currentLog);
         }
-      });
-    });
-    return output;
-  }
-
-  getYAMLArray(id: string): string[] {
-    const output = [];
-    this.http.get('/api/yaml/' + id, {responseType: 'text'}).subscribe((yamlData: string) => {
-      yamlData.split('\n').forEach(line => {
-        output.push(line);
       });
     });
     return output;

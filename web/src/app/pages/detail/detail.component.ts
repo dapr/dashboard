@@ -20,7 +20,7 @@ export class DetailComponent implements OnInit {
 
   ngOnInit() {
     this.id = this.route.snapshot.params.id;
-    this.getYAML(this.id);
+    this.getConfiguration(this.id);
     this.options = {
       folding: true,
       minimap: { enabled: true },
@@ -29,8 +29,8 @@ export class DetailComponent implements OnInit {
     };
   }
 
-  getYAML(id: string): void {
-    this.instances.getYAML(id).subscribe((data: string) => {
+  getConfiguration(id: string): void {
+    this.instances.getConfiguration(id).subscribe((data: string) => {
       this.model = data;
     });
   }

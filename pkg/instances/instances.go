@@ -21,7 +21,7 @@ type Instances interface {
 	Get() []Instance
 	Delete(id string) error
 	Logs(id string) string
-	YAML(id string) string
+	Configuration(id string) string
 }
 
 type instances struct {
@@ -90,7 +90,7 @@ func (i *instances) Logs(id string) string {
 	return ""
 }
 
-func (i *instances) YAML(id string) string {
+func (i *instances) Configuration(id string) string {
 	resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
 	if err != nil || len(resp.Items) == 0 {
 		return ""
