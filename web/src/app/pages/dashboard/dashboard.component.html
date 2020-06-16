@@ -9,7 +9,6 @@
           <th>App ID</th>
           <th>Status</th>
           <th>Age</th>
-          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -17,10 +16,6 @@
           <td><a routerLink="/detail/{{item.appID}}">{{ item.appID }}</a></td>
           <td>{{ item.status }}</td>
           <td>{{ item.age }}</td>
-          <td>
-              <nb-icon title="remove" *ngIf="item.supportsDeletion" (click)="delete(item.appID)" style="cursor: pointer;" icon="trash-2-outline"></nb-icon>
-              <nb-icon title="view logs" [routerLink]="['/logs', item.appID]" *ngIf="item.supportsLogs" style="cursor: pointer;" icon="file-outline"></nb-icon>
-          </td>
         </tr>
       </tbody>
     </table>

@@ -4,7 +4,6 @@ import { NgModule } from '@angular/core';
 import { PagesComponent } from './pages.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ComponentsComponent } from './components/components.component';
-import { LogsComponent } from './logs/logs.component';
 import { DetailComponent } from './detail/detail.component';
 
 const routes: Routes = [{
@@ -18,10 +17,6 @@ const routes: Routes = [{
     {
       path: 'components',
       component: ComponentsComponent,
-    },
-    {
-      path: 'logs/:id',
-      component: LogsComponent,
     },
     {
       path: 'detail/:id',

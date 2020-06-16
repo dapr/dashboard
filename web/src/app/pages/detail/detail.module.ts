@@ -4,6 +4,7 @@ import { NbCardModule, NbLayoutModule, NbButtonModule, NbCheckboxModule, NbTabse
 import { ThemeModule } from '../../@theme/theme.module';
 import { DetailComponent } from '../detail/detail.component';
 import { MonacoEditorModule } from 'ng-monaco-editor';
+import { LogsComponent } from './logs/logs.component';
 
 @NgModule({
   imports: [
@@ -18,6 +19,7 @@ import { MonacoEditorModule } from 'ng-monaco-editor';
   ],
   declarations: [
     DetailComponent,
+    LogsComponent
   ],
 })
 export class DetailModule { }

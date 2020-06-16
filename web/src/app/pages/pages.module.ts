@@ -4,7 +4,6 @@ import { ThemeModule } from '../@theme/theme.module';
 import { PagesComponent } from './pages.component';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ComponentsModule } from './components/components.module';
-import { LogsModule } from './logs/logs.module';
 import { PagesRoutingModule } from './pages-routing.module';
 import { DetailModule } from './detail/detail.module';
 
@@ -15,7 +14,6 @@ import { DetailModule } from './detail/detail.module';
     NbMenuModule,
     DashboardModule,
     ComponentsModule,
-    LogsModule,
     DetailModule,
     NbCardModule,
   ],
