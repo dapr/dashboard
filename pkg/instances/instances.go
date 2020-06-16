@@ -29,6 +29,12 @@ type instances struct {
 	getInstancesFn func() []Instance
 }
 
+const (
+	daprEnabledAnnotation = "dapr.io/enabled"
+	daprIDAnnotation      = "dapr.io/id"
+	daprPortAnnotation    = "dapr.io/port"
+)
+
 // NewInstances returns an Instances implementation
 func NewInstances(kubeClient *kubernetes.Clientset) Instances {
 	i := instances{}
@@ -52,9 +58,6 @@ func (i *instances) Logs(id string) string {
 	if err != nil || len(resp.Items) == 0 {
 		return ""
 	}
-
-	const daprEnabledAnnotation string = "dapr.io/enabled"
-	const daprIDAnnotation string = "dapr.io/id"
 
 	for _, d := range resp.Items {
 		if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
@@ -98,9 +101,6 @@ func (i *instances) Configuration(id string) string {
 	if err != nil || len(resp.Items) == 0 {
 		return ""
 	}
-
-	const daprEnabledAnnotation string = "dapr.io/enabled"
-	const daprIDAnnotation string = "dapr.io/id"
 
 	for _, d := range resp.Items {
 		if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
@@ -148,10 +148,6 @@ func (i *instances) getKubernetesInstances() []Instance {
 		log.Println(err)
 		return list
 	}
-
-	const daprEnabledAnnotation string = "dapr.io/enabled"
-	const daprIDAnnotation string = "dapr.io/id"
-	const daprPortAnnotation string = "dapr.io/id"
 
 	for _, d := range resp.Items {
 		if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
