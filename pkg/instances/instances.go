@@ -53,9 +53,12 @@ func (i *instances) Logs(id string) string {
 		return ""
 	}
 
+	const daprEnabledAnnotation string = "dapr.io/enabled"
+	const daprIDAnnotation string = "dapr.io/id"
+
 	for _, d := range resp.Items {
-		if d.Spec.Template.Annotations["dapr.io/enabled"] != "" {
-			daprID := d.Spec.Template.Annotations["dapr.io/id"]
+		if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
+			daprID := d.Spec.Template.Annotations[daprIDAnnotation]
 			if daprID == id {
 				pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(meta_v1.ListOptions{
 					LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
@@ -96,9 +99,12 @@ func (i *instances) Configuration(id string) string {
 		return ""
 	}
 
+	const daprEnabledAnnotation string = "dapr.io/enabled"
+	const daprIDAnnotation string = "dapr.io/id"
+
 	for _, d := range resp.Items {
-		if d.Spec.Template.Annotations["dapr.io/enabled"] != "" {
-			daprID := d.Spec.Template.Annotations["dapr.io/id"]
+		if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
+			daprID := d.Spec.Template.Annotations[daprIDAnnotation]
 			if daprID == id {
 				nspace := d.ObjectMeta.Namespace
 				restClient := i.kubeClient.CoreV1().RESTClient()
@@ -143,9 +149,13 @@ func (i *instances) getKubernetesInstances() []Instance {
 		return list
 	}
 
+	const daprEnabledAnnotation string = "dapr.io/enabled"
+	const daprIDAnnotation string = "dapr.io/id"
+	const daprPortAnnotation string = "dapr.io/id"
+
 	for _, d := range resp.Items {
-		if d.Spec.Template.Annotations["dapr.io/enabled"] != "" {
-			id := d.Spec.Template.Annotations["dapr.io/id"]
+		if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
+			id := d.Spec.Template.Annotations[daprIDAnnotation]
 			i := Instance{
 				AppID:            id,
 				HTTPPort:         3500,
@@ -161,7 +171,7 @@ func (i *instances) getKubernetesInstances() []Instance {
 				Status:           fmt.Sprintf("%d/%d", d.Status.ReadyReplicas, d.Status.Replicas),
 			}
 
-			if val, ok := d.Spec.Template.Annotations["dapr.io/port"]; ok {
+			if val, ok := d.Spec.Template.Annotations[daprPortAnnotation]; ok {
 				appPort, err := strconv.Atoi(val)
 				if err == nil {
 					i.AppPort = appPort
