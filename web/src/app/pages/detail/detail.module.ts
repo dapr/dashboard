@@ -19,7 +19,7 @@ import { LogsComponent } from './logs/logs.component';
   ],
   declarations: [
     DetailComponent,
-    LogsComponent
+    LogsComponent,
   ],
 })
 export class DetailModule { }
