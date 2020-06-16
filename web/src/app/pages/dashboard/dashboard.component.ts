@@ -3,8 +3,10 @@ import { InstanceService } from '../../instances/instance.service';
 
 @Component({
   selector: 'ngx-dashboard',
-  templateUrl: './dashboard.component.html'
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss'],
 })
+
 export class DashboardComponent implements OnDestroy {
   public data: any[];
   displayedColumns: string[] = ['name'];
@@ -12,7 +14,7 @@ export class DashboardComponent implements OnDestroy {
 
   constructor(private instanceService: InstanceService) {
     this.getInstances();
-    this.intervalHandler = setInterval(() => { this.getInstances() }, 3000);
+    this.intervalHandler = setInterval(() => { this.getInstances(); }, 3000);
   }
 
   getInstances() {

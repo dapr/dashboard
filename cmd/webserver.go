@@ -52,7 +52,7 @@ func RunWebServer() {
 	r.HandleFunc("/api/instances/{id}", deleteInstancesHandler).Methods("DELETE")
 	r.HandleFunc("/api/instances/{id}/logs", getLogsHandler)
 	r.HandleFunc("/api/components", getComponentsHandler)
-	r.HandleFunc("/api/yaml/{id}", getYamlHandler)
+	r.HandleFunc("/api/configuration/{id}", getConfigurationHandler)
 	r.PathPrefix("/").Handler(noCache(http.StripPrefix("/", http.FileServer(http.Dir(dir)))))
 
 	fmt.Println(fmt.Sprintf("Dapr Dashboard running on http://localhost:%v", port))
@@ -85,10 +85,17 @@ func getLogsHandler(w http.ResponseWriter, r *http.Request) {
 	respondWithPlainString(w, 200, logs)
 }
 
+<<<<<<< HEAD
 func getYamlHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	details := inst.YAML(id)
+=======
+func getConfigurationHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	details := inst.Configuration(id)
+>>>>>>> develop
 	respondWithPlainString(w, 200, details)
 }
 
