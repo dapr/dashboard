@@ -4,7 +4,6 @@ import { ComponentsComponent } from './components.component';
 
 @NgModule({
   imports: [
-    ThemeModule,
     RouterModule,
   ],
   declarations: [

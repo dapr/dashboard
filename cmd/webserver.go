@@ -85,17 +85,10 @@ func getLogsHandler(w http.ResponseWriter, r *http.Request) {
 	respondWithPlainString(w, 200, logs)
 }
 
-<<<<<<< HEAD
-func getYamlHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	details := inst.YAML(id)
-=======
 func getConfigurationHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	details := inst.Configuration(id)
->>>>>>> develop
 	respondWithPlainString(w, 200, details)
 }
 

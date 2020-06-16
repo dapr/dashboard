@@ -96,24 +96,15 @@ func (i *instances) Logs(id string) string {
 	return ""
 }
 
-<<<<<<< HEAD
-func (i *instances) YAML(id string) string {
-=======
 func (i *instances) Configuration(id string) string {
->>>>>>> develop
 	resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
 	if err != nil || len(resp.Items) == 0 {
 		return ""
 	}
 
 	for _, d := range resp.Items {
-<<<<<<< HEAD
-		if d.Spec.Template.Annotations["dapr.io/enabled"] != "" {
-			daprID := d.Spec.Template.Annotations["dapr.io/id"]
-=======
 		if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
 			daprID := d.Spec.Template.Annotations[daprIDAnnotation]
->>>>>>> develop
 			if daprID == id {
 				nspace := d.ObjectMeta.Namespace
 				restClient := i.kubeClient.CoreV1().RESTClient()
