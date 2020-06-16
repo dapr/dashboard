@@ -1,10 +1,8 @@
 import { RouterModule, Routes } from '@angular/router';
 import { NgModule } from '@angular/core';
-
 import { PagesComponent } from './pages.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { ComponentsComponent } from './components/components.component';
-import { LogsComponent } from './logs/logs.component';
+import { DaprComponentsComponent } from './dapr-components/dapr-components.component';
 
 const routes: Routes = [{
   path: '',
@@ -16,11 +14,7 @@ const routes: Routes = [{
     },
     {
       path: 'components',
-      component: ComponentsComponent,
-    },
-    {
-      path: 'logs/:id',
-      component: LogsComponent,
+      component: DaprComponentsComponent,
     },
     {
       path: '',
@@ -34,5 +28,4 @@ const routes: Routes = [{
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class PagesRoutingModule {
-}
+export class PagesRoutingModule { }

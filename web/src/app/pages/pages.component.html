@@ -1,0 +1,14 @@
+<mat-toolbar class="pages-header" color="primary">
+  <mat-icon aria-hidden="false" aria-label="Open Sidebar" (click)="sidenav.toggle()">format_list_bulleted</mat-icon>
+  <span>Dapr Dashboard</span>
+</mat-toolbar>
+<mat-sidenav-container class="example-container">
+  <mat-sidenav #sidenav opened mode="side">
+    <ul>
+      <li *ngFor="let item of menu">
+        <p>{{ item.title }}</p>
+      </li>
+    </ul>
+  </mat-sidenav>
+  <router-outlet></router-outlet>
+</mat-sidenav-container>

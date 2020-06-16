@@ -1,26 +1,23 @@
 import { NgModule } from '@angular/core';
-import { NbMenuModule, NbCardModule } from '@nebular/theme';
-
-import { ThemeModule } from '../@theme/theme.module';
 import { PagesComponent } from './pages.component';
 import { DashboardModule } from './dashboard/dashboard.module';
-import { ComponentsModule } from './components/components.module';
-import { LogsModule } from './logs/logs.module';
 import { PagesRoutingModule } from './pages-routing.module';
+import { CommonModule } from '@angular/common';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   imports: [
+    CommonModule,
     PagesRoutingModule,
-    ThemeModule,
-    NbMenuModule,
     DashboardModule,
-    ComponentsModule,
-    LogsModule,
-    NbCardModule
+    MatSidenavModule,
+    MatToolbarModule,
+    MatIconModule,
   ],
   declarations: [
     PagesComponent,
   ],
 })
-export class PagesModule {
-}
+export class PagesModule {}

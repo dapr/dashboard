@@ -1,46 +1,10 @@
 <h2>Overview</h2>
-<br>
-<br>
-<nb-card>
-  <nb-card-header>
-    Running Sidecars
-  </nb-card-header>
-
-  <nb-card-body>
-    <table class="table table-striped" [svData]="data" #sv="svDataTable">
-      <thead>
-        <tr>
-          <th>App ID</th>
-          <th>App Port</th>
-          <th>Dapr HTTP Port</th>
-          <th>Dapr gRPC Port</th>
-          <th>Command</th>
-          <th>Replicas</th>
-          <th>Address</th>
-          <th>PID</th>
-          <th>Created</th>
-          <th>Age</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of sv.data">
-          <td>{{ item.appID }}</td>
-          <td>{{ item.appPort }}</td>
-          <td>{{ item.httpPort }}</td>
-          <td>{{ item.grpcPort }}</td>
-          <td>{{ item.command }}</td>
-          <td>{{ item.replicas }}</td>
-          <td>{{ item.address }}</td>
-          <td>{{ item.pid }}</td>
-          <td>{{ item.created }}</td>
-          <td>{{ item.age }}</td>
-          <td>
-              <nb-icon title="remove" *ngIf="item.supportsDeletion" (click)="delete(item.appID)" style="cursor: pointer;" icon="trash-2-outline"></nb-icon>
-              <nb-icon title="view logs" [routerLink]="['/logs', item.appID]" *ngIf="item.supportsLogs" style="cursor: pointer;" icon="file-outline"></nb-icon>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </nb-card-body>
-</nb-card>
+<table mat-table [dataSource]="data" class="mat-elevation-z8">
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Name </th>
+      <td mat-cell *matCellDef="let item"> {{ item.appID }} </td>
+    </ng-container>
+  
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>

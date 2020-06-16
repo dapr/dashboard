@@ -1,18 +1,22 @@
-@import '../@theme/styles/themes';
+.pages-header {
+  height: 15%;
+}
 
-@include nb-install-component() {
-  ::ng-deep router-outlet + * {
-    display: block;
-    animation: fade 1s;
+.example-container {
+  height: 85%;
+}
 
-    @keyframes fade {
-      from {
-        opacity: 0;
-      }
+::ng-deep router-outlet + * {
+  display: flexbox;
+  animation: fade 1s;
 
-      to {
-        opacity: 1;
-      }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
     }
   }
 }

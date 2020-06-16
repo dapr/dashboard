@@ -13,6 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"
 	"k8s.io/client-go/kubernetes"
+	"sigs.k8s.io/yaml"
 )
 
 // Instances is an interface to interact with running Dapr instances in Kubrernetes or Standalone modes
@@ -20,6 +21,7 @@ type Instances interface {
 	Get() []Instance
 	Delete(id string) error
 	Logs(id string) string
+	YAML(id string) string
 }
 
 type instances struct {
@@ -88,6 +90,47 @@ func (i *instances) Logs(id string) string {
 	return ""
 }
 
+func (i *instances) YAML(id string) string {
+	resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
+	if err != nil || len(resp.Items) == 0 {
+		return ""
+	}
+
+	for _, d := range resp.Items {
+		if d.Spec.Template.Annotations["dapr.io/enabled"] != "" {
+			daprID := d.Spec.Template.Annotations["dapr.io/id"]
+			if daprID == id {
+				nspace := d.ObjectMeta.Namespace
+				restClient := i.kubeClient.CoreV1().RESTClient()
+				if err != nil {
+					log.Println(err)
+					return ""
+				}
+
+				url := fmt.Sprintf("/apis/apps/v1/namespaces/%s/deployments/%s", nspace, id)
+				data, err := restClient.Get().RequestURI(url).Stream()
+				if err != nil {
+					log.Println(err)
+					return ""
+				}
+
+				buf := new(bytes.Buffer)
+				buf.ReadFrom(data)
+				dataStr := buf.String()
+				j := []byte(dataStr)
+				y, err := yaml.JSONToYAML(j)
+				if err != nil {
+					log.Println(err)
+					return ""
+				}
+
+				return string(y)
+			}
+		}
+	}
+	return ""
+}
+
 func (i *instances) Delete(id string) error {
 	return standalone.Stop(id)
 }
@@ -115,6 +158,7 @@ func (i *instances) getKubernetesInstances() []Instance {
 				SupportsDeletion: false,
 				SupportsLogs:     true,
 				Address:          fmt.Sprintf("%s-dapr:80", id),
+				Status:           fmt.Sprintf("%d/%d", d.Status.ReadyReplicas, d.Status.Replicas),
 			}
 
 			if val, ok := d.Spec.Template.Annotations["dapr.io/port"]; ok {
