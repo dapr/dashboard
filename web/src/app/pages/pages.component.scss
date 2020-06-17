@@ -1,22 +1,35 @@
 .pages-header {
   height: 15%;
+  // box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 
 .example-container {
   height: 85%;
 }
 
-::ng-deep router-outlet + * {
-  display: flexbox;
-  animation: fade 1s;
+#header-image {
+  height: 85%;
+  width: auto;
+  padding-left: 3%;
+  padding-right: 1%;
+}
 
-  @keyframes fade {
-    from {
-      opacity: 0;
-    }
+mat-icon:hover {
+  cursor: pointer;
+}
 
-    to {
-      opacity: 1;
-    }
-  }
+mat-icon {
+  position: relative;
+  color: #888888;
+  font-size: 4vh;
+}
+
+h1 {
+  color: #444444;
+  font-size: 5vh;
+}
+
+.mat-elevation-z5 {
+  position: relative;
+  z-index: 2;
 }

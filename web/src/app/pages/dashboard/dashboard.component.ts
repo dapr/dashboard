@@ -9,7 +9,7 @@ import { InstanceService } from '../../instances/instance.service';
 
 export class DashboardComponent implements OnDestroy {
   public data: any[];
-  displayedColumns: string[] = ['name'];
+  displayedColumns: string[] = ['name', 'status', 'age'];
   private intervalHandler;
 
   constructor(private instanceService: InstanceService) {
