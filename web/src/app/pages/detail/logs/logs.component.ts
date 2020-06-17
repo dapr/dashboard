@@ -12,11 +12,6 @@ import { Log } from './log';
 export class LogsComponent implements OnInit {
   logs: Log[];
   id: string;
-  infoChecked = false;
-  debugChecked = false;
-  warningChecked = false;
-  errorChecked = false;
-  fatalChecked = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -33,35 +28,6 @@ export class LogsComponent implements OnInit {
 
     if (showMessage) {
     }
-  }
-
-  isActive(level: string): boolean {
-    if (level === 'info') return this.infoChecked;
-    if (level === 'debug') return this.debugChecked;
-    if (level === 'warning') return this.warningChecked;
-    if (level === 'error') return this.errorChecked;
-    if (level === 'fatal') return this.fatalChecked;
-    return false;
-  }
-
-  toggleInfo(checked: boolean) {
-    this.infoChecked = checked;
-  }
-
-  toggleDebug(checked: boolean) {
-    this.debugChecked = checked;
-  }
-
-  toggleWarning(checked: boolean) {
-    this.warningChecked = checked;
-  }
-
-  toggleError(checked: boolean) {
-    this.errorChecked = checked;
-  }
-
-  toggleFatal(checked: any) {
-    this.fatalChecked = checked;
   }
 
   goBack(): void {

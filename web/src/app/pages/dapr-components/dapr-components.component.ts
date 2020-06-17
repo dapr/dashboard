@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ComponentsService } from '../../components/component.service';
+import { MatAccordion } from '@angular/material/expansion';
 
 @Component({
   selector: 'ngx-dashboard',
@@ -25,6 +26,8 @@ export class DaprComponentsComponent implements OnInit {
       }
     });
   }
+
+  @ViewChild(MatAccordion) accordion: MatAccordion;
 
   getIconPath(type: string): string {
     if (type.includes('bindings')) {

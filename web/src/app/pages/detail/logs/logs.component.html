@@ -1,1 +1,6 @@
-<p>logs</p>
+<h3>Logs for Dapr Instance: {{id}}</h3>
+<div style="background: white;">
+    <ul *ngFor="let log of logs">
+      <p style="color: black; white-space: pre-wrap;"> {{ log.log }}</p>
+    </ul>
+</div>

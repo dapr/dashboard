@@ -25,10 +25,14 @@ h1 {
 }
 .sidenav-container {
   height: 85%;
+
+  .sidenav {
+    width: 200px;
+    background-color: #fff;
+  }
 }
-.sidenav-container .sidenav {
-  width: 200px;
-  background-color: #fff;
+mat-nav-list {
+  padding: 0;
 }
 .navigation-item-label {
   color: #444444;
