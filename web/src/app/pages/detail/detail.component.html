@@ -1,23 +1,19 @@
-<<<<<<< HEAD
-<p>pages</p>
-=======
-<nb-tabset>
-  <nb-tab tabTitle="Summary">
+<mat-tab-group>
+  <mat-tab label="Summary">
     <p>Summary</p>
-  </nb-tab>
-  <nb-tab tabTitle="Metadata">
+  </mat-tab>
+  <mat-tab label="Metadata">
     <p>Metadata</p>
-  </nb-tab>
-  <nb-tab tabTitle="YAML">
+  </mat-tab>
+  <mat-tab label="YAML">
     <ng-monaco-editor
       style="height: 300px"
       modelUri="file:text.yaml"
       [options]="options"
       [(ngModel)]="model"
     ></ng-monaco-editor>
-  </nb-tab>
-  <nb-tab tabTitle="Logs">
+  </mat-tab>
+  <mat-tab label="Logs">
     <ngx-logs></ngx-logs>
-  </nb-tab>
-</nb-tabset>
->>>>>>> develop
+  </mat-tab>
+</mat-tab-group>

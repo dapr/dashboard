@@ -6,15 +6,22 @@ import { CommonModule } from '@angular/common';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
+import { DetailModule } from './detail/detail.module';
+import { DaprComponentsModule } from './dapr-components/dapr-components.module';
+import {MatListModule} from '@angular/material/list';
 
 @NgModule({
   imports: [
     CommonModule,
     PagesRoutingModule,
     DashboardModule,
+    DaprComponentsModule,
+    DetailModule,
     MatSidenavModule,
     MatToolbarModule,
     MatIconModule,
+    MatListModule,
+    
   ],
   declarations: [
     PagesComponent,

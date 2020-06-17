@@ -2,15 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { InstanceService } from '../../../instances/instance.service';
-<<<<<<< HEAD
-=======
-import 'style-loader!angular2-toaster/toaster.css';
-import {
-  NbComponentStatus,
-  NbGlobalPhysicalPosition,
-  NbToastrService,
-} from '@nebular/theme';
->>>>>>> develop
 import { Log } from './log';
 
 @Component({
@@ -30,10 +21,6 @@ export class LogsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private instances: InstanceService,
-<<<<<<< HEAD
-=======
-    private toastrService: NbToastrService,
->>>>>>> develop
     private location: Location) { }
 
   ngOnInit() {
@@ -45,10 +32,6 @@ export class LogsComponent implements OnInit {
     this.logs = this.instances.getLogsArray(this.id);
 
     if (showMessage) {
-<<<<<<< HEAD
-=======
-      this.showToast('info');
->>>>>>> develop
     }
   }
 
@@ -81,24 +64,6 @@ export class LogsComponent implements OnInit {
     this.fatalChecked = checked;
   }
 
-<<<<<<< HEAD
-=======
-  private showToast(type: NbComponentStatus) {
-    const config = {
-      status: type,
-      destroyByClick: true,
-      duration: 4000,
-      hasIcon: true,
-      position: NbGlobalPhysicalPosition.TOP_RIGHT,
-      preventDuplicates: false,
-    };
-    this.toastrService.show(
-      'Logs refreshed',
-      'Status',
-      config);
-  }
-
->>>>>>> develop
   goBack(): void {
     this.location.back();
   }
