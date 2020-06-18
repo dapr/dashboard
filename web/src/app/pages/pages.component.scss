@@ -1,28 +1,29 @@
 .pages-header {
   height: 15%;
 }
+
 #header-image {
   height: 85%;
   width: auto;
   padding-left: 3%;
   padding-right: 1%;
 }
+
 mat-icon:hover {
   cursor: pointer;
 }
+
 mat-icon {
   position: relative;
   color: #888888;
   font-size: 4vh;
 }
-h1 {
-  color: #444444;
-  font-size: 5vh;
-}
+
 .mat-elevation-z5 {
   position: relative;
   z-index: 2;
 }
+
 .sidenav-container {
   height: 85%;
 
@@ -44,18 +45,22 @@ mat-nav-list {
   color: #444444;
   padding-left: 20px;
 }
+
 mat-sidenav:not(.mat-drawer-opened) {
   transform: translate3d(0, 0, 0) !important;
   visibility: visible !important;
   width: 60px !important;
   overflow: hidden;
 }
+
 mat-sidenav:not(.mat-drawer-opened) .navigation-item-label {
   display: none !important;
 }
+
 mat-sidenav:not(.mat-drawer-opened) .home-button {
   display: none !important;
 }
+
 .body {
   padding-left: 60px;
 }
