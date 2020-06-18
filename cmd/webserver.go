@@ -52,6 +52,7 @@ func RunWebServer() {
 	r.HandleFunc("/api/instances/{id}", deleteInstancesHandler).Methods("DELETE")
 	r.HandleFunc("/api/instances/{id}/logs", getLogsHandler)
 	r.HandleFunc("/api/components", getComponentsHandler)
+	r.HandleFunc("/api/components/status", getComponentsStatusHandler)
 	r.HandleFunc("/api/configuration/{id}", getConfigurationHandler)
 	r.PathPrefix("/").Handler(noCache(http.StripPrefix("/", http.FileServer(http.Dir(dir)))))
 
@@ -66,6 +67,11 @@ func getInstancesHandler(w http.ResponseWriter, r *http.Request) {
 
 func getComponentsHandler(w http.ResponseWriter, r *http.Request) {
 	resp := comps.Get()
+	respondWithJSON(w, 200, resp)
+}
+
+func getComponentsStatusHandler(w http.ResponseWriter, r *http.Request) {
+	resp := comps.GetStatus()
 	respondWithJSON(w, 200, resp)
 }
 

@@ -9,6 +9,8 @@ import { MatAccordion } from '@angular/material/expansion';
 })
 export class DaprComponentsComponent implements OnInit {
   public components: any[];
+  public componentsStatus: any[];
+  public displayedColumns: string[] = ['name', 'status', 'age', 'created', 'img'];
 
   constructor(private componentsService: ComponentsService) { }
 
@@ -24,6 +26,9 @@ export class DaprComponentsComponent implements OnInit {
         c.iconPath = this.getIconPath(c.spec.type);
         c.spec.metadata = JSON.stringify(c.spec.metadata, null, 2);
       }
+    });
+    this.componentsService.getComponentsStatus().subscribe((data: any[]) => {
+      this.componentsStatus = data;
     });
   }
 
