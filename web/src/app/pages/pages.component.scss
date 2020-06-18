@@ -31,6 +31,12 @@ h1 {
     background-color: #fff;
   }
 }
+
+.navigation-item.active {
+  background: #dcf0fb;
+  color: #062639;
+}
+
 mat-nav-list {
   padding: 0;
 }
