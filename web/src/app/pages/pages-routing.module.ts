@@ -4,6 +4,7 @@ import { PagesComponent } from './pages.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { DaprComponentsComponent } from './dapr-components/dapr-components.component';
 import { DetailComponent } from './detail/detail.component';
+import { ConfigurationComponent } from './configuration/configuration.component';
 
 const routes: Routes = [{
   path: '',
@@ -20,6 +21,10 @@ const routes: Routes = [{
     {
       path: 'detail/:id',
       component: DetailComponent,
+    },
+    {
+      path: 'configuration',
+      component: ConfigurationComponent,
     },
     {
       path: '',

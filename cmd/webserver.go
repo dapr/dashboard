@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/dapr/dashboard/pkg/components"
+	"github.com/dapr/dashboard/pkg/configuration"
 	"github.com/dapr/dashboard/pkg/instances"
 	"github.com/dapr/dashboard/pkg/kube"
 	"github.com/gorilla/mux"
@@ -37,6 +38,7 @@ var etagHeaders = []string{
 
 var inst instances.Instances
 var comps components.Components
+var conf configuration.Configuration
 
 const port = 8080
 
@@ -45,6 +47,7 @@ func RunWebServer() {
 	kubeClient, daprClient, _ := kube.Clients()
 	inst = instances.NewInstances(kubeClient)
 	comps = components.NewComponents(daprClient)
+	conf = configuration.NewConfiguration(daprClient)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/api/features", getFeaturesHandler)
@@ -54,6 +57,7 @@ func RunWebServer() {
 	r.HandleFunc("/api/components", getComponentsHandler)
 	r.HandleFunc("/api/components/status", getComponentsStatusHandler)
 	r.HandleFunc("/api/configuration/{id}", getConfigurationHandler)
+	r.HandleFunc("/api/daprconfig", getDaprConfigHandler)
 	r.PathPrefix("/").Handler(noCache(http.StripPrefix("/", http.FileServer(http.Dir(dir)))))
 
 	fmt.Println(fmt.Sprintf("Dapr Dashboard running on http://localhost:%v", port))
@@ -96,6 +100,11 @@ func getConfigurationHandler(w http.ResponseWriter, r *http.Request) {
 	id := vars["id"]
 	details := inst.Configuration(id)
 	respondWithPlainString(w, 200, details)
+}
+
+func getDaprConfigHandler(w http.ResponseWriter, r *http.Request) {
+	resp := conf.Get()
+	respondWithJSON(w, 200, resp)
 }
 
 func deleteInstancesHandler(w http.ResponseWriter, r *http.Request) {

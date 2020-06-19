@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { DetailModule } from './detail/detail.module';
 import { DaprComponentsModule } from './dapr-components/dapr-components.module';
 import { MatListModule } from '@angular/material/list';
+import { ConfigurationModule } from './configuration/configuration.module';
 
 @NgModule({
   imports: [
@@ -21,6 +22,7 @@ import { MatListModule } from '@angular/material/list';
     MatToolbarModule,
     MatIconModule,
     MatListModule,
+    ConfigurationModule,
   ],
   declarations: [
     PagesComponent,
