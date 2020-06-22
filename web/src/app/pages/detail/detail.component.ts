@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { InstanceService } from '../../instances/instance.service';
 import { ActivatedRoute } from '@angular/router';
+import { LogsComponent } from './logs/logs.component';
 
 @Component({
   selector: 'ngx-detail',

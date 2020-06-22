@@ -4,19 +4,7 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { NbLayoutModule } from '@nebular/theme';
 import { MonacoEditorModule, MonacoProviderService } from 'ng-monaco-editor';
-
-import {
-  NbDialogModule,
-  NbMenuModule,
-  NbSidebarModule,
-  NbToastrModule,
-  NbWindowModule,
-  NbCardModule,
-  NbThemeModule,
-} from '@nebular/theme';
-import { ThemeModule } from './@theme/theme.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -25,15 +13,6 @@ import { ThemeModule } from './@theme/theme.module';
     BrowserAnimationsModule,
     HttpClientModule,
     AppRoutingModule,
-    ThemeModule,
-    NbThemeModule.forRoot(),
-    NbMenuModule.forRoot(),
-    NbDialogModule.forRoot(),
-    NbWindowModule.forRoot(),
-    NbToastrModule.forRoot(),
-    NbSidebarModule.forRoot(),
-    NbLayoutModule,
-    NbCardModule,
     MonacoEditorModule.forRoot({
       baseUrl: 'lib',
       defaultOptions: {},

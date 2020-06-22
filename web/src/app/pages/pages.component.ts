@@ -1,23 +1,22 @@
-import { Component } from '@angular/core';
-import { MENU_ITEMS, COMPONENTS_MENU_ITEM } from './pages-menu';
+import { Component, ViewChild } from '@angular/core';
+import { MenuItem, MENU_ITEMS, COMPONENTS_MENU_ITEM } from './pages-menu';
 import { FeaturesService } from '../features/features.service';
+import { MatSidenav } from '@angular/material/sidenav';
 
 @Component({
   selector: 'ngx-pages',
   styleUrls: ['pages.component.scss'],
-  template: `
-  <ngx-one-column-layout>
-    <nb-menu [items]="menu"></nb-menu>
-    <router-outlet></router-outlet>
-  </ngx-one-column-layout>
-  `,
+  templateUrl: 'pages.component.html',
 })
 export class PagesComponent {
-  menu = MENU_ITEMS;
+  menu: MenuItem[] = MENU_ITEMS;
 
   constructor(private features: FeaturesService) {
     this.getFeatures();
   }
+
+  @ViewChild('drawer', { static: false }) 
+  drawer: MatSidenav;
 
   getFeatures() {
     this.features.get().subscribe((data: string[]) => {

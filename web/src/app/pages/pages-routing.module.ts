@@ -1,9 +1,8 @@
 import { RouterModule, Routes } from '@angular/router';
 import { NgModule } from '@angular/core';
-
 import { PagesComponent } from './pages.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { ComponentsComponent } from './components/components.component';
+import { DaprComponentsComponent } from './dapr-components/dapr-components.component';
 import { DetailComponent } from './detail/detail.component';
 
 const routes: Routes = [{
@@ -16,7 +15,7 @@ const routes: Routes = [{
     },
     {
       path: 'components',
-      component: ComponentsComponent,
+      component: DaprComponentsComponent,
     },
     {
       path: 'detail/:id',
