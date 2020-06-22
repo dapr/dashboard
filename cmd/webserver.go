@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/dapr/dashboard/pkg/components"
-	"github.com/dapr/dashboard/pkg/configuration"
+	"github.com/dapr/dashboard/pkg/configurations"
 	"github.com/dapr/dashboard/pkg/instances"
 	"github.com/dapr/dashboard/pkg/kube"
 	"github.com/gorilla/mux"
@@ -38,7 +38,7 @@ var etagHeaders = []string{
 
 var inst instances.Instances
 var comps components.Components
-var conf configuration.Configuration
+var conf configurations.Configurations
 
 const port = 8080
 
@@ -47,7 +47,7 @@ func RunWebServer() {
 	kubeClient, daprClient, _ := kube.Clients()
 	inst = instances.NewInstances(kubeClient)
 	comps = components.NewComponents(daprClient)
-	conf = configuration.NewConfiguration(daprClient)
+	conf = configurations.NewConfigurations(daprClient)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/api/features", getFeaturesHandler)

@@ -2,7 +2,9 @@ package configurations
 
 import (
 	"log"
+	"strconv"
 
+	v1alpha1 "github.com/dapr/dapr/pkg/apis/configuration/v1alpha1"
 	scheme "github.com/dapr/dapr/pkg/client/clientset/versioned"
 	"github.com/dapr/dashboard/pkg/age"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -49,8 +51,8 @@ func (c *configurations) Get() []ConfigurationsOutput {
 
 	co := []ConfigurationsOutput{}
 	for _, c := range confs.Items {
-		configs = append(configs, ConfigurationsOutput{
-			TracingEnabled:  c.Spec.TracingSpec.Enabled,
+		co = append(co, ConfigurationsOutput{
+			TracingEnabled:  tracingEnabled(c.Spec.TracingSpec),
 			Name:            c.GetName(),
 			MTLSEnabled:     c.Spec.MTLSSpec.Enabled,
 			WorkloadCertTTL: c.Spec.MTLSSpec.WorkloadCertTTL,
@@ -60,4 +62,12 @@ func (c *configurations) Get() []ConfigurationsOutput {
 		})
 	}
 	return co
+}
+
+func tracingEnabled(spec v1alpha1.TracingSpec) bool {
+	sr, err := strconv.ParseFloat(spec.SamplingRate, 32)
+	if err != nil {
+		return false
+	}
+	return sr > 0
 }
