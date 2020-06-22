@@ -11,4 +11,8 @@ export class ComponentsService {
   getComponents() {
     return this.http.get('/api/components');
   }
+
+  getComponentsStatus() {
+    return this.http.get('/api/components/status');
+  }
 }

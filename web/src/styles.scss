@@ -1,5 +1,31 @@
-html, body { height: 100%; }
+html, body { height: 100%;}
 body { margin: 0; font-family: 'Segoe UI', sans-serif; }
+
+#loader-container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+ngx-app {
+    position: relative;
+    height: 100%;
+}
+
+#loader {
+    width: 100px;
+    height: 100px;
+    border: 16px solid #dadada;
+    border-top: 16px solid #005085;
+    border-radius: 50%;
+    animation: loading 1s ease-in-out infinite;
+}
+
+@keyframes loading {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 
 h1 {
     color: #333333;

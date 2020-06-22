@@ -1,14 +1,26 @@
 <h2>Components List</h2>  
-  <mat-accordion class="example-headers-align" multi>
-      <div *ngFor="let component of components">
-        <mat-expansion-panel class="dapr-component">
-            <mat-expansion-panel-header collapsedHeight="100px" expandedHeight="100px">
-                <mat-panel-title>
-                    <img [src]="component.iconPath">
-                </mat-panel-title>
-                <mat-panel-description>{{ component.metadata.name }}</mat-panel-description>
-            </mat-expansion-panel-header>
-            <p>{{ component.spec.metadata }}</p>
-        </mat-expansion-panel>
-    </div>
-  </mat-accordion>
+
+<table mat-table [dataSource]="componentsStatus" class="mat-elevation-z8">
+  <ng-container matColumnDef="img">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let item"><img [src]="getIconPath(item.Type)"></td>
+  </ng-container>
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef>Name</th>
+    <td mat-cell *matCellDef="let item">{{ item.Name }}</td>
+  </ng-container>
+  <ng-container matColumnDef="status">
+    <th mat-header-cell *matHeaderCellDef>Type</th>
+    <td mat-cell *matCellDef="let item">{{ item.Type }}</td>
+  </ng-container>
+  <ng-container matColumnDef="age">
+    <th mat-header-cell *matHeaderCellDef>Age</th>
+    <td mat-cell *matCellDef="let item">{{ item.Age }}</td>
+  </ng-container>
+  <ng-container matColumnDef="created">
+      <th mat-header-cell *matHeaderCellDef>Created</th>
+      <td mat-cell *matCellDef="let item">{{ item.Created }}</td>
+  </ng-container>
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>

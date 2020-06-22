@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/dapr/dashboard/pkg/components"
+	"github.com/dapr/dashboard/pkg/configurations"
 	"github.com/dapr/dashboard/pkg/instances"
 	"github.com/dapr/dashboard/pkg/kube"
 	"github.com/gorilla/mux"
@@ -37,6 +38,7 @@ var etagHeaders = []string{
 
 var inst instances.Instances
 var comps components.Components
+var configs configurations.Configurations
 
 const port = 8080
 
@@ -45,6 +47,7 @@ func RunWebServer() {
 	kubeClient, daprClient, _ := kube.Clients()
 	inst = instances.NewInstances(kubeClient)
 	comps = components.NewComponents(daprClient)
+	configs = configurations.NewConfigurations(daprClient)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/api/features", getFeaturesHandler)
@@ -52,7 +55,9 @@ func RunWebServer() {
 	r.HandleFunc("/api/instances/{id}", deleteInstancesHandler).Methods("DELETE")
 	r.HandleFunc("/api/instances/{id}/logs", getLogsHandler)
 	r.HandleFunc("/api/components", getComponentsHandler)
+	r.HandleFunc("/api/components/status", getComponentsStatusHandler)
 	r.HandleFunc("/api/configuration/{id}", getConfigurationHandler)
+	r.HandleFunc("/api/daprconfig", getDaprConfigHandler)
 	r.PathPrefix("/").Handler(noCache(http.StripPrefix("/", http.FileServer(http.Dir(dir)))))
 
 	fmt.Println(fmt.Sprintf("Dapr Dashboard running on http://localhost:%v", port))
@@ -66,6 +71,11 @@ func getInstancesHandler(w http.ResponseWriter, r *http.Request) {
 
 func getComponentsHandler(w http.ResponseWriter, r *http.Request) {
 	resp := comps.Get()
+	respondWithJSON(w, 200, resp)
+}
+
+func getComponentsStatusHandler(w http.ResponseWriter, r *http.Request) {
+	resp := comps.GetStatus()
 	respondWithJSON(w, 200, resp)
 }
 
@@ -90,6 +100,11 @@ func getConfigurationHandler(w http.ResponseWriter, r *http.Request) {
 	id := vars["id"]
 	details := inst.Configuration(id)
 	respondWithPlainString(w, 200, details)
+}
+
+func getDaprConfigHandler(w http.ResponseWriter, r *http.Request) {
+	resp := configs.Get()
+	respondWithJSON(w, 200, resp)
 }
 
 func deleteInstancesHandler(w http.ResponseWriter, r *http.Request) {

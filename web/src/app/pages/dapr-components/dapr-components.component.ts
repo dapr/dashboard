@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ComponentsService } from '../../components/component.service';
-import { MatAccordion } from '@angular/material/expansion';
 
 @Component({
   selector: 'ngx-dashboard',
@@ -9,6 +8,8 @@ import { MatAccordion } from '@angular/material/expansion';
 })
 export class DaprComponentsComponent implements OnInit {
   public components: any[];
+  public componentsStatus: any[];
+  public displayedColumns: string[] = ['img', 'name', 'status', 'age', 'created'];
 
   constructor(private componentsService: ComponentsService) { }
 
@@ -25,9 +26,10 @@ export class DaprComponentsComponent implements OnInit {
         c.spec.metadata = JSON.stringify(c.spec.metadata, null, 2);
       }
     });
+    this.componentsService.getComponentsStatus().subscribe((data: any[]) => {
+      this.componentsStatus = data;
+    });
   }
-
-  @ViewChild(MatAccordion) accordion: MatAccordion;
 
   getIconPath(type: string): string {
     if (type.includes('bindings')) {
