@@ -38,7 +38,7 @@ var etagHeaders = []string{
 
 var inst instances.Instances
 var comps components.Components
-var conf configurations.Configurations
+var configs configurations.Configurations
 
 const port = 8080
 
@@ -47,7 +47,7 @@ func RunWebServer() {
 	kubeClient, daprClient, _ := kube.Clients()
 	inst = instances.NewInstances(kubeClient)
 	comps = components.NewComponents(daprClient)
-	conf = configurations.NewConfigurations(daprClient)
+	configs = configurations.NewConfigurations(daprClient)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/api/features", getFeaturesHandler)
@@ -103,7 +103,7 @@ func getConfigurationHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getDaprConfigHandler(w http.ResponseWriter, r *http.Request) {
-	resp := conf.Get()
+	resp := configs.Get()
 	respondWithJSON(w, 200, resp)
 }
 
