@@ -1,18 +1,20 @@
-package configuration
+package configurations
 
 import (
-	"github.com/dapr/cli/pkg/age"
+	"log"
+
 	scheme "github.com/dapr/dapr/pkg/client/clientset/versioned"
+	"github.com/dapr/dashboard/pkg/age"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// Configuration is an interface to interact with a Dapr configuration
-type Configuration interface {
+// Configurations is an interface to interact with a Dapr configuration
+type Configurations interface {
 	Supported() bool
 	Get() []ConfigurationsOutput
 }
 
-type configuration struct {
+type configurations struct {
 	daprClient scheme.Interface
 }
 
@@ -27,26 +29,27 @@ type ConfigurationsOutput struct {
 	Created         string `csv:"CREATED"`
 }
 
-// NewConfiguration returns a new Configuration instance
-func NewConfiguration(daprClient scheme.Interface) Configuration {
-	return &configuration{
+// NewConfigurations returns a new Configurations instance
+func NewConfigurations(daprClient scheme.Interface) Configurations {
+	return &configurations{
 		daprClient: daprClient,
 	}
 }
 
-func (c *configuration) Supported() bool {
+func (c *configurations) Supported() bool {
 	return c.daprClient != nil
 }
 
-func (c *configuration) Get() []ConfigurationsOutput {
+func (c *configurations) Get() []ConfigurationsOutput {
 	confs, err := c.daprClient.ConfigurationV1alpha1().Configurations(meta_v1.NamespaceAll).List(meta_v1.ListOptions{})
 	if err != nil {
+		log.Println(err)
 		return []ConfigurationsOutput{}
 	}
 
 	co := []ConfigurationsOutput{}
 	for _, c := range confs.Items {
-		co = append(co, ConfigurationsOutput{
+		configs = append(configs, ConfigurationsOutput{
 			TracingEnabled:  c.Spec.TracingSpec.Enabled,
 			Name:            c.GetName(),
 			MTLSEnabled:     c.Spec.MTLSSpec.Enabled,
