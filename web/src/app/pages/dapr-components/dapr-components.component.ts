@@ -9,7 +9,7 @@ import { ComponentsService } from '../../components/component.service';
 export class DaprComponentsComponent implements OnInit {
   public components: any[];
   public componentsStatus: any[];
-  public displayedColumns: string[] = ['name', 'status', 'age', 'created', 'img'];
+  public displayedColumns: string[] = ['img', 'name', 'status', 'age', 'created'];
 
   constructor(private componentsService: ComponentsService) { }
 
