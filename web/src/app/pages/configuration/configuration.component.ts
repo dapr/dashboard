@@ -18,7 +18,7 @@ export class ConfigurationComponent implements OnInit {
 
   public components: any[];
   public componentsStatus: any[];
-  public displayedColumns: string[] = [];
+  public displayedColumns: string[] = ['name', 'tracing-enabled', 'mtls-enabled', 'mtls-workload-ttl', 'mtls-clock-skew', 'age', 'created'];
 
   getConfiguration() {
     this.configService.getConfiguration().subscribe((data: any[]) => {
