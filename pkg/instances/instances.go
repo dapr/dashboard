@@ -106,31 +106,43 @@ func (i *instances) Configuration(id string) string {
 		if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
 			daprID := d.Spec.Template.Annotations[daprIDAnnotation]
 			if daprID == id {
-				nspace := d.ObjectMeta.Namespace
-				restClient := i.kubeClient.CoreV1().RESTClient()
+				pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(meta_v1.ListOptions{
+					LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
+				})
 				if err != nil {
 					log.Println(err)
 					return ""
 				}
 
-				url := fmt.Sprintf("/apis/apps/v1/namespaces/%s/deployments/%s", nspace, id)
-				data, err := restClient.Get().RequestURI(url).Stream()
-				if err != nil {
-					log.Println(err)
-					return ""
-				}
+				for _, p := range pods.Items {
+					name := p.ObjectMeta.Name
+					nspace := p.ObjectMeta.Namespace
 
-				buf := new(bytes.Buffer)
-				buf.ReadFrom(data)
-				dataStr := buf.String()
-				j := []byte(dataStr)
-				y, err := yaml.JSONToYAML(j)
-				if err != nil {
-					log.Println(err)
-					return ""
-				}
+					restClient := i.kubeClient.CoreV1().RESTClient()
+					if err != nil {
+						log.Println(err)
+						return ""
+					}
 
-				return string(y)
+					url := fmt.Sprintf("/api/v1/namespaces/%s/pods/%s", nspace, name)
+					data, err := restClient.Get().RequestURI(url).Stream()
+					if err != nil {
+						log.Println(err)
+						return ""
+					}
+
+					buf := new(bytes.Buffer)
+					buf.ReadFrom(data)
+					dataStr := buf.String()
+					j := []byte(dataStr)
+					y, err := yaml.JSONToYAML(j)
+					if err != nil {
+						log.Println(err)
+						return ""
+					}
+
+					return string(y)
+				}
 			}
 		}
 	}
