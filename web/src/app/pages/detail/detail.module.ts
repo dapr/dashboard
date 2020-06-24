@@ -6,6 +6,7 @@ import { MonacoEditorModule } from 'ng-monaco-editor';
 import { LogsComponent } from './logs/logs.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @NgModule({
   imports: [
@@ -14,6 +15,7 @@ import { MatCardModule } from '@angular/material/card';
     FormsModule,
     MatTabsModule,
     MatCardModule,
+    MatCheckboxModule,
   ],
   declarations: [
     DetailComponent,
