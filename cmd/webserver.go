@@ -53,6 +53,7 @@ func RunWebServer() {
 	r.HandleFunc("/api/features", getFeaturesHandler)
 	r.HandleFunc("/api/instances", getInstancesHandler)
 	r.HandleFunc("/api/instances/{id}", deleteInstancesHandler).Methods("DELETE")
+	r.HandleFunc("/api/instances/{id}", getInstanceHandler).Methods("GET")
 	r.HandleFunc("/api/instances/{id}/logs", getLogsHandler)
 	r.HandleFunc("/api/components", getComponentsHandler)
 	r.HandleFunc("/api/components/status", getComponentsStatusHandler)
@@ -104,6 +105,13 @@ func getConfigurationHandler(w http.ResponseWriter, r *http.Request) {
 
 func getDaprConfigHandler(w http.ResponseWriter, r *http.Request) {
 	resp := configs.Get()
+	respondWithJSON(w, 200, resp)
+}
+
+func getInstanceHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	resp := inst.GetInstance(id)
 	respondWithJSON(w, 200, resp)
 }
 

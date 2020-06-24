@@ -13,6 +13,10 @@ export class InstanceService {
     return this.http.get('/api/instances');
   }
 
+  getInstance(id: string) {
+    return this.http.get('/api/instances/' + id);
+  }
+
   deleteInstance(id: string) {
     return this.http.delete('/api/instances/' + id);
   }

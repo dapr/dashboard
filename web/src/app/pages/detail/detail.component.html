@@ -1,9 +1,86 @@
 <mat-tab-group>
   <mat-tab label="Summary">
     <h2>Summary</h2>
+    <mat-card class="mat-elevation-z8">
+      <mat-card-content>
+        <table>
+          <tbody>
+            <tr>
+              <td class="table-label">App ID</td>
+              <td class="table-data">{{ instance.appID }}</td>
+            </tr>
+            <tr>
+              <td class="table-label">App Port</td>
+              <td class="table-data">{{ instance.appPort }}</td>
+            </tr>
+            <tr>
+              <td class="table-label">Dapr HTTP Port</td>
+              <td class="table-data">{{ instance.httpPort }}</td>
+            </tr>
+            <tr>
+              <td class="table-label">Dapr gRPC Port</td>
+              <td class="table-data">{{ instance.grpcPort }}</td>
+            </tr>
+            <tr>
+              <td class="table-label">Command</td>
+              <td class="table-data">{{ instance.command }}</td>
+            </tr>
+            <tr>
+              <td class="table-label">Replicas</td>
+              <td class="table-data">{{ instance.replicas }}</td>
+            </tr>
+            <tr>
+              <td class="table-label">Address</td>
+              <td class="table-data">{{ instance.address }}</td>
+            </tr>
+            <tr>
+              <td class="table-label">PID</td>
+              <td class="table-data">{{ instance.pid }}</td>
+            </tr>
+            <tr>
+              <td class="table-label">Created</td>
+              <td class="table-data">{{ instance.created }}</td>
+            </tr>
+            <tr>
+              <td class="table-label">Age</td>
+              <td class="table-data">{{ instance.age }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </mat-card-content>
+    </mat-card>
   </mat-tab>
   <mat-tab label="Metadata">
     <h2>Metadata</h2>
+    <mat-card class="mat-elevation-z8">
+      <mat-card-content>
+        <table>
+          <tbody>
+            <tr>
+              <td class="table-label">Labels</td>
+              <td class="table-data">app:{{ modelYAML.metadata.labels["app"] }}</td>
+            </tr>
+            <tr>
+              <td class="table-label">Created</td>
+              <td class="table-data">{{ modelYAML.metadata.creationTimestamp }}</td>
+            </tr>
+            <tr>
+              <td class="table-label">Annotations</td>
+              <td>
+                <table>
+                  <tbody>
+                    <tr *ngFor="let annotation of annotations">
+                      <td class="dark table-sublabel">{{ annotation }}</td>
+                      <td class="table-data">{{ modelYAML.metadata.annotations[annotation] }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </mat-card-content>
+    </mat-card>
   </mat-tab>
   <mat-tab label="YAML">
     <h2>Deployment</h2>

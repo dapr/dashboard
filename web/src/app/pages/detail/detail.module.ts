@@ -5,6 +5,7 @@ import { DetailComponent } from '../detail/detail.component';
 import { MonacoEditorModule } from 'ng-monaco-editor';
 import { LogsComponent } from './logs/logs.component';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatCardModule } from '@angular/material/card';
 
 @NgModule({
   imports: [
@@ -12,6 +13,7 @@ import { MatTabsModule } from '@angular/material/tabs';
     MonacoEditorModule,
     FormsModule,
     MatTabsModule,
+    MatCardModule,
   ],
   declarations: [
     DetailComponent,

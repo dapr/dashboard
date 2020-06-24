@@ -19,6 +19,7 @@ import (
 // Instances is an interface to interact with running Dapr instances in Kubrernetes or Standalone modes
 type Instances interface {
 	Get() []Instance
+	GetInstance(id string) Instance
 	Delete(id string) error
 	Logs(id string) string
 	Configuration(id string) string
@@ -222,4 +223,14 @@ func (i *instances) getStandaloneInstances() []Instance {
 		}
 	}
 	return list
+}
+
+func (i *instances) GetInstance(id string) Instance {
+	instanceList := i.getInstancesFn()
+	for _, instance := range instanceList {
+		if instance.AppID == id {
+			return instance
+		}
+	}
+	return Instance{}
 }
