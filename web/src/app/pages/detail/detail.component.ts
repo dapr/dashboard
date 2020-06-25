@@ -16,12 +16,16 @@ export class DetailComponent implements OnInit {
   annotations: string[];
   options: Object;
   instance: any;
+  loadedConfiguration: boolean;
+  loadedInstance: boolean;
 
   constructor(
     private route: ActivatedRoute,
     private instances: InstanceService) {}
 
   ngOnInit() {
+    this.loadedConfiguration = false;
+    this.loadedInstance = false;
     this.id = this.route.snapshot.params.id;
     this.getConfiguration(this.id); 
     this.getInstance(this.id);
@@ -38,7 +42,8 @@ export class DetailComponent implements OnInit {
       this.model = data;
       try {
         this.modelYAML = yaml.safeLoad(data);
-        this.annotations = Object.keys(this.modelYAML.metadata.annotations)
+        this.annotations = Object.keys(this.modelYAML.metadata.annotations);
+        this.loadedConfiguration = true;
       } catch (e) {
         this.modelYAML = {};
       }
@@ -48,6 +53,7 @@ export class DetailComponent implements OnInit {
   getInstance(id: string) {
     this.instances.getInstance(id).subscribe((data: any) => {
       this.instance = data;
+      this.loadedInstance = true;
     });
   }
 }

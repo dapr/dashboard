@@ -1,7 +1,7 @@
 <mat-tab-group>
   <mat-tab label="Summary">
     <h2>Summary</h2>
-    <mat-card class="mat-elevation-z8">
+    <mat-card class="mat-elevation-z8" *ngIf="loadedInstance">
       <mat-card-content>
         <table>
           <tbody>
@@ -52,7 +52,7 @@
   </mat-tab>
   <mat-tab label="Metadata">
     <h2>Metadata</h2>
-    <mat-card class="mat-elevation-z8">
+    <mat-card class="mat-elevation-z8" *ngIf="loadedConfiguration">
       <mat-card-content>
         <table>
           <tbody>
