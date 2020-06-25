@@ -45,7 +45,6 @@ func NewInstances(kubeClient *kubernetes.Clientset) Instances {
 		i.kubeClient = kubeClient
 	} else {
 		i.getInstancesFn = i.getStandaloneInstances
-
 	}
 	return &i
 }

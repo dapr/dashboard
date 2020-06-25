@@ -10,6 +10,7 @@ import { DetailModule } from './detail/detail.module';
 import { DaprComponentsModule } from './dapr-components/dapr-components.module';
 import { MatListModule } from '@angular/material/list';
 import { ConfigurationModule } from './configuration/configuration.module';
+import { ControlPlaneModule } from './controlplane/controlplane.module';
 
 @NgModule({
   imports: [
@@ -23,6 +24,7 @@ import { ConfigurationModule } from './configuration/configuration.module';
     MatIconModule,
     MatListModule,
     ConfigurationModule,
+    ControlPlaneModule,
   ],
   declarations: [
     PagesComponent,

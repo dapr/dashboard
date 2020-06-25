@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { OnInit, Component, OnDestroy } from '@angular/core';
 import { InstanceService } from '../../instances/instance.service';
 
 @Component({
@@ -7,20 +7,22 @@ import { InstanceService } from '../../instances/instance.service';
   styleUrls: ['./dashboard.component.scss'],
 })
 
-export class DashboardComponent implements OnDestroy {
+export class DashboardComponent implements OnInit, OnDestroy {
   public data: any[];
   public displayedColumns: string[] = ['name', 'status', 'age'];
   private intervalHandler;
 
-  constructor(private instanceService: InstanceService) {
-    this.getInstances();
-    this.intervalHandler = setInterval(() => { this.getInstances(); }, 3000);
-  }
+  constructor(private instanceService: InstanceService) { }
 
   getInstances() {
     this.instanceService.getInstances().subscribe((data: any[]) => {
       this.data = data;
     });
+  }
+
+  ngOnInit() {
+    this.getInstances();
+    this.intervalHandler = setInterval(() => { this.getInstances(); }, 3000);
   }
 
   ngOnDestroy() {

@@ -7,10 +7,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/dapr/dashboard/pkg/components"
-	"github.com/dapr/dashboard/pkg/configurations"
-	"github.com/dapr/dashboard/pkg/instances"
-	"github.com/dapr/dashboard/pkg/kube"
+	components "github.com/dapr/dashboard/pkg/components"
+	configurations "github.com/dapr/dashboard/pkg/configurations"
+	instances "github.com/dapr/dashboard/pkg/instances"
+	kube "github.com/dapr/dashboard/pkg/kube"
+	status "github.com/dapr/dashboard/pkg/status"
 	"github.com/gorilla/mux"
 )
 
@@ -39,6 +40,7 @@ var etagHeaders = []string{
 var inst instances.Instances
 var comps components.Components
 var configs configurations.Configurations
+var stats status.Status
 
 const port = 8080
 
@@ -48,6 +50,7 @@ func RunWebServer() {
 	inst = instances.NewInstances(kubeClient)
 	comps = components.NewComponents(daprClient)
 	configs = configurations.NewConfigurations(daprClient)
+	stats = status.NewStatus(kubeClient)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/api/features", getFeaturesHandler)
@@ -59,6 +62,7 @@ func RunWebServer() {
 	r.HandleFunc("/api/components/status", getComponentsStatusHandler)
 	r.HandleFunc("/api/configuration/{id}", getConfigurationHandler)
 	r.HandleFunc("/api/daprconfig", getDaprConfigHandler)
+	r.HandleFunc("/api/controlplanestatus", getControlPlaneHandler)
 	r.PathPrefix("/").Handler(noCache(http.StripPrefix("/", http.FileServer(http.Dir(dir)))))
 
 	fmt.Println(fmt.Sprintf("Dapr Dashboard running on http://localhost:%v", port))
@@ -112,6 +116,11 @@ func getInstanceHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	resp := inst.GetInstance(id)
+	respondWithJSON(w, 200, resp)
+}
+
+func getControlPlaneHandler(w http.ResponseWriter, r *http.Request) {
+	resp := stats.Get()
 	respondWithJSON(w, 200, resp)
 }
 
