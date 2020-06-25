@@ -38,10 +38,12 @@ func NewConfigurations(daprClient scheme.Interface) Configurations {
 	}
 }
 
+// Supported checks whether or not the dapr client is available to access the configurations
 func (c *configurations) Supported() bool {
 	return c.daprClient != nil
 }
 
+// Get returns the list of Dapr Configurations
 func (c *configurations) Get() []ConfigurationsOutput {
 	confs, err := c.daprClient.ConfigurationV1alpha1().Configurations(meta_v1.NamespaceAll).List(meta_v1.ListOptions{})
 	if err != nil {
@@ -64,6 +66,7 @@ func (c *configurations) Get() []ConfigurationsOutput {
 	return co
 }
 
+// tracingEnabled checks if tracing is enabled for a configuration
 func tracingEnabled(spec v1alpha1.TracingSpec) bool {
 	sr, err := strconv.ParseFloat(spec.SamplingRate, 32)
 	if err != nil {

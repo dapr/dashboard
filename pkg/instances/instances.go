@@ -50,10 +50,12 @@ func NewInstances(kubeClient *kubernetes.Clientset) Instances {
 	return &i
 }
 
+// Get returns the appropriate environment's GetInstance function
 func (i *instances) Get() []Instance {
 	return i.getInstancesFn()
 }
 
+// Logs returns a string of all logs for the given Dapr app id
 func (i *instances) Logs(id string) string {
 	resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
 	if err != nil || len(resp.Items) == 0 {
@@ -97,6 +99,7 @@ func (i *instances) Logs(id string) string {
 	return ""
 }
 
+// Configuration returns the metadata of a Dapr application in YAML format
 func (i *instances) Configuration(id string) string {
 	resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
 	if err != nil || len(resp.Items) == 0 {
@@ -150,10 +153,12 @@ func (i *instances) Configuration(id string) string {
 	return ""
 }
 
+// Delete deletes the local Dapr sidecar instance
 func (i *instances) Delete(id string) error {
 	return standalone.Stop(id)
 }
 
+// getKubernetesInstances gets the list of Dapr applications running in the Kubernetes environment
 func (i *instances) getKubernetesInstances() []Instance {
 	list := []Instance{}
 	resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
@@ -199,6 +204,7 @@ func (i *instances) getKubernetesInstances() []Instance {
 	return list
 }
 
+// getStandaloneInstances returns the Dapr instances running in the standalone environment
 func (i *instances) getStandaloneInstances() []Instance {
 	list := []Instance{}
 	output, err := standalone.List()
@@ -225,6 +231,7 @@ func (i *instances) getStandaloneInstances() []Instance {
 	return list
 }
 
+// GetInstance uses the appropriate getInstance function (kubernetes, standalone, etc.) and returns the given instance from its id
 func (i *instances) GetInstance(id string) Instance {
 	instanceList := i.getInstancesFn()
 	for _, instance := range instanceList {
