@@ -1,4 +1,13 @@
 <h2>Overview</h2>
+<h3>Dapr System Overview</h3>
+<mat-card class="mat-elevation-z8">
+  <mat-card-content>
+    <p>There are currently {{ controlPlaneHealthiness }}/4 healthy Dapr control plane services.</p>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-raised-button routerLink="/controlplane">Control Plane Information</button>
+  </mat-card-actions>
+</mat-card>
 <h3>Dapr Applications</h3>
 <table mat-table [dataSource]="data" class="mat-elevation-z8">
     <ng-container matColumnDef="name">
