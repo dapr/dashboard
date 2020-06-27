@@ -9,9 +9,11 @@ import { StatusService } from 'src/app/status/status.service';
 })
 
 export class DashboardComponent implements OnInit, OnDestroy {
+
   public data: any[];
   public displayedColumns: string[] = ['name', 'status', 'age'];
-  public controlPlaneHealthiness: number;
+  public daprHealthiness: string;
+  public daprVersion: string;
   private intervalHandler;
 
   constructor(
@@ -21,11 +23,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.getInstances();
-    this.getControlPlaneHealthiness();
-    
-    this.intervalHandler = setInterval(() => { 
+    this.getControlPlaneData();
+
+    this.intervalHandler = setInterval(() => {
       this.getInstances();
-      this.getControlPlaneHealthiness();
+      this.getControlPlaneData();
     }, 3000);
   }
 
@@ -39,15 +41,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  getControlPlaneHealthiness(): void {
-    var totalHealthy = 0;
+  getControlPlaneData(): void {
     this.statusService.getControlPlaneStatus().subscribe((data: any[]) => {
+      this.daprHealthiness = data.every((service) => {
+        return service.Healthy == 'True'
+      }) ? 'Healthy' : 'Unhealthy';
       data.forEach(service => {
-        if (service.Healthy == 'True') {
-          totalHealthy += 1;
-        }
+        this.daprVersion = service.Version;
       });
-      this.controlPlaneHealthiness = totalHealthy;
     });
   }
 }

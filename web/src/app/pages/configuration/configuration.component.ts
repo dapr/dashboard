@@ -9,16 +9,13 @@ import { ConfigurationService } from '../../configuration/configuration.service'
 export class ConfigurationComponent implements OnInit {
 
   public config: any[];
+  public displayedColumns: string[] = ['name', 'tracing-enabled', 'mtls-enabled', 'mtls-workload-ttl', 'mtls-clock-skew', 'age', 'created'];
 
-  constructor(private configService: ConfigurationService) {}
+  constructor(private configService: ConfigurationService) { }
 
   ngOnInit(): void {
     this.getConfiguration();
   }
-
-  public components: any[];
-  public componentsStatus: any[];
-  public displayedColumns: string[] = ['name', 'tracing-enabled', 'mtls-enabled', 'mtls-workload-ttl', 'mtls-clock-skew', 'age', 'created'];
 
   getConfiguration() {
     this.configService.getConfiguration().subscribe((data: any[]) => {

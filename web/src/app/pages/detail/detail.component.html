@@ -1,7 +1,10 @@
+<h2 class="page-header-left" *ngIf="loadedInstance">{{ instance.appID }}</h2>
 <mat-tab-group>
   <mat-tab label="Summary">
-    <h2>Summary</h2>
-    <mat-card class="mat-elevation-z8" *ngIf="loadedInstance">
+    <mat-card class="card-large mat-elevation-z8" *ngIf="loadedInstance">
+      <mat-card-header>
+        <mat-card-title>Summary</mat-card-title>
+      </mat-card-header>
       <mat-card-content>
         <table>
           <tbody>
@@ -51,8 +54,10 @@
     </mat-card>
   </mat-tab>
   <mat-tab label="Metadata">
-    <h2>Metadata</h2>
-    <mat-card class="mat-elevation-z8" *ngIf="loadedConfiguration">
+    <mat-card class="card-large mat-elevation-z8" *ngIf="loadedConfiguration">
+      <mat-card-header>
+        <mat-card-title>Metadata</mat-card-title>
+      </mat-card-header>
       <mat-card-content>
         <table>
           <tbody>
@@ -82,14 +87,14 @@
       </mat-card-content>
     </mat-card>
   </mat-tab>
-  <mat-tab label="YAML">
-    <h2>Deployment</h2>
-    <ng-monaco-editor
-      style="height: 300px"
-      modelUri="file:text.yaml"
-      [options]="options"
-      [(ngModel)]="model"
-    ></ng-monaco-editor>
+  <mat-tab label="Configuration">
+    <mat-card class="card-large mat-elevation-z8">
+      <mat-card-header>
+        <mat-card-title>Deployment</mat-card-title>
+      </mat-card-header>
+      <ng-monaco-editor style="height: 300px" modelUri="file:text.yaml" [options]="options" [(ngModel)]="model">
+      </ng-monaco-editor>
+    </mat-card>
   </mat-tab>
   <mat-tab label="Logs">
     <ngx-logs></ngx-logs>

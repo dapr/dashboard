@@ -10,6 +10,7 @@ import { Log } from './log';
 })
 
 export class LogsComponent implements OnInit {
+
   logs: Log[];
   id: string;
   info: boolean;
@@ -20,18 +21,16 @@ export class LogsComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private instances: InstanceService) { }
+    private instances: InstanceService
+  ) { }
 
   ngOnInit() {
     this.id = this.route.snapshot.params.id;
-    this.getLogs(false);
+    this.getLogs();
   }
 
-  getLogs(showMessage: boolean) {
+  getLogs() {
     this.logs = this.instances.getLogsArray(this.id);
-
-    if (showMessage) {
-    }
   }
 
   isActive(level: string): boolean {

@@ -30,4 +30,4 @@ import { ControlPlaneModule } from './controlplane/controlplane.module';
     PagesComponent,
   ],
 })
-export class PagesModule {}
+export class PagesModule { }

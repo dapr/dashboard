@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { ControlPlaneComponent} from './controlplane.component';
+import { ControlPlaneComponent } from './controlplane.component';
 import { MatTableModule } from '@angular/material/table';
 
 @NgModule({

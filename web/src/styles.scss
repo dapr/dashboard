@@ -1,16 +1,22 @@
-html, body { height: 100%;}
-body { margin: 0; font-family: 'Segoe UI', sans-serif; }
+html,
+body {
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+body {
+    margin: 0;
+}
+
+ngx-app {
+    position: relative;
+    height: 100%;
+}
 
 #loader-container {
     height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-ngx-app {
-    position: relative;
-    height: 100%;
 }
 
 #loader {
@@ -23,23 +29,10 @@ ngx-app {
 }
 
 @keyframes loading {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-h1 {
-    color: #333333;
-    font-size: 5vh;
-  }
-
-h2 {
-    padding: 20px;
-    color: #444444;
-    font-size: 24px;
-}
-
-h3 {
-    padding-left: 5%;
-    color: #555555;
-    font-size: 20px;
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }

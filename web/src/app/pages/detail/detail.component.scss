@@ -1,39 +1,9 @@
-table {
-    border-spacing: 0px;
-}
-
-mat-card {
-    width: 90%;
-    margin: auto;
-    margin-bottom: 100px;
-}
-
-ng-monaco-editor {
-    width: 90%;
-    margin: auto;
-    height: 70%;
-}
+@use '../../theme/pages.scss';
+@use '../../theme/tables.scss';
+@use '../../theme/cards.scss';
 
 td {
-    padding: 7px;
     vertical-align: top;
-}
-
-.table-label {
-    font-weight: 500;
-    font-size: 14px;
-}
-
-.table-data {
-    font-weight: 200;
-    font-size: 12px;
-    color: #666666
-}
-
-.table-sublabel {
-    font-weight: 500;
-    font-size: 13px;
-    color: #666666
 }
 
 .dark {

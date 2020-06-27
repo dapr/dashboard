@@ -8,10 +8,10 @@ import { StatusService } from '../../status/status.service';
 })
 export class ControlPlaneComponent implements OnInit {
 
-  public displayedColumns: string[] = ['name', 'namespace', 'healthy', 'status', 'version', 'age', 'created'];
   public data: any[];
+  public displayedColumns: string[] = ['name', 'namespace', 'healthy', 'status', 'version', 'age', 'created'];
 
-  constructor(private statusService: StatusService) {}
+  constructor(private statusService: StatusService) { }
 
   ngOnInit(): void {
     this.getControlPlaneStatus();
@@ -20,7 +20,6 @@ export class ControlPlaneComponent implements OnInit {
   getControlPlaneStatus() {
     this.statusService.getControlPlaneStatus().subscribe((data: any[]) => {
       this.data = data;
-      console.log(data);
     });
   }
 }

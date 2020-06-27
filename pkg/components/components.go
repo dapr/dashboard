@@ -40,7 +40,7 @@ func (c *components) Supported() bool {
 	return c.daprClient != nil
 }
 
-// Get returns the list of Dapr componenets
+// Get returns the list of Dapr components
 func (c *components) Get() []v1alpha1.Component {
 	comps, err := c.daprClient.ComponentsV1alpha1().Components(meta_v1.NamespaceDefault).List(meta_v1.ListOptions{})
 	if err != nil {

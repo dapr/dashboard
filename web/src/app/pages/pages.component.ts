@@ -9,13 +9,14 @@ import { MatSidenav } from '@angular/material/sidenav';
   templateUrl: 'pages.component.html',
 })
 export class PagesComponent {
+
   menu: MenuItem[] = MENU_ITEMS;
 
   constructor(private features: FeaturesService) {
     this.getFeatures();
   }
 
-  @ViewChild('drawer', { static: false }) 
+  @ViewChild('drawer', { static: false })
   drawer: MatSidenav;
 
   getFeatures() {

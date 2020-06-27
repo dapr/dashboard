@@ -9,25 +9,26 @@ import * as yaml from 'js-yaml';
   styleUrls: ['./detail.component.scss'],
 })
 export class DetailComponent implements OnInit {
-  private id: string;
 
-  model: string;
-  modelYAML: any;
-  annotations: string[];
-  options: Object;
-  instance: any;
-  loadedConfiguration: boolean;
-  loadedInstance: boolean;
+  private id: string;
+  public model: string;
+  public modelYAML: any;
+  public annotations: string[];
+  public options: Object;
+  public instance: any;
+  public loadedConfiguration: boolean;
+  public loadedInstance: boolean;
 
   constructor(
     private route: ActivatedRoute,
-    private instances: InstanceService) {}
+    private instances: InstanceService
+  ) { }
 
   ngOnInit() {
     this.loadedConfiguration = false;
     this.loadedInstance = false;
     this.id = this.route.snapshot.params.id;
-    this.getConfiguration(this.id); 
+    this.getConfiguration(this.id);
     this.getInstance(this.id);
     this.options = {
       folding: true,

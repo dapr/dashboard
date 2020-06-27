@@ -25,5 +25,4 @@ import { MonacoEditorModule, MonacoProviderService } from 'ng-monaco-editor';
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {
-}
+export class AppModule { }

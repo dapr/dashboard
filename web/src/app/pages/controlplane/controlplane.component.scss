@@ -1,4 +1,2 @@
-table {
-    width: 90%;
-    margin: auto;
-}
+@use '../../theme/pages.scss';
+@use '../../theme/tables.scss';
