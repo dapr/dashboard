@@ -159,7 +159,10 @@ github.com/dapr/components-contrib v0.0.0-20200131172708-1fba8dd4b024/go.mod h1:
 github.com/dapr/components-contrib v0.0.0-20200219164914-5b75f4d0fbc6/go.mod h1:AZi8IGs8LFdywJg/YGwDs7MAxJkvGa8RgHN4NoJSKt0=
 github.com/dapr/components-contrib v0.0.0-20200331025048-fe9b90075a54/go.mod h1:c3KXN49vGYGeccF7i1Hq7T8a0VzV/r8891Yi2HmulC8=
 github.com/dapr/components-contrib v0.0.0-20200430212123-b647397b2c81/go.mod h1:D+yWYWWStM7YQzQHhBs2+7/6RyqNHFKnyujbsPzfsnI=
+<<<<<<< HEAD
 github.com/dapr/components-contrib v0.1.0/go.mod h1:aaRt+DpVrufMTIM3eXaNjPf/eOLHmcQYDpMl0Qr/F3Q=
+=======
+>>>>>>> origin/develop
 github.com/dapr/dapr v0.1.0 h1:BoWUOPqm4axCNL+M0hBIu21PQiOGhkOJ8NiwC1UPTrU=
 github.com/dapr/dapr v0.1.0/go.mod h1:Q0Pp3G8ADCGs+giaSxdc8aIN83qMzF0k5+KTvNJVpUg=
 github.com/dapr/dapr v0.3.0-rc.0.0.20200203194726-e540a7166aea/go.mod h1:jwsNz0vHrGyv5wuE0YcmIKmMuvaLGhij3Uy/00Jo/wE=
@@ -168,8 +171,11 @@ github.com/dapr/dapr v0.6.0 h1:wGe4S/yspL2DEUd5irL8zeRoNcT/nH8BM/UlWvKY0oo=
 github.com/dapr/dapr v0.6.0/go.mod h1:QRn+lHAR+3fS+HsdVykolRn0108I0LzhMJ+4uL+4LNM=
 github.com/dapr/dapr v0.7.1 h1:Aojq7EsiXhYKzvpQlXxe1R1/mluT+OCzKHrKaxrR8kI=
 github.com/dapr/dapr v0.7.1/go.mod h1:aFq3/2Ks7wHY7TE6GN3wR2BCjiw7y3GcP1LrJrniftw=
+<<<<<<< HEAD
 github.com/dapr/dapr v0.8.0 h1:seo+AONylwqiuSn0ilrpkMKicOr8HA9Bzkmepjyp90M=
 github.com/dapr/dapr v0.8.0/go.mod h1:C3r6PcHQ0k3Y1FE8/FRTDl6PbaXhZ6n3WCxDkvGEAV8=
+=======
+>>>>>>> origin/develop
 github.com/dapr/go-sdk v0.0.0-20200121181907-48249cda2fad/go.mod h1:yeOIFBz6+BigHpk4ASJbgQDVjQ8+00oCWrFyOAFdob8=
 github.com/dapr/go-sdk v0.0.0-20200312165010-7bb7a2205f3b/go.mod h1:yeOIFBz6+BigHpk4ASJbgQDVjQ8+00oCWrFyOAFdob8=
 github.com/davecgh/go-spew v0.0.0-20151105211317-5215b55f46b2/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -415,7 +421,10 @@ github.com/klauspost/compress v1.4.0/go.mod h1:RyIbtBH6LamlWaDj8nUwkbUhJ87Yi3uG0
 github.com/klauspost/compress v1.5.0 h1:iDac0ZKbmSA4PRrRuXXjZL8C7UoJan8oBYxXkMzEQrI=
 github.com/klauspost/compress v1.5.0/go.mod h1:RyIbtBH6LamlWaDj8nUwkbUhJ87Yi3uG0guNDohfE1A=
 github.com/klauspost/compress v1.8.2/go.mod h1:RyIbtBH6LamlWaDj8nUwkbUhJ87Yi3uG0guNDohfE1A=
+<<<<<<< HEAD
 github.com/klauspost/compress v1.9.2/go.mod h1:RyIbtBH6LamlWaDj8nUwkbUhJ87Yi3uG0guNDohfE1A=
+=======
+>>>>>>> origin/develop
 github.com/klauspost/compress v1.10.4/go.mod h1:aoV0uJVorq1K+umq18yTdKaF57EivdYsUV+/s2qKfXs=
 github.com/klauspost/cpuid v0.0.0-20180405133222-e7e905edc00e/go.mod h1:Pj4uuM528wm8OyEC2QMXAi2YiTZ96dNQPGgoMS4s3ek=
 github.com/klauspost/cpuid v1.2.1 h1:vJi+O/nMdFt0vqm8NZBI6wzALWdA2X+egi0ogNyrC/w=
