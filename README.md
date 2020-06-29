@@ -3,7 +3,7 @@
 The Dapr Dashboard is a web-based UI for Dapr, allowing users to see information, view logs and more for the Dapr sidecars running either locally or in a Kubernetes cluster.
 
 <p style="text-align:center">
-  <img src="img/img.png">
+  <img src="img/img.PNG">
 </p>
 
 ## Features
