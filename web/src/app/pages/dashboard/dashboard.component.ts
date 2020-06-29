@@ -11,7 +11,7 @@ import { StatusService } from 'src/app/status/status.service';
 export class DashboardComponent implements OnInit, OnDestroy {
 
   public data: any[];
-  public displayedColumns: string[] = ['name', 'status', 'age'];
+  public displayedColumns: string[] = ['name', 'labels', 'status', 'age', 'selector'];
   public daprHealthiness: string;
   public daprVersion: string;
   private intervalHandler;

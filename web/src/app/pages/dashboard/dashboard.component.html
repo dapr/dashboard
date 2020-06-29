@@ -1,15 +1,15 @@
 <h2 class="page-header">Overview</h2>
-<h3 class="card-header">Dapr System Status</h3>
+<h3 class="card-header">Dapr Control Plane</h3>
 <mat-card class="card-small mat-elevation-z8">
   <mat-card-content>
     <table>
       <tbody>
         <tr>
-          <td class="table-label">Dapr Version</td>
+          <td class="table-label">Version</td>
           <td class="table-data">v{{ daprVersion }}</td>
         </tr>
         <tr>
-          <td class="table-label">Dapr Status</td>
+          <td class="table-label">Status</td>
           <td class="table-data">{{ daprHealthiness }}</td>
         </tr>
       </tbody>
@@ -25,6 +25,10 @@
     <th mat-header-cell *matHeaderCellDef>Name</th>
     <td mat-cell *matCellDef="let item"><a routerLink="/detail/{{item.appID}}">{{ item.appID }}</a></td>
   </ng-container>
+  <ng-container matColumnDef="labels">
+    <th mat-header-cell *matHeaderCellDef>Labels</th>
+    <td mat-cell *matCellDef="let item">{{ item.labels }}</td>
+  </ng-container>
   <ng-container matColumnDef="status">
     <th mat-header-cell *matHeaderCellDef>Status</th>
     <td mat-cell *matCellDef="let item">{{ item.status }}</td>
@@ -32,6 +36,10 @@
   <ng-container matColumnDef="age">
     <th mat-header-cell *matHeaderCellDef>Age</th>
     <td mat-cell *matCellDef="let item">{{ item.age }}</td>
+  </ng-container>
+  <ng-container matColumnDef="selector">
+    <th mat-header-cell *matHeaderCellDef>Selector</th>
+    <td mat-cell *matCellDef="let item">{{ item.selector }}</td>
   </ng-container>
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>

@@ -182,6 +182,8 @@ func (i *instances) getKubernetesInstances() []Instance {
 				SupportsLogs:     true,
 				Address:          fmt.Sprintf("%s-dapr:80", id),
 				Status:           fmt.Sprintf("%d/%d", d.Status.ReadyReplicas, d.Status.Replicas),
+				Labels:           "app:" + d.Labels["app"],
+				Selector:         "app:" + d.Labels["app"],
 			}
 
 			if val, ok := d.Spec.Template.Annotations[daprPortAnnotation]; ok {

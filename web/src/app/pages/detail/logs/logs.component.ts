@@ -11,13 +11,13 @@ import { Log } from './log';
 
 export class LogsComponent implements OnInit {
 
-  logs: Log[];
-  id: string;
-  info: boolean;
-  debug: boolean;
-  warning: boolean;
-  error: boolean;
-  fatal: boolean;
+  public logs: Log[];
+  public id: string;
+  public info: boolean;
+  public debug: boolean;
+  public warning: boolean;
+  public error: boolean;
+  public fatal: boolean;
 
   constructor(
     private route: ActivatedRoute,

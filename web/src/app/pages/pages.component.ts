@@ -10,9 +10,9 @@ import { MatSidenav } from '@angular/material/sidenav';
 })
 export class PagesComponent {
 
-  menu: MenuItem[] = MENU_ITEMS;
-  isMenuOpen = true;
-  contentMargin = 240;
+  public menu: MenuItem[] = MENU_ITEMS;
+  public isMenuOpen = false;
+  public contentMargin = 60;
 
   constructor(private features: FeaturesService) {
     this.getFeatures();
