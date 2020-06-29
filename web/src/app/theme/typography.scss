@@ -1,0 +1,7 @@
+@import '~@angular/material/theming';
+
+$custom-typography: mat-typography-config(
+  $font-family: 'Segoe UI, sans-serif',
+);
+
+@include angular-material-typography($custom-typography);
