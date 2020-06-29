@@ -11,6 +11,8 @@ import { MatSidenav } from '@angular/material/sidenav';
 export class PagesComponent {
 
   menu: MenuItem[] = MENU_ITEMS;
+  isMenuOpen = true;
+  contentMargin = 240;
 
   constructor(private features: FeaturesService) {
     this.getFeatures();
@@ -27,5 +29,16 @@ export class PagesComponent {
         }
       }
     });
+  }
+
+  onDrawerToggle() {
+    console.log('On drwaer togglesd', this.isMenuOpen);
+    this.isMenuOpen = !this.isMenuOpen;
+    if (!this.isMenuOpen) {
+      this.contentMargin = 60;
+    }
+    else {
+      this.contentMargin = 240;
+    }
   }
 }

@@ -9,8 +9,7 @@
 #header-image {
   height: 85%;
   width: auto;
-  padding-left: 3%;
-  padding-right: 1%;
+  margin-right: 1%;
 }
 
 mat-icon:hover {
@@ -18,7 +17,6 @@ mat-icon:hover {
 }
 
 mat-icon {
-  position: relative;
   color: #888888;
 }
 
@@ -29,11 +27,6 @@ mat-icon {
 
 .sidenav-container {
   height: 85%;
-
-  .sidenav {
-    width: 15%;
-    background-color: #fff;
-  }
 }
 
 .navigation-item.active {
@@ -50,21 +43,10 @@ mat-nav-list {
   padding-left: 20px;
 }
 
-mat-sidenav:not(.mat-drawer-opened) {
-  transform: translate3d(0, 0, 0) !important;
-  visibility: visible !important;
-  width: 60px !important;
-  overflow: hidden;
+.sidenav.menu-close {
+  width: 60px;
 }
 
-mat-sidenav:not(.mat-drawer-opened) .navigation-item-label {
-  display: none !important;
-}
-
-mat-sidenav:not(.mat-drawer-opened) .home-button {
-  display: none !important;
-}
-
-.body {
-  padding-left: 60px;
+.sidenav.menu-open {
+  width: 200px;
 }

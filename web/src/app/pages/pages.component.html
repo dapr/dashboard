@@ -1,13 +1,18 @@
 <mat-toolbar class="pages-header mat-elevation-z5">
-  <mat-icon aria-hidden="false" aria-label="Open Sidebar" (click)="drawer.toggle()">format_list_bulleted</mat-icon>
   <img src="../../assets/images/dapr.png" id="header-image">
   <h1 class="app-header">Dashboard</h1>
 </mat-toolbar>
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #drawer class="sidenav"
-      mode="over"
-      opened="false">
+      mode="side"
+      [class.menu-open]="isMenuOpen"
+      [class.menu-close]="!isMenuOpen"
+      opened>
     <mat-nav-list class="navigation-list">
+      <a class="navigation-item" mat-list-item (click)="onDrawerToggle()">
+        <mat-icon class="material-icons">{{ isMenuOpen? 'chevron_left' : 'chevron_right' }}</mat-icon><span class="navigation-item-label"></span>
+      </a>
+      <mat-divider class="navigation-divider"></mat-divider>
       <a class="navigation-item" mat-list-item routerLink="/dashboard" routerLinkActive="active">
         <mat-icon class="material-icons">home</mat-icon><span class="navigation-item-label">Overview</span>
       </a>
@@ -19,10 +24,14 @@
       <a class="navigation-item" mat-list-item routerLink="/configuration" routerLinkActive="active">
         <mat-icon class="material-icons">build</mat-icon><span class="navigation-item-label">Configurations</span>
       </a>
+      <mat-divider class="navigation-divider"></mat-divider>
       <a class="navigation-item" mat-list-item routerLink="/controlplane" routerLinkActive="active">
         <mat-icon class="material-icons">settings</mat-icon><span class="navigation-item-label">Control Plane</span>
       </a>
     </mat-nav-list>
   </mat-sidenav>
-  <div class="body"><router-outlet></router-outlet></div>
+  <mat-sidenav-content
+    [ngStyle]="{ 'margin-left.px': contentMargin }">
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
 </mat-sidenav-container>
