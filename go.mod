@@ -3,12 +3,8 @@ module github.com/dapr/dashboard
 go 1.13
 
 require (
-<<<<<<< HEAD
 	github.com/dapr/cli v0.8.0
 	github.com/dapr/dapr v0.8.0
-=======
-	github.com/dapr/dapr v0.7.1
->>>>>>> origin/develop
 	github.com/dapr/go-sdk v0.0.0-20200312165010-7bb7a2205f3b // indirect
 	github.com/gorilla/mux v1.7.3
 	github.com/joomcode/errorx v1.0.1 // indirect
