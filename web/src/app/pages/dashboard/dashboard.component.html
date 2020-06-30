@@ -1,24 +1,26 @@
 <h2 class="page-header">Overview</h2>
-<h3 class="card-header">Dapr Control Plane</h3>
-<mat-card class="card-tiny mat-elevation-z8">
-  <mat-card-content>
-    <table>
-      <tbody>
-        <tr>
-          <td class="table-label">Version</td>
-          <td class="table-data">v{{ daprVersion }}</td>
-        </tr>
-        <tr>
-          <td class="table-label">Status</td>
-          <td class="table-data">{{ daprHealthiness }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </mat-card-content>
-  <mat-card-actions>
-    <button mat-raised-button routerLink="/controlplane">More Information</button>
-  </mat-card-actions>
-</mat-card>
+<ng-container *ngIf="this.globals.kubernetesEnabled">
+  <h3 class="card-header">Dapr Control Plane</h3>
+  <mat-card  class="card-tiny mat-elevation-z8">
+    <mat-card-content>
+      <table>
+        <tbody>
+          <tr>
+            <td class="table-label">Version</td>
+            <td class="table-data">v{{ daprVersion }}</td>
+          </tr>
+          <tr>
+            <td class="table-label">Status</td>
+            <td class="table-data">{{ daprHealthiness }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button routerLink="/controlplane">More Information</button>
+    </mat-card-actions>
+  </mat-card>
+</ng-container>
 <h3 class="table-header">Dapr Applications</h3>
 <table mat-table [dataSource]="data" class="table-large mat-elevation-z8">
   <ng-container matColumnDef="name">

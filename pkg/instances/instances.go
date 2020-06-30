@@ -23,6 +23,7 @@ type Instances interface {
 	Delete(id string) error
 	Logs(id string) string
 	Configuration(id string) string
+	CheckSupportedEnvironments() []string
 }
 
 type instances struct {
@@ -54,102 +55,120 @@ func (i *instances) Get() []Instance {
 	return i.getInstancesFn()
 }
 
+// CheckSupportedEnvironments checks for valid environments for Dapr applications to run in
+func (i *instances) CheckSupportedEnvironments() []string {
+	envs := make([]string, 2)
+	if i.kubeClient != nil {
+		envs = append(envs, "kubernetes")
+	}
+	envs = append(envs, "standalone")
+	return envs
+}
+
 // Logs returns a string of all logs for the given Dapr app id
 func (i *instances) Logs(id string) string {
-	resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
-	if err != nil || len(resp.Items) == 0 {
-		return ""
-	}
+	if i.kubeClient != nil {
+		resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
+		if err != nil || len(resp.Items) == 0 {
+			return ""
+		}
 
-	for _, d := range resp.Items {
-		if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
-			daprID := d.Spec.Template.Annotations[daprIDAnnotation]
-			if daprID == id {
-				pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(meta_v1.ListOptions{
-					LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
-				})
-				if err != nil {
-					log.Println(err)
-					return ""
-				}
-
-				for _, p := range pods.Items {
-					name := p.ObjectMeta.Name
-
-					options := v1.PodLogOptions{}
-					options.Container = "daprd"
-
-					logs := i.kubeClient.CoreV1().Pods(p.ObjectMeta.Namespace).GetLogs(name, &options)
-					arr, err := logs.Stream()
+		for _, d := range resp.Items {
+			if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
+				daprID := d.Spec.Template.Annotations[daprIDAnnotation]
+				if daprID == id {
+					pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(meta_v1.ListOptions{
+						LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
+					})
 					if err != nil {
 						log.Println(err)
 						return ""
 					}
 
-					buf := new(bytes.Buffer)
-					buf.ReadFrom(arr)
-					logsStr := buf.String()
+					for _, p := range pods.Items {
+						name := p.ObjectMeta.Name
 
-					return logsStr
+						options := v1.PodLogOptions{}
+						options.Container = "daprd"
+
+						logs := i.kubeClient.CoreV1().Pods(p.ObjectMeta.Namespace).GetLogs(name, &options)
+						arr, err := logs.Stream()
+						if err != nil {
+							log.Println(err)
+							return ""
+						}
+
+						buf := new(bytes.Buffer)
+						buf.ReadFrom(arr)
+						logsStr := buf.String()
+
+						return logsStr
+					}
 				}
 			}
 		}
+		return ""
+	} else {
+		return ""
 	}
-	return ""
 }
 
 // Configuration returns the metadata of a Dapr application in YAML format
 func (i *instances) Configuration(id string) string {
-	resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
-	if err != nil || len(resp.Items) == 0 {
-		return ""
-	}
+	if i.kubeClient != nil {
+		resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
+		if err != nil || len(resp.Items) == 0 {
+			return ""
+		}
 
-	for _, d := range resp.Items {
-		if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
-			daprID := d.Spec.Template.Annotations[daprIDAnnotation]
-			if daprID == id {
-				pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(meta_v1.ListOptions{
-					LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
-				})
-				if err != nil {
-					log.Println(err)
-					return ""
-				}
-
-				for _, p := range pods.Items {
-					name := p.ObjectMeta.Name
-					nspace := p.ObjectMeta.Namespace
-
-					restClient := i.kubeClient.CoreV1().RESTClient()
+		for _, d := range resp.Items {
+			if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
+				daprID := d.Spec.Template.Annotations[daprIDAnnotation]
+				if daprID == id {
+					pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(meta_v1.ListOptions{
+						LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
+					})
 					if err != nil {
 						log.Println(err)
 						return ""
 					}
 
-					url := fmt.Sprintf("/api/v1/namespaces/%s/pods/%s", nspace, name)
-					data, err := restClient.Get().RequestURI(url).Stream()
-					if err != nil {
-						log.Println(err)
-						return ""
-					}
+					for _, p := range pods.Items {
+						name := p.ObjectMeta.Name
+						nspace := p.ObjectMeta.Namespace
 
-					buf := new(bytes.Buffer)
-					buf.ReadFrom(data)
-					dataStr := buf.String()
-					j := []byte(dataStr)
-					y, err := yaml.JSONToYAML(j)
-					if err != nil {
-						log.Println(err)
-						return ""
-					}
+						restClient := i.kubeClient.CoreV1().RESTClient()
+						if err != nil {
+							log.Println(err)
+							return ""
+						}
 
-					return string(y)
+						url := fmt.Sprintf("/api/v1/namespaces/%s/pods/%s", nspace, name)
+						data, err := restClient.Get().RequestURI(url).Stream()
+						if err != nil {
+							log.Println(err)
+							return ""
+						}
+
+						buf := new(bytes.Buffer)
+						buf.ReadFrom(data)
+						dataStr := buf.String()
+						j := []byte(dataStr)
+						y, err := yaml.JSONToYAML(j)
+						if err != nil {
+							log.Println(err)
+							return ""
+						}
+
+						return string(y)
+					}
 				}
 			}
 		}
+		return ""
+	} else {
+		return ""
 	}
-	return ""
 }
 
 // Delete deletes the local Dapr sidecar instance

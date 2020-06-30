@@ -1,6 +1,7 @@
 import { OnInit, Component, OnDestroy } from '@angular/core';
 import { InstanceService } from '../../instances/instance.service';
 import { StatusService } from 'src/app/status/status.service';
+import { GlobalsService } from 'src/app/globals/globals.service'
 
 @Component({
   selector: 'ngx-dashboard',
@@ -11,19 +12,25 @@ import { StatusService } from 'src/app/status/status.service';
 export class DashboardComponent implements OnInit, OnDestroy {
 
   public data: any[];
-  public displayedColumns: string[] = ['name', 'labels', 'status', 'age', 'selector'];
+  public displayedColumns: string[];
   public daprHealthiness: string;
   public daprVersion: string;
   private intervalHandler;
 
   constructor(
     private instanceService: InstanceService,
-    private statusService: StatusService
+    private statusService: StatusService,
+    public globals: GlobalsService,
   ) { }
 
   ngOnInit() {
     this.getInstances();
     this.getControlPlaneData();
+    if (this.globals.kubernetesEnabled) {
+      this.displayedColumns = ['name', 'labels', 'status', 'age', 'selector'];
+    } else {
+      this.displayedColumns = ['name', 'age'];
+    }
 
     this.intervalHandler = setInterval(() => {
       this.getInstances();

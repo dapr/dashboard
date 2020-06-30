@@ -62,6 +62,7 @@ func RunWebServer() {
 	r.HandleFunc("/api/components/status", getComponentsStatusHandler)
 	r.HandleFunc("/api/configuration/{id}", getConfigurationHandler)
 	r.HandleFunc("/api/daprconfig", getDaprConfigHandler)
+	r.HandleFunc("/api/environments", getEnvironmentsHandler)
 	r.HandleFunc("/api/controlplanestatus", getControlPlaneHandler)
 	r.PathPrefix("/").Handler(noCache(http.StripPrefix("/", http.FileServer(http.Dir(dir)))))
 
@@ -86,11 +87,21 @@ func getComponentsStatusHandler(w http.ResponseWriter, r *http.Request) {
 
 func getFeaturesHandler(w http.ResponseWriter, r *http.Request) {
 	features := []string{}
-
 	if comps.Supported() {
 		features = append(features, "components")
 	}
+	if configs.Supported() {
+		features = append(features, "configurations")
+	}
+	if stats.Supported() {
+		features = append(features, "status")
+	}
 	respondWithJSON(w, 200, features)
+}
+
+func getEnvironmentsHandler(w http.ResponseWriter, r *http.Request) {
+	resp := inst.CheckSupportedEnvironments()
+	respondWithJSON(w, 200, resp)
 }
 
 func getLogsHandler(w http.ResponseWriter, r *http.Request) {

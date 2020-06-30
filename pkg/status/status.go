@@ -50,62 +50,66 @@ func (s *status) Supported() bool {
 
 // Get lists the status of each of the Dapr control plane services
 func (s *status) Get() []StatusOutput {
-	var wg sync.WaitGroup
-	wg.Add(len(controlPlaneLabels))
+	if s.Supported() {
+		var wg sync.WaitGroup
+		wg.Add(len(controlPlaneLabels))
 
-	m := sync.Mutex{}
-	statuses := []StatusOutput{}
+		m := sync.Mutex{}
+		statuses := []StatusOutput{}
 
-	for _, lbl := range controlPlaneLabels {
-		go func(label string) {
-			options := v1.ListOptions{}
-			labelSelector := map[string]string{
-				"app": label,
-			}
-			options.LabelSelector = labels.FormatLabels(labelSelector)
-
-			p, err := s.kubeClient.CoreV1().Pods(v1.NamespaceAll).List(options)
-			if err == nil && len(p.Items) == 1 {
-				pod := p.Items[0]
-
-				image := pod.Spec.Containers[0].Image
-				namespace := pod.GetNamespace()
-				age := age.GetAge(pod.CreationTimestamp.Time)
-				created := pod.CreationTimestamp.Format("2006-01-02 15:04.05")
-				version := image[strings.IndexAny(image, ":")+1:]
-				status := ""
-
-				if pod.Status.ContainerStatuses[0].State.Waiting != nil {
-					status = fmt.Sprintf("Waiting (%s)", pod.Status.ContainerStatuses[0].State.Waiting.Reason)
-				} else if pod.Status.ContainerStatuses[0].State.Running != nil {
-					status = "Running"
-				} else if pod.Status.ContainerStatuses[0].State.Terminated != nil {
-					status = "Terminated"
+		for _, lbl := range controlPlaneLabels {
+			go func(label string) {
+				options := v1.ListOptions{}
+				labelSelector := map[string]string{
+					"app": label,
 				}
+				options.LabelSelector = labels.FormatLabels(labelSelector)
 
-				healthy := "False"
-				if pod.Status.ContainerStatuses[0].Ready {
-					healthy = "True"
+				p, err := s.kubeClient.CoreV1().Pods(v1.NamespaceAll).List(options)
+				if err == nil && len(p.Items) == 1 {
+					pod := p.Items[0]
+
+					image := pod.Spec.Containers[0].Image
+					namespace := pod.GetNamespace()
+					age := age.GetAge(pod.CreationTimestamp.Time)
+					created := pod.CreationTimestamp.Format("2006-01-02 15:04.05")
+					version := image[strings.IndexAny(image, ":")+1:]
+					status := ""
+
+					if pod.Status.ContainerStatuses[0].State.Waiting != nil {
+						status = fmt.Sprintf("Waiting (%s)", pod.Status.ContainerStatuses[0].State.Waiting.Reason)
+					} else if pod.Status.ContainerStatuses[0].State.Running != nil {
+						status = "Running"
+					} else if pod.Status.ContainerStatuses[0].State.Terminated != nil {
+						status = "Terminated"
+					}
+
+					healthy := "False"
+					if pod.Status.ContainerStatuses[0].Ready {
+						healthy = "True"
+					}
+
+					s := StatusOutput{
+						Name:      label,
+						Namespace: namespace,
+						Created:   created,
+						Age:       age,
+						Status:    status,
+						Version:   version,
+						Healthy:   healthy,
+					}
+
+					m.Lock()
+					statuses = append(statuses, s)
+					m.Unlock()
 				}
+				wg.Done()
+			}(lbl)
+		}
 
-				s := StatusOutput{
-					Name:      label,
-					Namespace: namespace,
-					Created:   created,
-					Age:       age,
-					Status:    status,
-					Version:   version,
-					Healthy:   healthy,
-				}
-
-				m.Lock()
-				statuses = append(statuses, s)
-				m.Unlock()
-			}
-			wg.Done()
-		}(lbl)
+		wg.Wait()
+		return statuses
+	} else {
+		return []StatusOutput{}
 	}
-
-	wg.Wait()
-	return statuses
 }

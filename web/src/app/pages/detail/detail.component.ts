@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { InstanceService } from '../../instances/instance.service';
 import { ActivatedRoute } from '@angular/router';
 import * as yaml from 'js-yaml';
+import { GlobalsService } from 'src/app/globals/globals.service';
 
 @Component({
   selector: 'ngx-detail',
@@ -21,7 +22,8 @@ export class DetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private instances: InstanceService
+    private instances: InstanceService,
+    public globals: GlobalsService,
   ) { }
 
   ngOnInit() {
