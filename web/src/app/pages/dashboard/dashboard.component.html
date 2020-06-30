@@ -1,7 +1,7 @@
 <h2 class="page-header">Overview</h2>
 <ng-container *ngIf="this.globals.kubernetesEnabled">
   <h3 class="card-header">Dapr Control Plane</h3>
-  <mat-card  class="card-tiny mat-elevation-z8">
+  <mat-card class="card-tiny mat-elevation-z8">
     <mat-card-content>
       <table>
         <tbody>
@@ -42,6 +42,10 @@
   <ng-container matColumnDef="selector">
     <th mat-header-cell *matHeaderCellDef>Selector</th>
     <td mat-cell *matCellDef="let item">{{ item.selector }}</td>
+  </ng-container>
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef>Actions</th>
+    <td mat-cell *matCellDef="let item"><mat-icon (click)="delete(item.appID)">delete</mat-icon></td>
   </ng-container>
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>

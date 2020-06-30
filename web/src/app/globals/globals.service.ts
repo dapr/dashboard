@@ -12,14 +12,6 @@ export class GlobalsService {
   constructor(private http: HttpClient) { }
 
   getSupportedEnvironments() {
-    this.http.get('/api/environments').subscribe(data => {
-      let supportedEnvironments = <Array<any>>data;
-      if (supportedEnvironments.includes("kubernetes")) {
-        this.kubernetesEnabled = true;
-      }
-      else if (supportedEnvironments.includes("standalone")) {
-        this.standaloneEnabled = true;
-      }
-    });
+    return this.http.get('/api/environments');
   }
 }

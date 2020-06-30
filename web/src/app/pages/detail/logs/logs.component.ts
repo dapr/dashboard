@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { InstanceService } from '../../../instances/instance.service';
 import { Log } from './log';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'ngx-logs',
@@ -21,16 +22,20 @@ export class LogsComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private instances: InstanceService
+    private instances: InstanceService,
+    private snackbar: MatSnackBar,
   ) { }
 
   ngOnInit() {
     this.id = this.route.snapshot.params.id;
-    this.getLogs();
+    this.getLogs(false);
   }
 
-  getLogs() {
+  getLogs(refresh: boolean) {
     this.logs = this.instances.getLogsArray(this.id);
+    if (refresh) {
+      this.showSnackbar('Logs successfully refreshed');
+    }
   }
 
   isActive(level: string): boolean {
@@ -40,5 +45,11 @@ export class LogsComponent implements OnInit {
     if (level === "error") return this.error;
     if (level === "fatal") return this.fatal;
     return false;
+  }
+
+  showSnackbar(message: string) {
+    this.snackbar.open(message, '', {
+      duration: 2000,
+    });
   }
 }

@@ -1,7 +1,8 @@
 import { OnInit, Component, OnDestroy } from '@angular/core';
 import { InstanceService } from '../../instances/instance.service';
 import { StatusService } from 'src/app/status/status.service';
-import { GlobalsService } from 'src/app/globals/globals.service'
+import { GlobalsService } from 'src/app/globals/globals.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'ngx-dashboard',
@@ -12,7 +13,7 @@ import { GlobalsService } from 'src/app/globals/globals.service'
 export class DashboardComponent implements OnInit, OnDestroy {
 
   public data: any[];
-  public displayedColumns: string[];
+  public displayedColumns: string[] = [];
   public daprHealthiness: string;
   public daprVersion: string;
   private intervalHandler;
@@ -21,6 +22,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private instanceService: InstanceService,
     private statusService: StatusService,
     public globals: GlobalsService,
+    private snackbar: MatSnackBar,
   ) { }
 
   ngOnInit() {
@@ -29,7 +31,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (this.globals.kubernetesEnabled) {
       this.displayedColumns = ['name', 'labels', 'status', 'age', 'selector'];
     } else {
-      this.displayedColumns = ['name', 'age'];
+      this.displayedColumns = ['name', 'age', 'actions'];
     }
 
     this.intervalHandler = setInterval(() => {
@@ -40,6 +42,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     clearInterval(this.intervalHandler);
+  }
+
+  checkEnvironment() {
+    this.globals.getSupportedEnvironments();
   }
 
   getInstances() {
@@ -56,6 +62,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
       data.forEach(service => {
         this.daprVersion = service.Version;
       });
+    });
+  }
+
+  showSnackbar(message: string) {
+    this.snackbar.open(message, '', {
+      duration: 2000,
+    });
+  }
+
+  delete(id: string) {
+    this.instanceService.deleteInstance(id).subscribe(() => {
+      this.showSnackbar('Deleted Dapr instance with ID ' + id);
+    }, error => {
+      this.showSnackbar('Failed to remove Dapr instance with ID ' + id);
     });
   }
 }

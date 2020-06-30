@@ -5,6 +5,8 @@ import { DashboardComponent } from './dashboard.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   imports: [
@@ -13,6 +15,8 @@ import { MatButtonModule } from '@angular/material/button';
     MatTableModule,
     MatCardModule,
     MatButtonModule,
+    MatSnackBarModule,
+    MatIconModule,
   ],
   declarations: [
     DashboardComponent,

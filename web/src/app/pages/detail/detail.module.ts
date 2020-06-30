@@ -7,6 +7,8 @@ import { LogsComponent } from './logs/logs.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
   imports: [
@@ -16,6 +18,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatTabsModule,
     MatCardModule,
     MatCheckboxModule,
+    MatSnackBarModule,
+    MatButtonModule,
   ],
   declarations: [
     DetailComponent,

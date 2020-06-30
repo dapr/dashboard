@@ -10,3 +10,11 @@ a {
 a:hover {
     text-decoration: underline;
 }
+
+mat-icon:hover {
+    cursor: pointer;
+}
+
+mat-icon {
+    color: #888888;
+}

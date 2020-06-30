@@ -60,8 +60,9 @@ func (i *instances) CheckSupportedEnvironments() []string {
 	envs := make([]string, 2)
 	if i.kubeClient != nil {
 		envs = append(envs, "kubernetes")
+	} else {
+		envs = append(envs, "standalone")
 	}
-	envs = append(envs, "standalone")
 	return envs
 }
 

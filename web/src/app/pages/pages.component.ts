@@ -21,16 +21,20 @@ export class PagesComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.checkEnvironment();
     this.getFeatures();
+    this.globals.getSupportedEnvironments().subscribe(data => {
+      let supportedEnvironments = <Array<any>>data;
+      if (supportedEnvironments.includes("kubernetes")) {
+        this.globals.kubernetesEnabled = true;
+      }
+      else if (supportedEnvironments.includes("standalone")) {
+        this.globals.standaloneEnabled = true;
+      }
+    });
   }
 
   @ViewChild('drawer', { static: false })
   drawer: MatSidenav;
-
-  checkEnvironment() {
-    this.globals.getSupportedEnvironments();
-  }
 
   getFeatures() {
     this.features.get().subscribe((data: string[]) => {

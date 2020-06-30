@@ -1,4 +1,6 @@
 <h3 class="page-subheader">Logs for Dapr Instance: {{id}}</h3>
+<button mat-raised-button (click)="getLogs(true)">Refresh</button>
+<br>
 <mat-checkbox [(ngModel)]="info">Info</mat-checkbox>
 <mat-checkbox [(ngModel)]="debug">Debug</mat-checkbox>
 <mat-checkbox [(ngModel)]="warning">Warning</mat-checkbox>
