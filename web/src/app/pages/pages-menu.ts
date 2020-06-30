@@ -33,6 +33,6 @@ export const CONTROLPLANE_MENU_ITEM = {
   name: 'status',
 };
 
-export const MENU_ITEMS: MenuItem[] = [
+export var MENU_ITEMS: MenuItem[] = [
   DASHBOARD_MENU_ITEM,
 ];

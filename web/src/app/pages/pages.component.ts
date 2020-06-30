@@ -34,7 +34,7 @@ export class PagesComponent implements OnInit {
 
   getFeatures() {
     this.features.get().subscribe((data: string[]) => {
-      for (const feature of data) {
+      for (let feature of data) {
         if (feature === COMPONENTS_MENU_ITEM.name) {
           this.menu.push(COMPONENTS_MENU_ITEM);
         }

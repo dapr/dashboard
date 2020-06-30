@@ -36,8 +36,8 @@
               <td class="table-label">Address</td>
               <td class="table-data">{{ instance.address }}</td>
             </tr>
-            <tr>
-              <td *ngIf="this.globals.standaloneEnabled" class="table-label">PID</td>
+            <tr *ngIf="this.globals.standaloneEnabled">
+              <td class="table-label">PID</td>
               <td class="table-data">{{ instance.pid }}</td>
             </tr>
             <tr>
