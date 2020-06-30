@@ -1,12 +1,12 @@
+@use '../../theme/pages.scss';
+@use '../../theme/tables.scss';
+@use '../../theme/cards.scss';
+
 a {
     text-decoration: none;
+    color: #0d2192;
 }
 
 a:hover {
     text-decoration: underline;
-}
-
-table {
-    width: 90%;
-    margin: auto;
 }

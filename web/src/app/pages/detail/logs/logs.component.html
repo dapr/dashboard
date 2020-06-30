@@ -1,6 +1,9 @@
-<h2>Logs for Dapr Instance: {{id}}</h2>
-<div style="background: white;">
-    <ul *ngFor="let log of logs">
-      <p style="color: black; white-space: pre-wrap;"> {{ log.log }}</p>
-    </ul>
-</div>
+<h3 class="page-subheader">Logs for Dapr Instance: {{id}}</h3>
+<mat-checkbox [(ngModel)]="info">Info</mat-checkbox>
+<mat-checkbox [(ngModel)]="debug">Debug</mat-checkbox>
+<mat-checkbox [(ngModel)]="warning">Warning</mat-checkbox>
+<mat-checkbox [(ngModel)]="error">Error</mat-checkbox>
+<mat-checkbox [(ngModel)]="fatal">Fatal</mat-checkbox>
+<ul *ngFor="let log of logs">
+    <li *ngIf="isActive(log.level)">{{ log.log }}</li>
+</ul>

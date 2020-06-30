@@ -7,7 +7,7 @@ import { MatTableModule } from '@angular/material/table';
   declarations: [ConfigurationComponent],
   imports: [
     CommonModule,
-    MatTableModule
+    MatTableModule,
   ]
 })
 export class ConfigurationModule { }

@@ -9,13 +9,16 @@ import { MatSidenav } from '@angular/material/sidenav';
   templateUrl: 'pages.component.html',
 })
 export class PagesComponent {
-  menu: MenuItem[] = MENU_ITEMS;
+
+  public menu: MenuItem[] = MENU_ITEMS;
+  public isMenuOpen = false;
+  public contentMargin = 60;
 
   constructor(private features: FeaturesService) {
     this.getFeatures();
   }
 
-  @ViewChild('drawer', { static: false }) 
+  @ViewChild('drawer', { static: false })
   drawer: MatSidenav;
 
   getFeatures() {
@@ -26,5 +29,16 @@ export class PagesComponent {
         }
       }
     });
+  }
+
+  onDrawerToggle() {
+    console.log('On drwaer togglesd', this.isMenuOpen);
+    this.isMenuOpen = !this.isMenuOpen;
+    if (!this.isMenuOpen) {
+      this.contentMargin = 60;
+    }
+    else {
+      this.contentMargin = 240;
+    }
   }
 }

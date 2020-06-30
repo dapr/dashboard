@@ -1,5 +1,6 @@
-import { Component, OnDestroy } from '@angular/core';
+import { OnInit, Component, OnDestroy } from '@angular/core';
 import { InstanceService } from '../../instances/instance.service';
+import { StatusService } from 'src/app/status/status.service';
 
 @Component({
   selector: 'ngx-dashboard',
@@ -7,14 +8,31 @@ import { InstanceService } from '../../instances/instance.service';
   styleUrls: ['./dashboard.component.scss'],
 })
 
-export class DashboardComponent implements OnDestroy {
+export class DashboardComponent implements OnInit, OnDestroy {
+
   public data: any[];
-  public displayedColumns: string[] = ['name', 'status', 'age'];
+  public displayedColumns: string[] = ['name', 'labels', 'status', 'age', 'selector'];
+  public daprHealthiness: string;
+  public daprVersion: string;
   private intervalHandler;
 
-  constructor(private instanceService: InstanceService) {
+  constructor(
+    private instanceService: InstanceService,
+    private statusService: StatusService
+  ) { }
+
+  ngOnInit() {
     this.getInstances();
-    this.intervalHandler = setInterval(() => { this.getInstances(); }, 3000);
+    this.getControlPlaneData();
+
+    this.intervalHandler = setInterval(() => {
+      this.getInstances();
+      this.getControlPlaneData();
+    }, 3000);
+  }
+
+  ngOnDestroy() {
+    clearInterval(this.intervalHandler);
   }
 
   getInstances() {
@@ -23,7 +41,14 @@ export class DashboardComponent implements OnDestroy {
     });
   }
 
-  ngOnDestroy() {
-    clearInterval(this.intervalHandler);
+  getControlPlaneData(): void {
+    this.statusService.getControlPlaneStatus().subscribe((data: any[]) => {
+      this.daprHealthiness = data.every((service) => {
+        return service.Healthy == 'True'
+      }) ? 'Healthy' : 'Unhealthy';
+      data.forEach(service => {
+        this.daprVersion = service.Version;
+      });
+    });
   }
 }

@@ -19,6 +19,7 @@ import (
 // Instances is an interface to interact with running Dapr instances in Kubrernetes or Standalone modes
 type Instances interface {
 	Get() []Instance
+	GetInstance(id string) Instance
 	Delete(id string) error
 	Logs(id string) string
 	Configuration(id string) string
@@ -44,15 +45,16 @@ func NewInstances(kubeClient *kubernetes.Clientset) Instances {
 		i.kubeClient = kubeClient
 	} else {
 		i.getInstancesFn = i.getStandaloneInstances
-
 	}
 	return &i
 }
 
+// Get returns the appropriate environment's GetInstance function
 func (i *instances) Get() []Instance {
 	return i.getInstancesFn()
 }
 
+// Logs returns a string of all logs for the given Dapr app id
 func (i *instances) Logs(id string) string {
 	resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
 	if err != nil || len(resp.Items) == 0 {
@@ -96,6 +98,7 @@ func (i *instances) Logs(id string) string {
 	return ""
 }
 
+// Configuration returns the metadata of a Dapr application in YAML format
 func (i *instances) Configuration(id string) string {
 	resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
 	if err != nil || len(resp.Items) == 0 {
@@ -106,41 +109,55 @@ func (i *instances) Configuration(id string) string {
 		if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
 			daprID := d.Spec.Template.Annotations[daprIDAnnotation]
 			if daprID == id {
-				nspace := d.ObjectMeta.Namespace
-				restClient := i.kubeClient.CoreV1().RESTClient()
+				pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(meta_v1.ListOptions{
+					LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
+				})
 				if err != nil {
 					log.Println(err)
 					return ""
 				}
 
-				url := fmt.Sprintf("/apis/apps/v1/namespaces/%s/deployments/%s", nspace, id)
-				data, err := restClient.Get().RequestURI(url).Stream()
-				if err != nil {
-					log.Println(err)
-					return ""
-				}
+				for _, p := range pods.Items {
+					name := p.ObjectMeta.Name
+					nspace := p.ObjectMeta.Namespace
 
-				buf := new(bytes.Buffer)
-				buf.ReadFrom(data)
-				dataStr := buf.String()
-				j := []byte(dataStr)
-				y, err := yaml.JSONToYAML(j)
-				if err != nil {
-					log.Println(err)
-					return ""
-				}
+					restClient := i.kubeClient.CoreV1().RESTClient()
+					if err != nil {
+						log.Println(err)
+						return ""
+					}
 
-				return string(y)
+					url := fmt.Sprintf("/api/v1/namespaces/%s/pods/%s", nspace, name)
+					data, err := restClient.Get().RequestURI(url).Stream()
+					if err != nil {
+						log.Println(err)
+						return ""
+					}
+
+					buf := new(bytes.Buffer)
+					buf.ReadFrom(data)
+					dataStr := buf.String()
+					j := []byte(dataStr)
+					y, err := yaml.JSONToYAML(j)
+					if err != nil {
+						log.Println(err)
+						return ""
+					}
+
+					return string(y)
+				}
 			}
 		}
 	}
 	return ""
 }
 
+// Delete deletes the local Dapr sidecar instance
 func (i *instances) Delete(id string) error {
 	return standalone.Stop(id)
 }
 
+// getKubernetesInstances gets the list of Dapr applications running in the Kubernetes environment
 func (i *instances) getKubernetesInstances() []Instance {
 	list := []Instance{}
 	resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
@@ -165,6 +182,8 @@ func (i *instances) getKubernetesInstances() []Instance {
 				SupportsLogs:     true,
 				Address:          fmt.Sprintf("%s-dapr:80", id),
 				Status:           fmt.Sprintf("%d/%d", d.Status.ReadyReplicas, d.Status.Replicas),
+				Labels:           "app:" + d.Labels["app"],
+				Selector:         "app:" + d.Labels["app"],
 			}
 
 			if val, ok := d.Spec.Template.Annotations[daprPortAnnotation]; ok {
@@ -186,6 +205,7 @@ func (i *instances) getKubernetesInstances() []Instance {
 	return list
 }
 
+// getStandaloneInstances returns the Dapr instances running in the standalone environment
 func (i *instances) getStandaloneInstances() []Instance {
 	list := []Instance{}
 	output, err := standalone.List()
@@ -210,4 +230,15 @@ func (i *instances) getStandaloneInstances() []Instance {
 		}
 	}
 	return list
+}
+
+// GetInstance uses the appropriate getInstance function (kubernetes, standalone, etc.) and returns the given instance from its id
+func (i *instances) GetInstance(id string) Instance {
+	instanceList := i.getInstancesFn()
+	for _, instance := range instanceList {
+		if instance.AppID == id {
+			return instance
+		}
+	}
+	return Instance{}
 }

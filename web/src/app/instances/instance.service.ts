@@ -13,21 +13,25 @@ export class InstanceService {
     return this.http.get('/api/instances');
   }
 
+  getInstance(id: string) {
+    return this.http.get('/api/instances/' + id);
+  }
+
   deleteInstance(id: string) {
     return this.http.delete('/api/instances/' + id);
   }
 
   getLogs(id: string) {
-    return this.http.get('/api/instances/' + id + '/logs', {responseType: 'text'});
+    return this.http.get('/api/instances/' + id + '/logs', { responseType: 'text' });
   }
 
   getConfiguration(id: string) {
-    return this.http.get('/api/configuration/' + id, {responseType: 'text'});
+    return this.http.get('/api/configuration/' + id, { responseType: 'text' });
   }
 
   getLogsArray(id: string): Log[] {
     const output = [];
-    this.http.get('/api/instances/' + id + '/logs', {responseType: 'text'}).subscribe((logData: string) => {
+    this.http.get('/api/instances/' + id + '/logs', { responseType: 'text' }).subscribe((logData: string) => {
       logData.split('\n').forEach(log => {
         const regEx = RegExp('(?<=level=).*?(?=\s)', '');
         const level: string[] = regEx.exec(log);

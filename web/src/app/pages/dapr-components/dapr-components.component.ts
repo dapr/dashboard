@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ComponentsService } from '../../components/component.service';
 
 @Component({
@@ -7,6 +7,7 @@ import { ComponentsService } from '../../components/component.service';
   styleUrls: ['dapr-components.component.scss'],
 })
 export class DaprComponentsComponent implements OnInit {
+  
   public components: any[];
   public componentsStatus: any[];
   public displayedColumns: string[] = ['img', 'name', 'status', 'age', 'created'];
