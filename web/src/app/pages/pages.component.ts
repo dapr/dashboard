@@ -22,15 +22,6 @@ export class PagesComponent implements OnInit {
 
   ngOnInit() {
     this.getFeatures();
-    this.globals.getSupportedEnvironments().subscribe(data => {
-      let supportedEnvironments = <Array<any>>data;
-      if (supportedEnvironments.includes("kubernetes")) {
-        this.globals.kubernetesEnabled = true;
-      }
-      else if (supportedEnvironments.includes("standalone")) {
-        this.globals.standaloneEnabled = true;
-      }
-    });
   }
 
   @ViewChild('drawer', { static: false })

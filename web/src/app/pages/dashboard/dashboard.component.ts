@@ -16,6 +16,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   public displayedColumns: string[] = [];
   public daprHealthiness: string;
   public daprVersion: string;
+  public tableLoaded: boolean = false;
   private intervalHandler;
 
   constructor(
@@ -26,13 +27,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
+    this.tableLoaded = false;
     this.getInstances();
     this.getControlPlaneData();
-    if (this.globals.kubernetesEnabled) {
-      this.displayedColumns = ['name', 'labels', 'status', 'age', 'selector'];
-    } else {
-      this.displayedColumns = ['name', 'age', 'actions'];
-    }
+    this.globals.getSupportedEnvironments().subscribe(data => {
+      let supportedEnvironments = <Array<any>>data;
+      if (supportedEnvironments.includes("kubernetes")) {
+        this.globals.kubernetesEnabled = true;
+        this.displayedColumns = ['name', 'labels', 'status', 'age', 'selector'];
+      }
+      else if (supportedEnvironments.includes("standalone")) {
+        this.globals.standaloneEnabled = true;
+        this.displayedColumns = ['name', 'age', 'actions'];
+      }
+      this.tableLoaded = true;
+    });
 
     this.intervalHandler = setInterval(() => {
       this.getInstances();
