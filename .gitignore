@@ -2,3 +2,5 @@ release/
 node_modules/
 dist/
 release/
+*.exe
+.vscode/**/*
