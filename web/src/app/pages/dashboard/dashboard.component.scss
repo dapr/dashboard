@@ -11,10 +11,18 @@ a:hover {
     text-decoration: underline;
 }
 
-mat-icon:hover {
+.delete:hover {
     cursor: pointer;
 }
 
-mat-icon {
+.delete {
     color: #888888;
+}
+
+.green {
+    color: green;
+}
+
+.red {
+    color: red;
 }

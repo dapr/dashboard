@@ -6,5 +6,5 @@ ng build --base-href ./
 cd ..
 cp -r ./web/dist ./release/web/
 export GOOS=linux
-go build -o dashboard.exe
+go build -o dashboard
 mv ./dashboard ./release
