@@ -1,24 +1,60 @@
-import { Component, OnDestroy } from '@angular/core';
-import { NbDialogService } from '@nebular/theme';
+import { OnInit, Component, OnDestroy } from '@angular/core';
 import { InstanceService } from '../../instances/instance.service';
+import { StatusService } from 'src/app/status/status.service';
+import { GlobalsService } from 'src/app/globals/globals.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
-import 'style-loader!angular2-toaster/toaster.css';
-import {
-  NbComponentStatus,
-  NbGlobalPhysicalPosition,
-  NbToastrService,
-} from '@nebular/theme';
 @Component({
   selector: 'ngx-dashboard',
-  templateUrl: './dashboard.component.html'
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardComponent implements OnDestroy {
+
+export class DashboardComponent implements OnInit, OnDestroy {
+
   public data: any[];
+  public displayedColumns: string[] = [];
+  public daprHealthiness: string;
+  public daprVersion: string;
+  public tableLoaded: boolean = false;
   private intervalHandler;
 
-  constructor(private instanceService: InstanceService, private toastrService: NbToastrService, private dialogService: NbDialogService) {
+  constructor(
+    private instanceService: InstanceService,
+    private statusService: StatusService,
+    public globals: GlobalsService,
+    private snackbar: MatSnackBar,
+  ) { }
+
+  ngOnInit() {
+    this.tableLoaded = false;
     this.getInstances();
-    this.intervalHandler = setInterval(() => { this.getInstances() }, 3000);
+    this.getControlPlaneData();
+    this.globals.getSupportedEnvironments().subscribe(data => {
+      let supportedEnvironments = <Array<any>>data;
+      if (supportedEnvironments.includes("kubernetes")) {
+        this.globals.kubernetesEnabled = true;
+        this.displayedColumns = ['name', 'labels', 'status', 'age', 'selector'];
+      }
+      else if (supportedEnvironments.includes("standalone")) {
+        this.globals.standaloneEnabled = true;
+        this.displayedColumns = ['name', 'age', 'actions'];
+      }
+      this.tableLoaded = true;
+    });
+
+    this.intervalHandler = setInterval(() => {
+      this.getInstances();
+      this.getControlPlaneData();
+    }, 3000);
+  }
+
+  ngOnDestroy() {
+    clearInterval(this.intervalHandler);
+  }
+
+  checkEnvironment() {
+    this.globals.getSupportedEnvironments();
   }
 
   getInstances() {
@@ -27,32 +63,28 @@ export class DashboardComponent implements OnDestroy {
     });
   }
 
-  ngOnDestroy() {
-    clearInterval(this.intervalHandler);
+  getControlPlaneData(): void {
+    this.statusService.getControlPlaneStatus().subscribe((data: any[]) => {
+      this.daprHealthiness = data.every((service) => {
+        return service.Healthy == 'True'
+      }) ? 'Healthy' : 'Unhealthy';
+      data.forEach(service => {
+        this.daprVersion = service.Version;
+      });
+    });
+  }
+
+  showSnackbar(message: string) {
+    this.snackbar.open(message, '', {
+      duration: 2000,
+    });
   }
 
   delete(id: string) {
     this.instanceService.deleteInstance(id).subscribe(() => {
-      this.showToast('success', 'Operation succeeded', 'Deleted Dapr instance with ID ' + id)
+      this.showSnackbar('Deleted Dapr instance with ID ' + id);
     }, error => {
-      this.showToast('danger', 'Operation failed', 'Failed to remove Dapr instance with ID ' + id)
+      this.showSnackbar('Failed to remove Dapr instance with ID ' + id);
     });
-  }
-
-  private showToast(type: NbComponentStatus, title: string, body: string) {
-    const config = {
-      status: type,
-      destroyByClick: true,
-      duration: 4000,
-      hasIcon: true,
-      position: NbGlobalPhysicalPosition.TOP_RIGHT,
-      preventDuplicates: false,
-    };
-    const titleContent = title ? `. ${title}` : '';
-
-    this.toastrService.show(
-      body,
-      titleContent,
-      config);
   }
 }

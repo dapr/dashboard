@@ -1,0 +1,27 @@
+<mat-toolbar class="pages-header mat-elevation-z5">
+  <img src="../../assets/images/dapr.png" id="header-image">
+  <h1 class="app-header">Dashboard</h1>
+</mat-toolbar>
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer class="sidenav"
+      mode="side"
+      [class.menu-open]="isMenuOpen"
+      [class.menu-close]="!isMenuOpen"
+      opened>
+    <mat-nav-list class="navigation-list">
+      <a class="navigation-item" mat-list-item (click)="onDrawerToggle()">
+        <mat-icon class="material-icons">{{ isMenuOpen? 'chevron_left' : 'chevron_right' }}</mat-icon><span class="navigation-item-label"></span>
+      </a>
+      <ng-container *ngFor="let component of menu">
+        <mat-divider class="navigation-divider"></mat-divider>
+        <a class="navigation-item" mat-list-item [routerLink]="component.link" routerLinkActive="active">
+          <mat-icon class="material-icons">{{ component.icon }}</mat-icon><span class="navigation-item-label">{{ component.title }}</span>
+        </a>
+      </ng-container>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content
+    [ngStyle]="{ 'margin-left.px': contentMargin }">
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

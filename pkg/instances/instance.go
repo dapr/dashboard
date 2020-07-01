@@ -15,4 +15,7 @@ type Instance struct {
 	SupportsDeletion bool   `json:"supportsDeletion"`
 	SupportsLogs     bool   `json:"supportsLogs"`
 	Manifest         string `json:"manifest"`
+	Status           string `json:"status"`
+	Labels           string `json:"labels"`
+	Selector         string `json:"selector"`
 }

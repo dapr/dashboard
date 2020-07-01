@@ -13,19 +13,29 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/serializer/json"
 	"k8s.io/client-go/kubernetes"
+	"sigs.k8s.io/yaml"
 )
 
 // Instances is an interface to interact with running Dapr instances in Kubrernetes or Standalone modes
 type Instances interface {
 	Get() []Instance
+	GetInstance(id string) Instance
 	Delete(id string) error
 	Logs(id string) string
+	Configuration(id string) string
+	CheckSupportedEnvironments() []string
 }
 
 type instances struct {
 	kubeClient     *kubernetes.Clientset
 	getInstancesFn func() []Instance
 }
+
+const (
+	daprEnabledAnnotation = "dapr.io/enabled"
+	daprIDAnnotation      = "dapr.io/id"
+	daprPortAnnotation    = "dapr.io/port"
+)
 
 // NewInstances returns an Instances implementation
 func NewInstances(kubeClient *kubernetes.Clientset) Instances {
@@ -36,62 +46,138 @@ func NewInstances(kubeClient *kubernetes.Clientset) Instances {
 		i.kubeClient = kubeClient
 	} else {
 		i.getInstancesFn = i.getStandaloneInstances
-
 	}
 	return &i
 }
 
+// Get returns the appropriate environment's GetInstance function
 func (i *instances) Get() []Instance {
 	return i.getInstancesFn()
 }
 
-func (i *instances) Logs(id string) string {
-	resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
-	if err != nil || len(resp.Items) == 0 {
-		return ""
+// CheckSupportedEnvironments checks for valid environments for Dapr applications to run in
+func (i *instances) CheckSupportedEnvironments() []string {
+	envs := make([]string, 2)
+	if i.kubeClient != nil {
+		envs = append(envs, "kubernetes")
+	} else {
+		envs = append(envs, "standalone")
 	}
+	return envs
+}
 
-	for _, d := range resp.Items {
-		if d.Spec.Template.Annotations["dapr.io/enabled"] != "" {
-			daprID := d.Spec.Template.Annotations["dapr.io/id"]
-			if daprID == id {
-				pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(meta_v1.ListOptions{
-					LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
-				})
-				if err != nil {
-					log.Println(err)
-					return ""
-				}
+// Logs returns a string of all logs for the given Dapr app id
+func (i *instances) Logs(id string) string {
+	if i.kubeClient != nil {
+		resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
+		if err != nil || len(resp.Items) == 0 {
+			return ""
+		}
 
-				for _, p := range pods.Items {
-					name := p.ObjectMeta.Name
-
-					options := v1.PodLogOptions{}
-					options.Container = "daprd"
-
-					logs := i.kubeClient.CoreV1().Pods(p.ObjectMeta.Namespace).GetLogs(name, &options)
-					arr, err := logs.Stream()
+		for _, d := range resp.Items {
+			if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
+				daprID := d.Spec.Template.Annotations[daprIDAnnotation]
+				if daprID == id {
+					pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(meta_v1.ListOptions{
+						LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
+					})
 					if err != nil {
 						log.Println(err)
 						return ""
 					}
 
-					buf := new(bytes.Buffer)
-					buf.ReadFrom(arr)
-					logsStr := buf.String()
+					for _, p := range pods.Items {
+						name := p.ObjectMeta.Name
 
-					return logsStr
+						options := v1.PodLogOptions{}
+						options.Container = "daprd"
+
+						logs := i.kubeClient.CoreV1().Pods(p.ObjectMeta.Namespace).GetLogs(name, &options)
+						arr, err := logs.Stream()
+						if err != nil {
+							log.Println(err)
+							return ""
+						}
+
+						buf := new(bytes.Buffer)
+						buf.ReadFrom(arr)
+						logsStr := buf.String()
+
+						return logsStr
+					}
 				}
 			}
 		}
+		return ""
+	} else {
+		return ""
 	}
-	return ""
 }
 
+// Configuration returns the metadata of a Dapr application in YAML format
+func (i *instances) Configuration(id string) string {
+	if i.kubeClient != nil {
+		resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
+		if err != nil || len(resp.Items) == 0 {
+			return ""
+		}
+
+		for _, d := range resp.Items {
+			if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
+				daprID := d.Spec.Template.Annotations[daprIDAnnotation]
+				if daprID == id {
+					pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(meta_v1.ListOptions{
+						LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
+					})
+					if err != nil {
+						log.Println(err)
+						return ""
+					}
+
+					for _, p := range pods.Items {
+						name := p.ObjectMeta.Name
+						nspace := p.ObjectMeta.Namespace
+
+						restClient := i.kubeClient.CoreV1().RESTClient()
+						if err != nil {
+							log.Println(err)
+							return ""
+						}
+
+						url := fmt.Sprintf("/api/v1/namespaces/%s/pods/%s", nspace, name)
+						data, err := restClient.Get().RequestURI(url).Stream()
+						if err != nil {
+							log.Println(err)
+							return ""
+						}
+
+						buf := new(bytes.Buffer)
+						buf.ReadFrom(data)
+						dataStr := buf.String()
+						j := []byte(dataStr)
+						y, err := yaml.JSONToYAML(j)
+						if err != nil {
+							log.Println(err)
+							return ""
+						}
+
+						return string(y)
+					}
+				}
+			}
+		}
+		return ""
+	} else {
+		return ""
+	}
+}
+
+// Delete deletes the local Dapr sidecar instance
 func (i *instances) Delete(id string) error {
 	return standalone.Stop(id)
 }
 
+// getKubernetesInstances gets the list of Dapr applications running in the Kubernetes environment
 func (i *instances) getKubernetesInstances() []Instance {
 	list := []Instance{}
 	resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
@@ -101,8 +187,8 @@ func (i *instances) getKubernetesInstances() []Instance {
 	}
 
 	for _, d := range resp.Items {
-		if d.Spec.Template.Annotations["dapr.io/enabled"] != "" {
-			id := d.Spec.Template.Annotations["dapr.io/id"]
+		if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
+			id := d.Spec.Template.Annotations[daprIDAnnotation]
 			i := Instance{
 				AppID:            id,
 				HTTPPort:         3500,
@@ -115,9 +201,12 @@ func (i *instances) getKubernetesInstances() []Instance {
 				SupportsDeletion: false,
 				SupportsLogs:     true,
 				Address:          fmt.Sprintf("%s-dapr:80", id),
+				Status:           fmt.Sprintf("%d/%d", d.Status.ReadyReplicas, d.Status.Replicas),
+				Labels:           "app:" + d.Labels["app"],
+				Selector:         "app:" + d.Labels["app"],
 			}
 
-			if val, ok := d.Spec.Template.Annotations["dapr.io/port"]; ok {
+			if val, ok := d.Spec.Template.Annotations[daprPortAnnotation]; ok {
 				appPort, err := strconv.Atoi(val)
 				if err == nil {
 					i.AppPort = appPort
@@ -136,6 +225,7 @@ func (i *instances) getKubernetesInstances() []Instance {
 	return list
 }
 
+// getStandaloneInstances returns the Dapr instances running in the standalone environment
 func (i *instances) getStandaloneInstances() []Instance {
 	list := []Instance{}
 	output, err := standalone.List()
@@ -160,4 +250,15 @@ func (i *instances) getStandaloneInstances() []Instance {
 		}
 	}
 	return list
+}
+
+// GetInstance uses the appropriate getInstance function (kubernetes, standalone, etc.) and returns the given instance from its id
+func (i *instances) GetInstance(id string) Instance {
+	instanceList := i.getInstancesFn()
+	for _, instance := range instanceList {
+		if instance.AppID == id {
+			return instance
+		}
+	}
+	return Instance{}
 }

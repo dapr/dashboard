@@ -1,18 +1,53 @@
-@import '../@theme/styles/themes';
+@use '../theme/pages.scss';
+@use '../theme/tables.scss';
+@use '../theme/cards.scss';
 
-@include nb-install-component() {
-  ::ng-deep router-outlet + * {
-    display: block;
-    animation: fade 1s;
+.pages-header {
+  height: 15%;
+}
 
-    @keyframes fade {
-      from {
-        opacity: 0;
-      }
+#header-image {
+  height: 85%;
+  width: auto;
+  margin-right: 1%;
+}
 
-      to {
-        opacity: 1;
-      }
-    }
-  }
+mat-icon:hover {
+  cursor: pointer;
+}
+
+mat-icon {
+  color: #888888;
+}
+
+.mat-elevation-z5 {
+  position: relative;
+  z-index: 2;
+}
+
+.sidenav-container {
+  height: 85%;
+}
+
+.navigation-item.active {
+  background: #d9dffc;
+  color: #062639;
+}
+
+mat-nav-list {
+  padding: 0;
+  overflow: hidden;
+}
+
+.navigation-item-label {
+  color: #444444;
+  padding-left: 20px;
+}
+
+.sidenav.menu-close {
+  width: 60px;
+}
+
+.sidenav.menu-open {
+  width: 200px;
 }

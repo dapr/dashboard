@@ -1,0 +1,33 @@
+<h2 class="page-header">Dapr Configurations</h2>
+<table mat-table [dataSource]="config" class="table-large mat-elevation-z8">
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef>Name</th>
+    <td mat-cell *matCellDef="let item">{{ item.Name }}</td>
+  </ng-container>
+  <ng-container matColumnDef="tracing-enabled">
+    <th mat-header-cell *matHeaderCellDef>Tracing Enabled</th>
+    <td mat-cell *matCellDef="let item">{{ item.TracingEnabled}}</td>
+  </ng-container>
+  <ng-container matColumnDef="mtls-enabled">
+    <th mat-header-cell *matHeaderCellDef>MTLS Enabled</th>
+    <td mat-cell *matCellDef="let item">{{ item.MTLSEnabled }}</td>
+  </ng-container>
+  <ng-container matColumnDef="mtls-workload-ttl">
+    <th mat-header-cell *matHeaderCellDef>WorkloadCert TTL</th>
+    <td mat-cell *matCellDef="let item">{{ item.WorkloadCertTTL }}</td>
+  </ng-container>
+  <ng-container matColumnDef="mtls-clock-skew">
+    <th mat-header-cell *matHeaderCellDef>Clock Skew</th>
+    <td mat-cell *matCellDef="let item">{{ item.ClockSkew }}</td>
+  </ng-container>
+  <ng-container matColumnDef="age">
+    <th mat-header-cell *matHeaderCellDef>Age</th>
+    <td mat-cell *matCellDef="let item">{{ item.Age }}</td>
+  </ng-container>
+  <ng-container matColumnDef="created">
+    <th mat-header-cell *matHeaderCellDef>Created</th>
+    <td mat-cell *matCellDef="let item">{{ item.Created }}</td>
+  </ng-container>
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>

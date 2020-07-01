@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ComponentsService {
 
@@ -10,5 +10,9 @@ export class ComponentsService {
 
   getComponents() {
     return this.http.get('/api/components');
+  }
+
+  getComponentsStatus() {
+    return this.http.get('/api/components/status');
   }
 }

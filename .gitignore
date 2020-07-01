@@ -1,1 +1,4 @@
 release/
+node_modules/
+dist/
+release/

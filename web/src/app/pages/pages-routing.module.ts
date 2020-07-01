@@ -1,10 +1,11 @@
 import { RouterModule, Routes } from '@angular/router';
 import { NgModule } from '@angular/core';
-
 import { PagesComponent } from './pages.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { ComponentsComponent } from './components/components.component';
-import { LogsComponent } from './logs/logs.component';
+import { DaprComponentsComponent } from './dapr-components/dapr-components.component';
+import { DetailComponent } from './detail/detail.component';
+import { ConfigurationComponent } from './configuration/configuration.component';
+import { ControlPlaneComponent } from './controlplane/controlplane.component';
 
 const routes: Routes = [{
   path: '',
@@ -16,17 +17,26 @@ const routes: Routes = [{
     },
     {
       path: 'components',
-      component: ComponentsComponent,
+      component: DaprComponentsComponent,
     },
     {
-      path: 'logs/:id',
-      component: LogsComponent,
+      path: 'detail/:id',
+      component: DetailComponent,
+    },
+    {
+      path: 'configuration',
+      component: ConfigurationComponent,
+    },
+    {
+      path: 'controlplane',
+      component: ControlPlaneComponent,
     },
     {
       path: '',
       redirectTo: 'dashboard',
       pathMatch: 'full',
     },
+    { path: '**', redirectTo: 'dashboard' },
   ],
 }];
 
@@ -34,5 +44,4 @@ const routes: Routes = [{
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class PagesRoutingModule {
-}
+export class PagesRoutingModule { }

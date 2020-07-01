@@ -4,7 +4,7 @@ metadata:
   name: deployment-reader
 rules:
 - apiGroups: ["", "dapr.io", "apps", "extensions"]
-  resources: ["deployments", "pods", "pods/log", "components"]
+  resources: ["deployments", "pods", "pods/log", "components", "configurations"]
   verbs: ["get", "list"]
 
 ---
@@ -52,7 +52,7 @@ spec:
     spec:
       containers:
       - name: dapr-dashboard
-        image: yaron2/daprdashboard
+        image: willdavsmith/dashboard:latest
         ports:
         - containerPort: 8080
         imagePullPolicy: Always
