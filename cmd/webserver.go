@@ -16,7 +16,8 @@ import (
 )
 
 const (
-	dir = "./web/dist"
+	dir  = "./web/dist"
+	port = 8080
 )
 
 var epoch = time.Unix(0, 0).Format(time.RFC1123)
@@ -42,8 +43,6 @@ var comps components.Components
 var configs configurations.Configurations
 var stats status.Status
 
-const port = 8080
-
 // RunWebServer starts the web server that serves the Dapr UI dashboard and the API
 func RunWebServer() {
 	kubeClient, daprClient, _ := kube.Clients()
@@ -64,10 +63,17 @@ func RunWebServer() {
 	r.HandleFunc("/api/daprconfig", getDaprConfigHandler)
 	r.HandleFunc("/api/environments", getEnvironmentsHandler)
 	r.HandleFunc("/api/controlplanestatus", getControlPlaneHandler)
-	r.PathPrefix("/").Handler(noCache(http.StripPrefix("/", http.FileServer(http.Dir(dir)))))
+
+	fs := http.FileServer(http.Dir(dir))
+	r.HandleFunc("/{rest:.*}", angularHandler)
+	r.PathPrefix("/").Handler(noCache(http.StripPrefix("/", fs)))
 
 	fmt.Println(fmt.Sprintf("Dapr Dashboard running on http://localhost:%v", port))
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), r))
+}
+
+func angularHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./web/dist/index.html")
 }
 
 func getInstancesHandler(w http.ResponseWriter, r *http.Request) {
