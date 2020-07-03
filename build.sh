@@ -10,7 +10,7 @@ rm -r -f release
 # (TODO: currently its for linux enable darwin and windows as well by uncommenting the platforms array with multiple platforms below)
 
 platforms=("linux_amd64")
-# platforms=("linux_amd64" "windows_amd64" "darwin_amd64")
+#platforms=("linux_amd64" "windows_amd64" "darwin_amd64")
 
 for platform in "${platforms[@]}"
 do
@@ -27,7 +27,14 @@ do
   env CGO_ENABLED=0 GOOS=$GOOS GOARCH=$GOARCH go build -a -o $go_executable_output_file
 
   echo preparing release dir release/${platform}
-  mkdir -p release/${platform}/web/
+  mkdir -p ./release/${platform}/web/
   cp -r ./web/dist ./release/${platform}/web/
   mv ./$go_executable_output_file ./release/${platform}
+
+  # create archives
+  if [ $GOOS = "windows" ]; then
+    zip -r -q ./release/dashboard_${platform}.zip ./release/${platform}
+  else
+    tar -zcf ./release/dashboard_${platform}.tar.gz ./release/${platform}
+  fi
 done

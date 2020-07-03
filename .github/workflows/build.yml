@@ -53,17 +53,39 @@ jobs:
       run: npm install -g @angular/cli > /dev/null    
     - name: Build and prepare release
       run: |
+        sudo apt install zip
         ./build.sh
-        echo doing ls for release
-        ls release
     - name: Build docker image
-      run: docker build -t ${{ secrets.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.REL_VERSION }} .
+      run: docker build -t ${{ secrets.DOCKER_DAPRIO_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.REL_VERSION }} .
     - name: Push dashboard docker images
       if: github.event_name != 'pull_request'
       run: |
         echo performing docker login 
         docker login -u ${{ secrets.DOCKER_REGISTRY_ID }} -p ${{ secrets.DOCKER_REGISTRY_PASS }}
         echo pushing docker image for ${{ env.DOTNET_SAMPLE_APP_IMAGE_NAME }}
-        echo image with tag ${{ secrets.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.REL_VERSION }} will be pushed
-        docker push ${{ secrets.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.REL_VERSION }}
+        echo image with tag ${{ secrets.DOCKER_DAPRIO_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.REL_VERSION }} will be pushed
+        docker push ${{ secrets.DOCKER_DAPRIO_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.REL_VERSION }}
+    - name: Publish binaries to github for tags
+      if: startswith(github.ref, 'refs/tags/v')
+      run: |
+        sudo npm install --silent --no-progress -g github-release-cli
+        
+        # Parse repository to get owner and repo names
+        OWNER_NAME="${GITHUB_REPOSITORY%%/*}"
+        REPO_NAME="${GITHUB_REPOSITORY#*/}"
+        
+        # Get the list of files
+        RELEASE_ARTIFACT_TAR=release/*.tar.gz)
+        RELEASE_ARTIFACT_ZIP=release/*.zip)
+        
+        export GITHUB_TOKEN=${{ secrets.DAPR_BOT_TOKEN }}
+        echo "Uploading release packages to GitHub Release"
+        github-release upload \
+          --owner $OWNER_NAME \
+          --repo $REPO_NAME \
+          --body "Release dapr dashboard v${REL_VERSION}" \
+          --tag "v${REL_VERSION}" \
+          --name "Dapr dashboard v${REL_VERSION}" \
+          --prerelease true \
+          ${RELEASE_ARTIFACT_TAR[*]} ${RELEASE_ARTIFACT_ZIP[*]}
 
