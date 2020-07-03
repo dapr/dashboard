@@ -75,8 +75,7 @@ jobs:
         REPO_NAME="${GITHUB_REPOSITORY#*/}"
         
         # Get the list of files
-        RELEASE_ARTIFACT_TAR=(release/*.tar.gz)
-        RELEASE_ARTIFACT_ZIP=(release/*.zip)
+        RELEASE_ARTIFACT=(release/artifacts*)
         
         export GITHUB_TOKEN=${{ secrets.DAPR_BOT_TOKEN }}
         echo "Uploading release packages to GitHub Release"
@@ -87,5 +86,5 @@ jobs:
           --tag "v${REL_VERSION}" \
           --name "Dapr dashboard v${REL_VERSION}" \
           --prerelease true \
-          ${RELEASE_ARTIFACT_TAR[*]} ${RELEASE_ARTIFACT_ZIP[*]}
+          ${RELEASE_ARTIFACT[*]}
 
