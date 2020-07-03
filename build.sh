@@ -33,8 +33,8 @@ do
 
   # create archives
   if [ $GOOS = "windows" ]; then
-    zip -r -q ./release/artifactes/dashboard_${platform}.zip ./release/${platform}
+    zip -r -q ./release/dashboard_${platform}.zip ./release/${platform}
   else
-    tar -zcf ./release/artifacts/dashboard_${platform}.tar.gz ./release/${platform}
+    tar -zcf ./release/dashboard_${platform}.tar.gz ./release/${platform}
   fi
 done
