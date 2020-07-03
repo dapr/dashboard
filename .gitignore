@@ -1,4 +1,8 @@
 release/
 node_modules/
+web/npm-debug.log
+dashboard
 dist/
 release/
+*.exe
+.vscode/**/*

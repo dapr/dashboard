@@ -1,0 +1,69 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+      - release-*
+    tags:
+      - v*
+    paths-ignore: 
+      - '**.md'
+  pull_request:
+    branches:
+      - master
+      - release-*
+    paths-ignore: 
+      - '**.md'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GOVER: 1.14.3
+      GOPROXY: https://proxy.golang.org
+      NODE_VERSION: 12.x
+      IMAGE_NAME: dashboard
+    steps:  
+    - name: Setup node ${{ env.NODE_VERSION }} and npm
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    - name: Set up Go ${{ env.GOVER }}
+      uses: actions/setup-go@v2-beta
+      with:
+        go-version: ${{ env.GOVER }}
+    - name: Check out code
+      uses: actions/checkout@v2
+    # TODO enable golint once its cleaned.
+    #- name: golangci-lint
+    #  uses: golangci/golangci-lint-action@v1
+    #  with:
+    #    version: v1.26
+    - name: Parse release version and set REL_VERSION env var.
+      run: python ./.github/scripts/get_release_version.py    
+    - name: Setup node_module caching # this allows for re-using node_modules caching, making builds a bit faster.
+      uses: actions/cache@v1 
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('web/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+    - name: Install angular cli
+      run: npm install -g @angular/cli > /dev/null    
+    - name: Build and prepare release
+      run: |
+        ./build.sh
+        echo doing ls for release
+        ls release
+    - name: Build docker image
+      run: docker build -t ${{ secrets.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.REL_VERSION }} .
+    - name: Push dashboard docker images
+      if: github.event_name != 'pull_request'
+      run: |
+        echo performing docker login 
+        docker login -u ${{ secrets.DOCKER_REGISTRY_ID }} -p ${{ secrets.DOCKER_REGISTRY_PASS }}
+        echo pushing docker image for ${{ env.DOTNET_SAMPLE_APP_IMAGE_NAME }}
+        echo image with tag ${{ secrets.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.REL_VERSION }} will be pushed
+        docker push ${{ secrets.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.REL_VERSION }}
+
