@@ -4,13 +4,17 @@ cd web
 npm i
 ng build --base-href ./
 cd ..
-rm -r -f release
+release_dir=./release
+artifacts_dir=${release_dir}/artifacts
+rm -r -f ${release_dir}
+mkdir -p ${artifacts_dir}
+
 
 # build go code and prepare release dir for platforms.
-# (TODO: currently its for linux enable darwin and windows as well by uncommenting the platforms array with multiple platforms below)
+# (TODO: currently its for linux enable darwin and windows (if angular code build here can be used on windows and mac) by uncommenting the platforms array with multiple platforms below)
 
 platforms=("linux_amd64")
-platforms=("linux_amd64" "windows_amd64" "darwin_amd64")
+#platforms=("linux_amd64" "windows_amd64" "darwin_amd64")
 
 for platform in "${platforms[@]}"
 do
@@ -26,15 +30,18 @@ do
   echo building go executable for $GOOS $GOARCH, output will be $go_executable_output_file
   env CGO_ENABLED=0 GOOS=$GOOS GOARCH=$GOARCH go build -a -o $go_executable_output_file
 
-  echo preparing release dir release/${platform}
+  platform_release_dir=${release_dir}/${platform}
+  platform_artifact_archive=${artifacts_dir}/dashboard_${platform}
+
+  echo preparing release dir ${platform_release_dir}
   mkdir -p ./release/${platform}/web/
-  cp -r ./web/dist ./release/${platform}/web/
-  mv ./$go_executable_output_file ./release/${platform}
+  cp -r ./web/dist ${platform_release_dir}/web/
+  mv ./$go_executable_output_file ${platform_release_dir}
 
   # create archives
   if [ $GOOS = "windows" ]; then
-    zip -r -q ./release/dashboard_${platform}.zip ./release/${platform}
+    zip -r -q ${platform_artifact_archive}.zip ${platform_release_dir}
   else
-    tar -zcf ./release/dashboard_${platform}.tar.gz ./release/${platform}
+    tar -zcf ${platform_artifact_archive}.tar.gz ${platform_release_dir}
   fi
 done
