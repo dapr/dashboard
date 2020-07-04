@@ -34,14 +34,10 @@ do
   platform_artifact_archive=${artifacts_dir}/dashboard_${platform}
 
   echo preparing release dir ${platform_release_dir}
-  mkdir -p ./release/${platform}/web/
+  mkdir -p ${platform_release_dir}/web/
   cp -r ./web/dist ${platform_release_dir}/web/
   mv ./$go_executable_output_file ${platform_release_dir}
 
   # create archives
-  if [ $GOOS = "windows" ]; then
-    zip -r -q ${platform_artifact_archive}.zip ${platform_release_dir}
-  else
-    tar -zcf ${platform_artifact_archive}.tar.gz ${platform_release_dir}
-  fi
+  tar -zcf ${platform_artifact_archive}.tar.gz ${platform_release_dir}
 done
