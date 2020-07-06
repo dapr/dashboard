@@ -63,17 +63,19 @@ func RunWebServer() {
 	stats = status.NewStatus(kubeClient)
 
 	r := mux.NewRouter()
-	r.HandleFunc("/api/features", getFeaturesHandler)
-	r.HandleFunc("/api/instances", getInstancesHandler)
-	r.HandleFunc("/api/instances/{id}", deleteInstancesHandler).Methods("DELETE")
-	r.HandleFunc("/api/instances/{id}", getInstanceHandler).Methods("GET")
-	r.HandleFunc("/api/instances/{id}/logs", getLogsHandler)
-	r.HandleFunc("/api/components", getComponentsHandler)
-	r.HandleFunc("/api/components/status", getComponentsStatusHandler)
-	r.HandleFunc("/api/configuration/{id}", getConfigurationHandler)
-	r.HandleFunc("/api/daprconfig", getDaprConfigHandler)
-	r.HandleFunc("/api/environments", getEnvironmentsHandler)
-	r.HandleFunc("/api/controlplanestatus", getControlPlaneHandler)
+
+	api := r.PathPrefix("/api/").Subrouter()
+	api.HandleFunc("/features", getFeaturesHandler).Methods("GET")
+	api.HandleFunc("/instances", getInstancesHandler).Methods("GET")
+	api.HandleFunc("/instances/{id}", deleteInstancesHandler).Methods("DELETE")
+	api.HandleFunc("/instances/{id}", getInstanceHandler).Methods("GET")
+	api.HandleFunc("/instances/{id}/logs", getLogsHandler).Methods("GET")
+	api.HandleFunc("/components", getComponentsHandler).Methods("GET")
+	api.HandleFunc("/components/status", getComponentsStatusHandler).Methods("GET")
+	api.HandleFunc("/configuration/{id}", getConfigurationHandler).Methods("GET")
+	api.HandleFunc("/daprconfig", getDaprConfigHandler).Methods("GET")
+	api.HandleFunc("/environments", getEnvironmentsHandler).Methods("GET")
+	api.HandleFunc("/controlplanestatus", getControlPlaneHandler).Methods("GET")
 
 	spa := spaHandler{staticPath: "web/dist", indexPath: "index.html"}
 
@@ -81,7 +83,7 @@ func RunWebServer() {
 
 	srv := &http.Server{
 		Handler:      r,
-		Addr:         "127.0.0.1:8080",
+		Addr:         fmt.Sprintf("127.0.0.1:%v", port),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
@@ -107,12 +109,6 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// get the volume of the absolute path and remove it
 	volume := filepath.VolumeName(path)
 	path = strings.Replace(path, volume, "", 1)
-
-	// if the path is not a static file or library dependency (i.e. .js file)
-	// serve it directly without prepending its path
-	// if !(strings.Contains(path, "assets") || strings.Contains(path, "lib")) {
-	// 	path = filepath.Base(path)
-	// }
 
 	// prepend the path with the path to the static directory
 	path = filepath.Join(h.staticPath, path)
