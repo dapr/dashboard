@@ -27,7 +27,7 @@ Go > 1.13 is required.
 Install the Angular CLI:
 
 ```
-npm i @angular/cli
+npm i --global @angular/cli
 ```
 
 Clone the repo and run the dashboard:
