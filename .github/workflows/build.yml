@@ -24,6 +24,7 @@ jobs:
       GOPROXY: https://proxy.golang.org
       NODE_VERSION: 12.x
       IMAGE_NAME: dashboard
+      ARTIFACTS_DIR: release/artifacts
     steps:  
     - name: Setup node ${{ env.NODE_VERSION }} and npm
       uses: actions/setup-node@v1
@@ -54,6 +55,11 @@ jobs:
     - name: Build and prepare release
       run: |
         ./build.sh
+    - name: upload artifacts
+      uses: actions/upload-artifact@master
+      with:
+        name: artifacts
+        path: ${{ env.ARTIFACTS_DIR }}
     - name: Build docker image
       run: docker build -t ${{ secrets.DOCKER_DAPRIO_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.REL_VERSION }} .
     - name: Push dashboard docker images
@@ -74,7 +80,7 @@ jobs:
         REPO_NAME="${GITHUB_REPOSITORY#*/}"
         
         # Get the list of files
-        RELEASE_ARTIFACT=(release/artifacts/*)
+        RELEASE_ARTIFACT=(${{ env.ARTIFACTS_DIR }}/*)
         
         export GITHUB_TOKEN=${{ secrets.DAPR_BOT_TOKEN }}
         echo "Uploading release packages to GitHub Release"
