@@ -11,10 +11,7 @@ mkdir -p ${artifacts_dir}
 
 
 # build go code and prepare release dir for platforms.
-# (TODO: currently its for linux enable darwin and windows (if angular code build here can be used on windows and mac) by uncommenting the platforms array with multiple platforms below)
-
-platforms=("linux_amd64")
-#platforms=("linux_amd64" "windows_amd64" "darwin_amd64")
+platforms=("linux_amd64" "windows_amd64" "darwin_amd64")
 
 for platform in "${platforms[@]}"
 do
