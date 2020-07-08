@@ -1,8 +1,6 @@
 package kube
 
 import (
-	"os"
-
 	scheme "github.com/dapr/dapr/pkg/client/clientset/versioned"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -16,13 +14,10 @@ func Clients() (*kubernetes.Clientset, scheme.Interface, error) {
 	}
 
 	kubeClient, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return kubeClient, nil, err
+	}
+
 	daprClient, err := scheme.NewForConfig(config)
 	return kubeClient, daprClient, err
-}
-
-func homeDir() string {
-	if h := os.Getenv("HOME"); h != "" {
-		return h
-	}
-	return os.Getenv("USERPROFILE") // windows
 }
