@@ -37,9 +37,9 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v2
     - name: golangci-lint
-     uses: golangci/golangci-lint-action@v1
-     with:
-       version: v1.26
+      uses: golangci/golangci-lint-action@v1
+      with:
+        version: v1.26
     - name: Parse release version and set REL_VERSION env var.
       run: python ./.github/scripts/get_release_version.py    
     - name: Setup node_module caching # this allows for re-using node_modules caching, making builds a bit faster.
