@@ -127,7 +127,7 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// otherwise, use http.FileServer to serve the static dir
-	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
+	noCache(http.StripPrefix("/", http.FileServer(http.Dir(h.staticPath)))).ServeHTTP(w, r)
 }
 
 func getInstancesHandler(w http.ResponseWriter, r *http.Request) {
