@@ -127,7 +127,7 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// otherwise, use http.FileServer to serve the static dir
-	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
+	noCache(http.StripPrefix("/", http.FileServer(http.Dir(h.staticPath)))).ServeHTTP(w, r)
 }
 
 func getInstancesHandler(w http.ResponseWriter, r *http.Request) {
@@ -212,7 +212,12 @@ func respondWithError(w http.ResponseWriter, code int, message string) {
 
 func respondWithPlainString(w http.ResponseWriter, code int, payload string) {
 	w.WriteHeader(code)
-	w.Write([]byte(payload))
+	_, err := w.Write([]byte(payload))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 }
 
 func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
@@ -220,7 +225,11 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	w.Write(response)
+	_, err := w.Write(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func noCache(h http.Handler) http.Handler {

@@ -86,7 +86,9 @@ func (i *instances) Logs(id string) string {
 						return ""
 					}
 
-					for _, p := range pods.Items {
+					if len(pods.Items) > 0 {
+						p := pods.Items[0]
+
 						name := p.ObjectMeta.Name
 
 						options := v1.PodLogOptions{}
@@ -100,7 +102,11 @@ func (i *instances) Logs(id string) string {
 						}
 
 						buf := new(bytes.Buffer)
-						buf.ReadFrom(arr)
+						_, err = buf.ReadFrom(arr)
+						if err != nil {
+							log.Println(err)
+							return ""
+						}
 						logsStr := buf.String()
 
 						return logsStr
@@ -108,10 +114,8 @@ func (i *instances) Logs(id string) string {
 				}
 			}
 		}
-		return ""
-	} else {
-		return ""
 	}
+	return ""
 }
 
 // Configuration returns the metadata of a Dapr application in YAML format
@@ -134,7 +138,9 @@ func (i *instances) Configuration(id string) string {
 						return ""
 					}
 
-					for _, p := range pods.Items {
+					if len(pods.Items) > 0 {
+						p := pods.Items[0]
+
 						name := p.ObjectMeta.Name
 						nspace := p.ObjectMeta.Namespace
 
@@ -152,7 +158,11 @@ func (i *instances) Configuration(id string) string {
 						}
 
 						buf := new(bytes.Buffer)
-						buf.ReadFrom(data)
+						_, err = buf.ReadFrom(data)
+						if err != nil {
+							log.Println(err)
+							return ""
+						}
 						dataStr := buf.String()
 						j := []byte(dataStr)
 						y, err := yaml.JSONToYAML(j)
@@ -166,10 +176,9 @@ func (i *instances) Configuration(id string) string {
 				}
 			}
 		}
-		return ""
-	} else {
-		return ""
+
 	}
+	return ""
 }
 
 // Delete deletes the local Dapr sidecar instance
@@ -215,7 +224,11 @@ func (i *instances) getKubernetesInstances() []Instance {
 
 			s := json.NewYAMLSerializer(json.DefaultMetaFactory, nil, nil)
 			buf := new(bytes.Buffer)
-			s.Encode(&d, buf)
+			err := s.Encode(&d, buf)
+			if err != nil {
+				log.Println(err)
+				return list
+			}
 
 			i.Manifest = buf.String()
 
