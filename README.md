@@ -10,15 +10,32 @@ The Dapr Dashboard is a web-based UI for Dapr, allowing users to see information
 
 This repo is under heavy development, all devs and web developers in particular are welcome to start contributing!
 
-* List Dapr sidecars with metadata (Self hosted, Kubernetes)
-* Stop a running sidecar (Self hosted)
-* View sidecar logs (Kubernetes)
-* View components in the cluster (Kubernetes)
+### Kubernetes
+* List Dapr sidecars with metadata
+* View sidecar logs
+* View Dapr sidecar deployment file
+* View Dapr components in the cluster
+* View Dapr configurations in the cluster
+* View Dapr control plane status
+
+### Standalone
+* List Dapr sidecars with metadata
+* Stop a running sidecar
 
 ## Getting started
 
-### Local machine
+### Prerequisites
+[Dapr Runtime](https://github.com/dapr/dapr)
+[Dapr CLI](https://github.com/dapr/cli)
 
+### Installation
+
+#### Kubernetes
+If Dapr was installed with [Helm](https://github.com/dapr/docs/blob/master/getting-started/environment-setup.md#using-helm-advanced), run `dapr dashboard -k`, or if you installed Dapr in a non-default namespace, `dapr dashboard -k -n your-namespace`
+
+If Dapr was installed with `dapr init -k`, run `dapr-dashboard -k`
+
+#### Standalone
 Running the dashboard locally will work with Dapr instances running on the local machine.
 
 First, make sure you have [Go](https://golang.org/dl/) installed.
@@ -32,7 +49,7 @@ npm i --global @angular/cli
 
 Clone the repo and run the dashboard:
 
-```
+```bash
 mkdir -p $GOPATH/src/github.com/dapr/dashboard
 cd $GOPATH/src/github.com/dapr
 git clone git@github.com:dapr/dashboard.git
@@ -41,54 +58,12 @@ npm i
 ng build
 cd ..
 go build
+
+# Mac/ Linux
 ./dashboard
+
+# Windows
+./dashboard.exe
 ```
 
 Done! point your browser to http://localhost:8080.
-
-### Kubernetes
-
-Running the dashboard in Kubernetes will let you view and manage the Dapr instances running in your cluster.
-
-1. Deploy the dashboard:
-
-```
-kubectl apply -f https://raw.githubusercontent.com/dapr/dashboard/master/deploy/dashboard.yaml
-```
-
-Wait until the dashboard pod is in Running state:
-
-```
-kubectl get pod --selector=app=dapr-dashboard -w
-```
-
-2. Connect to the dashboard:
-
-```
-kubectl port-forward svc/dapr-dashboard 8080:8080
-```
-
-Done! point your browser to http://localhost:8080.
-
-## Building from source
-
-First, install the Angular CLI:
-
-```
-npm i @angular/cli
-```
-
-Build the website and the Go web server into the `/release` dir:
-
-```
-./build.sh
-```
-
-### Building a Docker image
-
-After you have the release dir in place, run:
-
-```
-docker build -t <image>:<tag> .
-docker push <image>:<tag>
-```
