@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	actors "github.com/dapr/dashboard/pkg/actors"
 	components "github.com/dapr/dashboard/pkg/components"
 	configurations "github.com/dapr/dashboard/pkg/configurations"
 	instances "github.com/dapr/dashboard/pkg/instances"
@@ -53,6 +54,7 @@ var inst instances.Instances
 var comps components.Components
 var configs configurations.Configurations
 var stats status.Status
+var actor actors.Actors
 
 // RunWebServer starts the web server that serves the Dapr UI dashboard and the API
 func RunWebServer() {
@@ -61,6 +63,7 @@ func RunWebServer() {
 	comps = components.NewComponents(daprClient)
 	configs = configurations.NewConfigurations(daprClient)
 	stats = status.NewStatus(kubeClient)
+	actor = actors.NewActors(daprClient)
 
 	r := mux.NewRouter()
 
@@ -76,6 +79,7 @@ func RunWebServer() {
 	api.HandleFunc("/daprconfig", getDaprConfigHandler).Methods("GET")
 	api.HandleFunc("/environments", getEnvironmentsHandler).Methods("GET")
 	api.HandleFunc("/controlplanestatus", getControlPlaneHandler).Methods("GET")
+	api.HandleFunc("/actors", getActorsHandler).Methods("GET")
 
 	spa := spaHandler{staticPath: "web/dist", indexPath: "index.html"}
 
@@ -192,6 +196,11 @@ func getInstanceHandler(w http.ResponseWriter, r *http.Request) {
 
 func getControlPlaneHandler(w http.ResponseWriter, r *http.Request) {
 	resp := stats.Get()
+	respondWithJSON(w, 200, resp)
+}
+
+func getActorsHandler(w http.ResponseWriter, r *http.Request) {
+	resp := actor.Get()
 	respondWithJSON(w, 200, resp)
 }
 

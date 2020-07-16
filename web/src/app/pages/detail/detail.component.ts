@@ -3,6 +3,7 @@ import { InstanceService } from '../../instances/instance.service';
 import { ActivatedRoute } from '@angular/router';
 import * as yaml from 'js-yaml';
 import { GlobalsService } from 'src/app/globals/globals.service';
+import { ActorsService } from 'src/app/actors/actors.service';
 
 @Component({
   selector: 'ngx-detail',
@@ -19,10 +20,12 @@ export class DetailComponent implements OnInit {
   public instance: any;
   public loadedConfiguration: boolean;
   public loadedInstance: boolean;
+  public actors: any[]
 
   constructor(
     private route: ActivatedRoute,
     private instances: InstanceService,
+    private actorsService: ActorsService,
     public globals: GlobalsService,
   ) { }
 
@@ -56,7 +59,12 @@ export class DetailComponent implements OnInit {
   getInstance(id: string) {
     this.instances.getInstance(id).subscribe((data: any) => {
       this.instance = data;
+      this.getActors(this.instance.httpPort);
       this.loadedInstance = true;
     });
+  }
+
+  getActors(port: string) {
+    this.actors = this.actorsService.getActors(port);
   }
 }

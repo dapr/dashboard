@@ -99,4 +99,27 @@
   <mat-tab *ngIf="this.globals.kubernetesEnabled" label="Logs">
     <ngx-logs></ngx-logs>
   </mat-tab>
+  <mat-tab label="Actors">
+    <mat-card class="card-large mat-elevation-z8">
+      <mat-card-header>
+        <mat-card-title>Actors</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <table>
+          <tbody>
+            <ng-container *ngFor="let actor of actors">
+              <tr>
+                <td class="table-label">Type</td>
+                <td class="table-data">{{ actor.type }}</td>
+              </tr>
+              <tr>
+                <td class="table-label">Count</td>
+                <td class="table-data">{{ actor.count }}</td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
 </mat-tab-group>
