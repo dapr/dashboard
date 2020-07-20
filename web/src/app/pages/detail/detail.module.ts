@@ -9,6 +9,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTableModule } from '@angular/material/table';
 
 @NgModule({
   imports: [
@@ -20,6 +21,7 @@ import { MatButtonModule } from '@angular/material/button';
     MatCheckboxModule,
     MatSnackBarModule,
     MatButtonModule,
+    MatTableModule
   ],
   declarations: [
     DetailComponent,

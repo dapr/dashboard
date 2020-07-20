@@ -100,26 +100,18 @@
     <ngx-logs></ngx-logs>
   </mat-tab>
   <mat-tab label="Actors">
-    <mat-card class="card-large mat-elevation-z8">
-      <mat-card-header>
-        <mat-card-title>Actors</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <table>
-          <tbody>
-            <ng-container *ngFor="let actor of actors">
-              <tr>
-                <td class="table-label">Type</td>
-                <td class="table-data">{{ actor.type }}</td>
-              </tr>
-              <tr>
-                <td class="table-label">Count</td>
-                <td class="table-data">{{ actor.count }}</td>
-              </tr>
-            </ng-container>
-          </tbody>
-        </table>
-      </mat-card-content>
-    </mat-card>
+    <h3 class="table-header">Actors</h3>
+    <table *ngIf="loadedActors" mat-table [dataSource]="actors" class="table-large mat-elevation-z8">
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef>Type</th>
+        <td mat-cell *matCellDef="let item">{{ item.type }}</td>
+      </ng-container>
+      <ng-container matColumnDef="count">
+        <th mat-header-cell *matHeaderCellDef>Count</th>
+        <td mat-cell *matCellDef="let item">{{ item.count }}</td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
   </mat-tab>
 </mat-tab-group>

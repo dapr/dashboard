@@ -1,20 +1,37 @@
 package actors
 
 import (
-	"bytes"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
 
-	scheme "github.com/dapr/dapr/pkg/client/clientset/versioned"
+	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/kubernetes"
 )
 
 // Actors is an interface to interact with Dapr actors
 type Actors interface {
-	Supported() bool
-	Get() string
+	Get(id string, port int) string
 }
 
 type actors struct {
-	daprClient scheme.Interface
+	kubeClient *kubernetes.Clientset
+}
+
+const (
+	daprEnabledAnnotation = "dapr.io/enabled"
+	daprIDAnnotation      = "dapr.io/id"
+	daprPortAnnotation    = "dapr.io/port"
+)
+
+// ActorsOutput represents an Actor api call response
+type ActorsOutput struct {
+	ID       string                      `json:"id`
+	Actors   []MetadataActiveActorsCount `json:"actors"`
+	Extended map[string]interface{}      `json:"extended"`
 }
 
 // MetadataActiveActorsCount represents actor metadata: type and count
@@ -24,34 +41,98 @@ type MetadataActiveActorsCount struct {
 }
 
 // NewActors returns a new Actors instance
-func NewActors(daprClient scheme.Interface) Actors {
+func NewActors(kubeClient *kubernetes.Clientset) Actors {
 	return &actors{
-		daprClient: daprClient,
+		kubeClient: kubeClient,
 	}
 }
 
-// Supported checks whether or not the Dapr client is available
-func (a *actors) Supported() bool {
-	return a.daprClient != nil
-}
+func (a *actors) Get(id string, port int) string {
+	if a.kubeClient != nil {
+		resp, err := a.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
+		if err != nil || len(resp.Items) == 0 {
+			return ""
+		}
 
-func (a *actors) Get() string {
-	if a.Supported() {
-		b := a.daprClient
-		c := b.ComponentsV1alpha1()
-		restClient := c.RESTClient()
-		// restClient := a.daprClient.Discovery().RESTClient()
-		data, err := restClient.Get().RequestURI("/v1.0/metadata").Stream()
+		for _, d := range resp.Items {
+			if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
+				daprID := d.Spec.Template.Annotations[daprIDAnnotation]
+				if daprID == id {
+					pods, err := a.kubeClient.CoreV1().Pods(d.GetNamespace()).List(meta_v1.ListOptions{
+						LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
+					})
+					if err != nil {
+						log.Println(err)
+						return ""
+					}
 
-		buf := new(bytes.Buffer)
-		_, err = buf.ReadFrom(data)
+					if len(pods.Items) > 0 {
+						p := pods.Items[0]
+
+						url := fmt.Sprintf("http://%v:%v/v1.0/metadata", p.Status.PodIP, 3500)
+
+						resp, err := http.Get(url)
+						if err != nil {
+							log.Println(err)
+							return ""
+						}
+
+						defer resp.Body.Close()
+						body, err := ioutil.ReadAll(resp.Body)
+						if err != nil {
+							log.Println(err)
+							return ""
+						}
+
+						var data ActorsOutput
+
+						if err := json.Unmarshal(body, &data); err != nil {
+							return string(body)
+						}
+
+						out := ""
+						for _, act := range data.Actors {
+							out += fmt.Sprintf("{id: %s, count: %v}\n", act.Type, act.Count)
+						}
+
+						return out
+					}
+				}
+			}
+		}
+
+	} else {
+		url := fmt.Sprintf("http://localhost:%v/v1.0/metadata", port)
+		resp, err := http.Get(url)
 		if err != nil {
 			log.Println(err)
 			return ""
 		}
-		dataStr := buf.String()
 
-		return dataStr
+		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Println(err)
+			return ""
+		}
+
+		var data ActorsOutput
+
+		if err := json.Unmarshal(body, &data); err != nil {
+			return string(body)
+		}
+
+		out := ""
+		for _, act := range data.Actors {
+			actorJSON, err := json.Marshal(act)
+			if err != nil {
+				log.Println(err)
+				return ""
+			}
+			out += string(actorJSON)
+		}
+
+		return out
 	}
 	return ""
 }

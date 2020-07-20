@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import * as yaml from 'js-yaml';
 import { GlobalsService } from 'src/app/globals/globals.service';
 import { ActorsService } from 'src/app/actors/actors.service';
+import { Actor } from 'src/app/actors/Actor';
 
 @Component({
   selector: 'ngx-detail',
@@ -20,7 +21,9 @@ export class DetailComponent implements OnInit {
   public instance: any;
   public loadedConfiguration: boolean;
   public loadedInstance: boolean;
-  public actors: any[]
+  public loadedActors: boolean;
+  public actors: Actor[];
+  public displayedColumns: string[] = ["type", "count"];
 
   constructor(
     private route: ActivatedRoute,
@@ -32,9 +35,11 @@ export class DetailComponent implements OnInit {
   ngOnInit() {
     this.loadedConfiguration = false;
     this.loadedInstance = false;
+    this.loadedActors = false;
     this.id = this.route.snapshot.params.id;
     this.getConfiguration(this.id);
     this.getInstance(this.id);
+    this.getActors(this.id);
     this.options = {
       folding: true,
       minimap: { enabled: true },
@@ -59,12 +64,14 @@ export class DetailComponent implements OnInit {
   getInstance(id: string) {
     this.instances.getInstance(id).subscribe((data: any) => {
       this.instance = data;
-      this.getActors(this.instance.httpPort);
       this.loadedInstance = true;
     });
   }
 
-  getActors(port: string) {
-    this.actors = this.actorsService.getActors(port);
+  getActors(id: string) {
+    this.actorsService.getActors(id).subscribe(data => {
+      this.actors = data;
+      this.loadedActors = true;
+    });
   }
 }

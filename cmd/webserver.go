@@ -63,7 +63,7 @@ func RunWebServer() {
 	comps = components.NewComponents(daprClient)
 	configs = configurations.NewConfigurations(daprClient)
 	stats = status.NewStatus(kubeClient)
-	actor = actors.NewActors(daprClient)
+	actor = actors.NewActors(kubeClient)
 
 	r := mux.NewRouter()
 
@@ -79,7 +79,7 @@ func RunWebServer() {
 	api.HandleFunc("/daprconfig", getDaprConfigHandler).Methods("GET")
 	api.HandleFunc("/environments", getEnvironmentsHandler).Methods("GET")
 	api.HandleFunc("/controlplanestatus", getControlPlaneHandler).Methods("GET")
-	api.HandleFunc("/actors", getActorsHandler).Methods("GET")
+	api.HandleFunc("/actors/{id}", getActorsHandler).Methods("GET")
 
 	spa := spaHandler{staticPath: "web/dist", indexPath: "index.html"}
 
@@ -200,8 +200,11 @@ func getControlPlaneHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getActorsHandler(w http.ResponseWriter, r *http.Request) {
-	resp := actor.Get()
-	respondWithJSON(w, 200, resp)
+	vars := mux.Vars(r)
+	id := vars["id"]
+	port := inst.GetInstance(id).HTTPPort
+	resp := actor.Get(id, port)
+	respondWithPlainString(w, 200, resp)
 }
 
 func deleteInstancesHandler(w http.ResponseWriter, r *http.Request) {
