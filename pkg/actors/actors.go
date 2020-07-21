@@ -24,12 +24,11 @@ type actors struct {
 const (
 	daprEnabledAnnotation = "dapr.io/enabled"
 	daprIDAnnotation      = "dapr.io/id"
-	daprPortAnnotation    = "dapr.io/port"
 )
 
 // ActorsOutput represents an Actor api call response
 type ActorsOutput struct {
-	ID       string                      `json:"id`
+	ID       string                      `json:"id"`
 	Actors   []MetadataActiveActorsCount `json:"actors"`
 	Extended map[string]interface{}      `json:"extended"`
 }
