@@ -11,6 +11,7 @@ import { DaprComponentsModule } from './dapr-components/dapr-components.module';
 import { MatListModule } from '@angular/material/list';
 import { ConfigurationModule } from './configuration/configuration.module';
 import { ControlPlaneModule } from './controlplane/controlplane.module';
+import { DaprComponentDetailModule } from './dapr-components/dapr-component-detail/dapr-component-detail.module';
 
 @NgModule({
   imports: [
@@ -25,6 +26,7 @@ import { ControlPlaneModule } from './controlplane/controlplane.module';
     MatListModule,
     ConfigurationModule,
     ControlPlaneModule,
+    DaprComponentDetailModule,
   ],
   declarations: [
     PagesComponent,

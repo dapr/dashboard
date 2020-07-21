@@ -14,6 +14,10 @@ export class ComponentsService {
     return this.http.get<DaprComponent[]>('/api/components');
   }
 
+  getComponent(name: string): Observable<DaprComponent> {
+    return this.http.get<DaprComponent>('/api/components/' + name);
+  }
+
   getComponentsStatus(): Observable<DaprComponentStatus[]> {
     return this.http.get<DaprComponentStatus[]>('/api/components/status');
   }

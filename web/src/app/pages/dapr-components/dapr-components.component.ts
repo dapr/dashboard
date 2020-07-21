@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ComponentsService } from 'src/app/components/component.service';
-import { DaprComponentStatus, DaprComponent } from 'src/app/types/types';
+import { ComponentsService } from 'src/app/components/components.service';
+import { DaprComponentStatus } from 'src/app/types/types';
 
 @Component({
   selector: 'ngx-dashboard',

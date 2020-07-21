@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ComponentsService } from './component.service';
+import { ComponentsService } from './components.service';
 
-describe('ComponentService', () => {
+describe('ComponentsService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('should be created', () => {

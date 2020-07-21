@@ -12,7 +12,8 @@ import (
 // Components is an interface to interact with Dapr components
 type Components interface {
 	Supported() bool
-	Get() []v1alpha1.Component
+	GetComponents() []v1alpha1.Component
+	GetComponent(name string) v1alpha1.Component
 	GetStatus() []ComponentsOutput
 }
 
@@ -40,18 +41,24 @@ func (c *components) Supported() bool {
 	return c.daprClient != nil
 }
 
-// Get returns the list of Dapr components
-func (c *components) Get() []v1alpha1.Component {
+// GetComponents returns the list of all Dapr components
+func (c *components) GetComponents() []v1alpha1.Component {
 	comps, err := c.daprClient.ComponentsV1alpha1().Components(meta_v1.NamespaceDefault).List(meta_v1.ListOptions{})
 	if err != nil {
 		log.Println(err)
 		return []v1alpha1.Component{}
 	}
-	log.Println(comps.Items)
-	log.Println("_")
-	log.Println(comps.Items[0].Scopes)
-	log.Println("S")
 	return comps.Items
+}
+
+// GetComponent returns a specific component based on a supplied component name
+func (c *components) GetComponent(name string) v1alpha1.Component {
+	comps, err := c.daprClient.ComponentsV1alpha1().Components(meta_v1.NamespaceDefault).List(meta_v1.ListOptions{})
+	if err != nil {
+		log.Println(err)
+		return v1alpha1.Component{}
+	}
+	return comps.Items[0]
 }
 
 // GetStatus returns returns a list of Dapr component statuses

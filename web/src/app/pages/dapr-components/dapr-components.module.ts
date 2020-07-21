@@ -3,7 +3,6 @@ import { RouterModule } from '@angular/router';
 import { DaprComponentsComponent } from './dapr-components.component';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
-import { DaprComponentDetailComponent } from './dapr-component-detail/dapr-component-detail.component';
 
 @NgModule({
   imports: [
@@ -12,8 +11,7 @@ import { DaprComponentDetailComponent } from './dapr-component-detail/dapr-compo
     MatTableModule,
   ],
   declarations: [
-    DaprComponentsComponent,
-    DaprComponentDetailComponent,
+    DaprComponentsComponent
   ],
 })
 export class DaprComponentsModule { }
