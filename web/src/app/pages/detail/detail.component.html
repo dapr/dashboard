@@ -101,7 +101,7 @@
   </mat-tab>
   <mat-tab label="Actors">
     <h3 class="table-header">Actors</h3>
-    <table *ngIf="loadedActors" mat-table [dataSource]="actors" class="table-large mat-elevation-z8">
+    <table *ngIf="loadedMetadata" mat-table [dataSource]="metadata" class="table-large mat-elevation-z8">
       <ng-container matColumnDef="type">
         <th mat-header-cell *matHeaderCellDef>Type</th>
         <td mat-cell *matCellDef="let item">{{ item.type }}</td>
@@ -110,8 +110,8 @@
         <th mat-header-cell *matHeaderCellDef>Count</th>
         <td mat-cell *matCellDef="let item">{{ item.count }}</td>
       </ng-container>
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr mat-header-row *matHeaderRowDef="metadataDisplayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: metadataDisplayedColumns;"></tr>
     </table>
   </mat-tab>
 </mat-tab-group>

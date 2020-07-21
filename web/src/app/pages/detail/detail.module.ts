@@ -21,7 +21,7 @@ import { MatTableModule } from '@angular/material/table';
     MatCheckboxModule,
     MatSnackBarModule,
     MatButtonModule,
-    MatTableModule
+    MatTableModule,
   ],
   declarations: [
     DetailComponent,

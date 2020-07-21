@@ -10,12 +10,10 @@ import (
 	"strings"
 	"time"
 
-	actors "github.com/dapr/dashboard/pkg/actors"
 	components "github.com/dapr/dashboard/pkg/components"
 	configurations "github.com/dapr/dashboard/pkg/configurations"
 	instances "github.com/dapr/dashboard/pkg/instances"
 	kube "github.com/dapr/dashboard/pkg/kube"
-	status "github.com/dapr/dashboard/pkg/status"
 	"github.com/gorilla/mux"
 )
 
@@ -53,8 +51,6 @@ type spaHandler struct {
 var inst instances.Instances
 var comps components.Components
 var configs configurations.Configurations
-var stats status.Status
-var actor actors.Actors
 
 // RunWebServer starts the web server that serves the Dapr UI dashboard and the API
 func RunWebServer() {
@@ -62,8 +58,6 @@ func RunWebServer() {
 	inst = instances.NewInstances(kubeClient)
 	comps = components.NewComponents(daprClient)
 	configs = configurations.NewConfigurations(daprClient)
-	stats = status.NewStatus(kubeClient)
-	actor = actors.NewActors(kubeClient)
 
 	r := mux.NewRouter()
 
@@ -79,7 +73,7 @@ func RunWebServer() {
 	api.HandleFunc("/daprconfig", getDaprConfigHandler).Methods("GET")
 	api.HandleFunc("/environments", getEnvironmentsHandler).Methods("GET")
 	api.HandleFunc("/controlplanestatus", getControlPlaneHandler).Methods("GET")
-	api.HandleFunc("/actors/{id}", getActorsHandler).Methods("GET")
+	api.HandleFunc("/metadata/{id}", getMetadataHandler).Methods("GET")
 
 	spa := spaHandler{staticPath: "web/dist", indexPath: "index.html"}
 
@@ -135,7 +129,7 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func getInstancesHandler(w http.ResponseWriter, r *http.Request) {
-	resp := inst.Get()
+	resp := inst.GetInstances()
 	respondWithJSON(w, 200, resp)
 }
 
@@ -157,7 +151,7 @@ func getFeaturesHandler(w http.ResponseWriter, r *http.Request) {
 	if configs.Supported() {
 		features = append(features, "configurations")
 	}
-	if stats.Supported() {
+	if inst.Supported() {
 		features = append(features, "status")
 	}
 	respondWithJSON(w, 200, features)
@@ -171,14 +165,14 @@ func getEnvironmentsHandler(w http.ResponseWriter, r *http.Request) {
 func getLogsHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	logs := inst.Logs(id)
+	logs := inst.GetLogs(id)
 	respondWithPlainString(w, 200, logs)
 }
 
 func getConfigurationHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	details := inst.Configuration(id)
+	details := inst.GetConfiguration(id)
 	respondWithPlainString(w, 200, details)
 }
 
@@ -195,22 +189,21 @@ func getInstanceHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getControlPlaneHandler(w http.ResponseWriter, r *http.Request) {
-	resp := stats.Get()
+	resp := inst.GetControlPlaneStatus()
 	respondWithJSON(w, 200, resp)
 }
 
-func getActorsHandler(w http.ResponseWriter, r *http.Request) {
+func getMetadataHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	port := inst.GetInstance(id).HTTPPort
-	resp := actor.Get(id, port)
-	respondWithPlainString(w, 200, resp)
+	resp := inst.GetMetadata(id)
+	respondWithJSON(w, 200, resp)
 }
 
 func deleteInstancesHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	err := inst.Delete(id)
+	err := inst.DeleteInstance(id)
 	if err != nil {
 		respondWithError(w, 500, err.Error())
 		return

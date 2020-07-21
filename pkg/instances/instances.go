@@ -2,27 +2,35 @@ package instances
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"strconv"
+	"strings"
+	"sync"
 
-	"github.com/dapr/cli/pkg/age"
 	"github.com/dapr/cli/pkg/standalone"
+	"github.com/dapr/dashboard/pkg/age"
 	v1 "k8s.io/api/core/v1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/runtime/serializer/json"
+	json_serializer "k8s.io/apimachinery/pkg/runtime/serializer/json"
 	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/yaml"
 )
 
-// Instances is an interface to interact with running Dapr instances in Kubrernetes or Standalone modes
+// Instances is an interface to interact with running Dapr instances in Kubernetes or Standalone modes
 type Instances interface {
-	Get() []Instance
+	Supported() bool
+	GetInstances() []Instance
 	GetInstance(id string) Instance
-	Delete(id string) error
-	Logs(id string) string
-	Configuration(id string) string
+	DeleteInstance(id string) error
+	GetLogs(id string) string
+	GetConfiguration(id string) string
+	GetControlPlaneStatus() []StatusOutput
+	GetMetadata(id string) []MetadataActiveActorsCount
 	CheckSupportedEnvironments() []string
 }
 
@@ -35,6 +43,10 @@ const (
 	daprEnabledAnnotation = "dapr.io/enabled"
 	daprIDAnnotation      = "dapr.io/id"
 	daprPortAnnotation    = "dapr.io/port"
+)
+
+var (
+	controlPlaneLabels = [...]string{"dapr-operator", "dapr-sentry", "dapr-placement", "dapr-sidecar-injector"}
 )
 
 // NewInstances returns an Instances implementation
@@ -50,8 +62,13 @@ func NewInstances(kubeClient *kubernetes.Clientset) Instances {
 	return &i
 }
 
-// Get returns the appropriate environment's GetInstance function
-func (i *instances) Get() []Instance {
+// Supported checks if the current kubernetes client is available
+func (i *instances) Supported() bool {
+	return i.kubeClient != nil
+}
+
+// GetInstances returns the result of the appropriate environment's GetInstance function
+func (i *instances) GetInstances() []Instance {
 	return i.getInstancesFn()
 }
 
@@ -66,8 +83,8 @@ func (i *instances) CheckSupportedEnvironments() []string {
 	return envs
 }
 
-// Logs returns a string of all logs for the given Dapr app id
-func (i *instances) Logs(id string) string {
+// GetLogs returns a string of all logs for the given Dapr app id
+func (i *instances) GetLogs(id string) string {
 	if i.kubeClient != nil {
 		resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
 		if err != nil || len(resp.Items) == 0 {
@@ -118,8 +135,8 @@ func (i *instances) Logs(id string) string {
 	return ""
 }
 
-// Configuration returns the metadata of a Dapr application in YAML format
-func (i *instances) Configuration(id string) string {
+// GetConfiguration returns the metadata of a Dapr application in YAML format
+func (i *instances) GetConfiguration(id string) string {
 	if i.kubeClient != nil {
 		resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
 		if err != nil || len(resp.Items) == 0 {
@@ -181,9 +198,143 @@ func (i *instances) Configuration(id string) string {
 	return ""
 }
 
-// Delete deletes the local Dapr sidecar instance
-func (i *instances) Delete(id string) error {
+// DeleteInstance deletes the local Dapr sidecar instance
+func (i *instances) DeleteInstance(id string) error {
 	return standalone.Stop(id)
+}
+
+// GetInstance uses the appropriate getInstance function (kubernetes, standalone, etc.) and returns the given instance from its id
+func (i *instances) GetInstance(id string) Instance {
+	instanceList := i.getInstancesFn()
+	for _, instance := range instanceList {
+		if instance.AppID == id {
+			return instance
+		}
+	}
+	return Instance{}
+}
+
+// Get lists the status of each of the Dapr control plane services
+func (i *instances) GetControlPlaneStatus() []StatusOutput {
+	if i.kubeClient != nil {
+		var wg sync.WaitGroup
+		wg.Add(len(controlPlaneLabels))
+
+		m := sync.Mutex{}
+		statuses := []StatusOutput{}
+
+		for _, lbl := range controlPlaneLabels {
+			go func(label string) {
+				options := meta_v1.ListOptions{}
+				labelSelector := map[string]string{
+					"app": label,
+				}
+				options.LabelSelector = labels.FormatLabels(labelSelector)
+
+				p, err := i.kubeClient.CoreV1().Pods(v1.NamespaceAll).List(options)
+				if err == nil && len(p.Items) == 1 {
+					pod := p.Items[0]
+
+					image := pod.Spec.Containers[0].Image
+					namespace := pod.GetNamespace()
+					age := age.GetAge(pod.CreationTimestamp.Time)
+					created := pod.CreationTimestamp.Format("2006-01-02 15:04.05")
+					version := image[strings.IndexAny(image, ":")+1:]
+					status := ""
+
+					if pod.Status.ContainerStatuses[0].State.Waiting != nil {
+						status = fmt.Sprintf("Waiting (%s)", pod.Status.ContainerStatuses[0].State.Waiting.Reason)
+					} else if pod.Status.ContainerStatuses[0].State.Running != nil {
+						status = "Running"
+					} else if pod.Status.ContainerStatuses[0].State.Terminated != nil {
+						status = "Terminated"
+					}
+
+					healthy := "False"
+					if pod.Status.ContainerStatuses[0].Ready {
+						healthy = "True"
+					}
+
+					s := StatusOutput{
+						Name:      label,
+						Namespace: namespace,
+						Created:   created,
+						Age:       age,
+						Status:    status,
+						Version:   version,
+						Healthy:   healthy,
+					}
+
+					m.Lock()
+					statuses = append(statuses, s)
+					m.Unlock()
+				}
+				wg.Done()
+			}(lbl)
+		}
+
+		wg.Wait()
+		return statuses
+	}
+	return []StatusOutput{}
+}
+
+// GetMetadata returns the result from the /v1.0/metadata endpoint
+func (i *instances) GetMetadata(id string) []MetadataActiveActorsCount {
+	url := ""
+	if i.kubeClient != nil {
+		resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
+		if err != nil || len(resp.Items) == 0 {
+			return []MetadataActiveActorsCount{}
+		}
+
+		for _, d := range resp.Items {
+			if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
+				daprID := d.Spec.Template.Annotations[daprIDAnnotation]
+				if daprID == id {
+					pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(meta_v1.ListOptions{
+						LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
+					})
+					if err != nil {
+						log.Println(err)
+						return []MetadataActiveActorsCount{}
+					}
+
+					if len(pods.Items) > 0 {
+						p := pods.Items[0]
+						url = fmt.Sprintf("http://%v:%v/v1.0/metadata", p.Status.PodIP, 3500)
+					}
+				}
+			}
+		}
+
+	} else {
+		port := i.GetInstance(id).HTTPPort
+		url = fmt.Sprintf("http://localhost:%v/v1.0/metadata", port)
+	}
+	if url != "" {
+
+		resp, err := http.Get(url)
+		if err != nil {
+			log.Println(err)
+			return []MetadataActiveActorsCount{}
+		}
+
+		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Println(err)
+			return []MetadataActiveActorsCount{}
+		}
+
+		var data MetadataOutput
+		if err := json.Unmarshal(body, &data); err != nil {
+			log.Println(err)
+			return []MetadataActiveActorsCount{}
+		}
+		return data.Actors
+	}
+	return []MetadataActiveActorsCount{}
 }
 
 // getKubernetesInstances gets the list of Dapr applications running in the Kubernetes environment
@@ -222,7 +373,7 @@ func (i *instances) getKubernetesInstances() []Instance {
 				}
 			}
 
-			s := json.NewYAMLSerializer(json.DefaultMetaFactory, nil, nil)
+			s := json_serializer.NewYAMLSerializer(json_serializer.DefaultMetaFactory, nil, nil)
 			buf := new(bytes.Buffer)
 			err := s.Encode(&d, buf)
 			if err != nil {
@@ -263,15 +414,4 @@ func (i *instances) getStandaloneInstances() []Instance {
 		}
 	}
 	return list
-}
-
-// GetInstance uses the appropriate getInstance function (kubernetes, standalone, etc.) and returns the given instance from its id
-func (i *instances) GetInstance(id string) Instance {
-	instanceList := i.getInstancesFn()
-	for _, instance := range instanceList {
-		if instance.AppID == id {
-			return instance
-		}
-	}
-	return Instance{}
 }

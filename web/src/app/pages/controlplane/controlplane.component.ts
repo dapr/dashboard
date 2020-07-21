@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { StatusService } from '../../status/status.service';
+import { InstanceService } from 'src/app/instances/instance.service';
+import { Status } from 'src/app/types/types';
 
 @Component({
   selector: 'app-controlplane',
@@ -8,17 +9,17 @@ import { StatusService } from '../../status/status.service';
 })
 export class ControlPlaneComponent implements OnInit {
 
-  public data: any[];
+  public data: Status[];
   public displayedColumns: string[] = ['name', 'namespace', 'healthy', 'status', 'version', 'age', 'created'];
 
-  constructor(private statusService: StatusService) { }
+  constructor(private statusService: InstanceService) { }
 
   ngOnInit(): void {
     this.getControlPlaneStatus();
   }
 
-  getControlPlaneStatus() {
-    this.statusService.getControlPlaneStatus().subscribe((data: any[]) => {
+  getControlPlaneStatus(): void {
+    this.statusService.getControlPlaneStatus().subscribe((data: Status[]) => {
       this.data = data;
     });
   }

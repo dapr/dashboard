@@ -1,8 +1,8 @@
 import { OnInit, Component, OnDestroy } from '@angular/core';
-import { InstanceService } from '../../instances/instance.service';
-import { StatusService } from 'src/app/status/status.service';
+import { InstanceService } from 'src/app/instances/instance.service';
 import { GlobalsService } from 'src/app/globals/globals.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Instance, Status } from 'src/app/types/types';
 
 @Component({
   selector: 'ngx-dashboard',
@@ -12,21 +12,20 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 export class DashboardComponent implements OnInit, OnDestroy {
 
-  public data: any[];
+  public instances: Instance[];
   public displayedColumns: string[] = [];
   public daprHealthiness: string;
   public daprVersion: string;
-  public tableLoaded: boolean = false;
+  public tableLoaded: boolean;
   private intervalHandler;
 
   constructor(
     private instanceService: InstanceService,
-    private statusService: StatusService,
     public globals: GlobalsService,
     private snackbar: MatSnackBar,
   ) { }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.tableLoaded = false;
     this.getInstances();
     this.getControlPlaneData();
@@ -49,38 +48,38 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }, 3000);
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     clearInterval(this.intervalHandler);
   }
 
-  checkEnvironment() {
+  checkEnvironment(): void {
     this.globals.getSupportedEnvironments();
   }
 
-  getInstances() {
-    this.instanceService.getInstances().subscribe((data: any[]) => {
-      this.data = data;
+  getInstances(): void {
+    this.instanceService.getInstances().subscribe((data: Instance[]) => {
+      this.instances = data;
     });
   }
 
   getControlPlaneData(): void {
-    this.statusService.getControlPlaneStatus().subscribe((data: any[]) => {
+    this.instanceService.getControlPlaneStatus().subscribe((data: Status[]) => {
       this.daprHealthiness = data.every((service) => {
-        return service.Healthy == 'True'
+        return service.healthy == 'True'
       }) ? 'Healthy' : 'Unhealthy';
       data.forEach(service => {
-        this.daprVersion = service.Version;
+        this.daprVersion = service.version;
       });
     });
   }
 
-  showSnackbar(message: string) {
+  showSnackbar(message: string): void {
     this.snackbar.open(message, '', {
       duration: 2000,
     });
   }
 
-  delete(id: string) {
+  delete(id: string): void {
     this.instanceService.deleteInstance(id).subscribe(() => {
       this.showSnackbar('Deleted Dapr instance with ID ' + id);
     }, error => {

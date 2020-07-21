@@ -7,7 +7,7 @@
         <tbody>
           <tr>
             <td class="table-label-large">Version</td>
-            <td class="table-data-large">v{{ daprVersion }}</td>
+            <td class="table-data-large">{{ daprVersion }}</td>
           </tr>
           <tr>
             <td class="table-label-large">Status</td>
@@ -32,7 +32,7 @@
   </mat-card>
 </ng-container>
 <h3 class="table-header">Dapr Applications</h3>
-<table *ngIf="tableLoaded" mat-table [dataSource]="data" class="table-large mat-elevation-z8">
+<table *ngIf="tableLoaded" mat-table [dataSource]="instances" class="table-large mat-elevation-z8">
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef>Name</th>
     <td mat-cell *matCellDef="let item"><a routerLink="/detail/{{item.appID}}">{{ item.appID }}</a></td>
