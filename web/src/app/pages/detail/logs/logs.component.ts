@@ -32,10 +32,12 @@ export class LogsComponent implements OnInit {
   }
 
   getLogs(refresh: boolean) {
-    this.logs = this.instances.getLogsArray(this.id);
-    if (refresh) {
-      this.showSnackbar('Logs successfully refreshed');
-    }
+    this.instances.getLogsArray(this.id).subscribe(data => {
+      this.logs = data;
+      if (refresh) {
+        this.showSnackbar('Logs successfully refreshed');
+      }
+    });
   }
 
   isActive(level: string): boolean {
