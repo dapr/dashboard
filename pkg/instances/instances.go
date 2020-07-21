@@ -30,7 +30,8 @@ type Instances interface {
 	GetLogs(id string) string
 	GetConfiguration(id string) string
 	GetControlPlaneStatus() []StatusOutput
-	GetMetadata(id string) []MetadataActiveActorsCount
+	GetMetadata(id string) MetadataOutput
+	GetActiveActorsCount(metadata MetadataOutput) []MetadataActiveActorsCount
 	CheckSupportedEnvironments() []string
 }
 
@@ -214,7 +215,7 @@ func (i *instances) GetInstance(id string) Instance {
 	return Instance{}
 }
 
-// Get lists the status of each of the Dapr control plane services
+// GetControlPlaneStatus lists the status of each of the Dapr control plane services
 func (i *instances) GetControlPlaneStatus() []StatusOutput {
 	if i.kubeClient != nil {
 		var wg sync.WaitGroup
@@ -280,12 +281,12 @@ func (i *instances) GetControlPlaneStatus() []StatusOutput {
 }
 
 // GetMetadata returns the result from the /v1.0/metadata endpoint
-func (i *instances) GetMetadata(id string) []MetadataActiveActorsCount {
+func (i *instances) GetMetadata(id string) MetadataOutput {
 	url := ""
 	if i.kubeClient != nil {
 		resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
 		if err != nil || len(resp.Items) == 0 {
-			return []MetadataActiveActorsCount{}
+			return MetadataOutput{}
 		}
 
 		for _, d := range resp.Items {
@@ -297,7 +298,7 @@ func (i *instances) GetMetadata(id string) []MetadataActiveActorsCount {
 					})
 					if err != nil {
 						log.Println(err)
-						return []MetadataActiveActorsCount{}
+						return MetadataOutput{}
 					}
 
 					if len(pods.Items) > 0 {
@@ -313,28 +314,32 @@ func (i *instances) GetMetadata(id string) []MetadataActiveActorsCount {
 		url = fmt.Sprintf("http://localhost:%v/v1.0/metadata", port)
 	}
 	if url != "" {
-
 		resp, err := http.Get(url)
 		if err != nil {
 			log.Println(err)
-			return []MetadataActiveActorsCount{}
+			return MetadataOutput{}
 		}
 
 		defer resp.Body.Close()
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			log.Println(err)
-			return []MetadataActiveActorsCount{}
+			return MetadataOutput{}
 		}
 
 		var data MetadataOutput
 		if err := json.Unmarshal(body, &data); err != nil {
 			log.Println(err)
-			return []MetadataActiveActorsCount{}
+			return MetadataOutput{}
 		}
-		return data.Actors
+		return data
 	}
-	return []MetadataActiveActorsCount{}
+	return MetadataOutput{}
+}
+
+// GetActiveActorsCount returns the Actors slice of a MetadataOutput
+func (i *instances) GetActiveActorsCount(metadata MetadataOutput) []MetadataActiveActorsCount {
+	return metadata.Actors
 }
 
 // getKubernetesInstances gets the list of Dapr applications running in the Kubernetes environment

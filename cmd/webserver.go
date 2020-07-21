@@ -196,7 +196,8 @@ func getControlPlaneHandler(w http.ResponseWriter, r *http.Request) {
 func getMetadataHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	resp := inst.GetMetadata(id)
+	md := inst.GetMetadata(id)
+	resp := inst.GetActiveActorsCount(md)
 	respondWithJSON(w, 200, resp)
 }
 
