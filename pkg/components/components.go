@@ -22,10 +22,10 @@ type components struct {
 
 // ComponentsOutput represent a Dapr component.
 type ComponentsOutput struct {
-	Name    string `csv:"Name"`
-	Type    string `csv:"Type"`
-	Age     string `csv:"AGE"`
-	Created string `csv:"CREATED"`
+	Name    string `json:"name"`
+	Type    string `json:"type"`
+	Age     string `json:"age"`
+	Created string `json:"created"`
 }
 
 // NewComponents returns a new Components instance
@@ -47,6 +47,10 @@ func (c *components) Get() []v1alpha1.Component {
 		log.Println(err)
 		return []v1alpha1.Component{}
 	}
+	log.Println(comps.Items)
+	log.Println("_")
+	log.Println(comps.Items[0].Scopes)
+	log.Println("S")
 	return comps.Items
 }
 

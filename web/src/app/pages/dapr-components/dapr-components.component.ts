@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ComponentsService } from 'src/app/components/component.service';
+import { DaprComponentStatus, DaprComponent } from 'src/app/types/types';
 
 @Component({
   selector: 'ngx-dashboard',
@@ -7,9 +8,8 @@ import { ComponentsService } from 'src/app/components/component.service';
   styleUrls: ['dapr-components.component.scss'],
 })
 export class DaprComponentsComponent implements OnInit {
-  
-  public components: any[];
-  public componentsStatus: any[];
+
+  public componentsStatus: DaprComponentStatus[];
   public statusLoaded: boolean;
   public displayedColumns: string[] = ['img', 'name', 'status', 'age', 'created'];
 
@@ -21,15 +21,7 @@ export class DaprComponentsComponent implements OnInit {
 
   getComponents(): void {
     this.statusLoaded = false;
-    this.componentsService.getComponents().subscribe((data: any[]) => {
-      this.components = data;
-
-      for (const c of this.components) {
-        c.iconPath = this.getIconPath(c.spec.type);
-        c.spec.metadata = JSON.stringify(c.spec.metadata, null, 2);
-      }
-    });
-    this.componentsService.getComponentsStatus().subscribe((data: any[]) => {
+    this.componentsService.getComponentsStatus().subscribe((data: DaprComponentStatus[]) => {
       this.componentsStatus = data;
       this.statusLoaded = true;
     });

@@ -43,11 +43,10 @@ export interface Log {
 
 // DaprComponent describes an Dapr component type
 export interface DaprComponent {
-	iconPath: string;
-	metadata: Object;
-	spec:     Object;
-	auth:     Object;
-	scopes:   string[];
+	metadata: any;
+	spec:     any;
+	auth:     any;
+	scopes:   any;
 }
 
 // DaprComponentStatus represent a Dapr component status
