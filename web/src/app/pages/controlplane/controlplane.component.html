@@ -2,31 +2,31 @@
 <table mat-table [dataSource]="data" class="table-large mat-elevation-z8">
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef>Name</th>
-    <td mat-cell *matCellDef="let item">{{ item.Name }}</td>
+    <td mat-cell *matCellDef="let item">{{ item.name }}</td>
   </ng-container>
   <ng-container matColumnDef="namespace">
     <th mat-header-cell *matHeaderCellDef>Namespace</th>
-    <td mat-cell *matCellDef="let item">{{ item.Namespace }}</td>
+    <td mat-cell *matCellDef="let item">{{ item.namespace }}</td>
   </ng-container>
   <ng-container matColumnDef="healthy">
     <th mat-header-cell *matHeaderCellDef>Healthy</th>
-    <td mat-cell *matCellDef="let item">{{ item.Healthy }}</td>
+    <td mat-cell *matCellDef="let item">{{ item.healthy }}</td>
   </ng-container>
   <ng-container matColumnDef="status">
     <th mat-header-cell *matHeaderCellDef>Status</th>
-    <td mat-cell *matCellDef="let item">{{ item.Status }}</td>
+    <td mat-cell *matCellDef="let item">{{ item.status }}</td>
   </ng-container>
   <ng-container matColumnDef="version">
     <th mat-header-cell *matHeaderCellDef>Version</th>
-    <td mat-cell *matCellDef="let item">{{ item.Version }}</td>
+    <td mat-cell *matCellDef="let item">{{ item.version }}</td>
   </ng-container>
   <ng-container matColumnDef="age">
     <th mat-header-cell *matHeaderCellDef>Age</th>
-    <td mat-cell *matCellDef="let item">{{ item.Age }}</td>
+    <td mat-cell *matCellDef="let item">{{ item.age }}</td>
   </ng-container>
   <ng-container matColumnDef="created">
     <th mat-header-cell *matHeaderCellDef>Created</th>
-    <td mat-cell *matCellDef="let item">{{ item.Created }}</td>
+    <td mat-cell *matCellDef="let item">{{ item.created }}</td>
   </ng-container>
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>

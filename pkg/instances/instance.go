@@ -19,3 +19,27 @@ type Instance struct {
 	Labels           string `json:"labels"`
 	Selector         string `json:"selector"`
 }
+
+// StatusOutput represents the status of a named Dapr resource.
+type StatusOutput struct {
+	Name      string `json:"name"`
+	Namespace string `json:"namespace"`
+	Healthy   string `json:"healthy"`
+	Status    string `json:"status"`
+	Version   string `json:"version"`
+	Age       string `json:"age"`
+	Created   string `json:"created"`
+}
+
+// MetadataOutput represents a metadata api call response
+type MetadataOutput struct {
+	ID       string                      `json:"id"`
+	Actors   []MetadataActiveActorsCount `json:"actors"`
+	Extended map[string]interface{}      `json:"extended"`
+}
+
+// MetadataActiveActorsCount represents actor metadata: type and count
+type MetadataActiveActorsCount struct {
+	Type  string `json:"type"`
+	Count int    `json:"count"`
+}

@@ -8,7 +8,7 @@ export class ConfigurationService {
 
   constructor(private http: HttpClient) { }
 
-  getConfiguration() {
+  getConfigurations() {
     return this.http.get('/api/daprconfig');
   }
 }
