@@ -17,10 +17,12 @@ This repo is under heavy development, all devs and web developers in particular 
 * View Dapr components in the cluster
 * View Dapr configurations in the cluster
 * View Dapr control plane status
+* View Dapr actor metadata information
 
 ### Standalone
 * List Dapr sidecars with metadata
 * Stop a running sidecar
+* View Dapr actor metadata information
 
 ## Getting started
 
