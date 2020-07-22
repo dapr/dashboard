@@ -51,6 +51,7 @@ export interface DaprComponent {
 
 // DaprComponentStatus represent a Dapr component status
 export interface DaprComponentStatus {
+    img: string;
     name: string;
     type: string;
     age: string;

@@ -2,7 +2,7 @@
 <table mat-table [dataSource]="componentsStatus" class="table-large mat-elevation-z8">
   <ng-container matColumnDef="img">
     <th mat-header-cell *matHeaderCellDef></th>
-    <td mat-cell *matCellDef="let item"><img [src]="getIconPath(item.type)" class="component-img"></td>
+    <td mat-cell *matCellDef="let item"><img src="{{item.img}}" class="component-img"></td>
   </ng-container>
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef>Name</th>

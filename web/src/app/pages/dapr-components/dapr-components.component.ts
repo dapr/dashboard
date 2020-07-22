@@ -23,6 +23,9 @@ export class DaprComponentsComponent implements OnInit {
     this.statusLoaded = false;
     this.componentsService.getComponentsStatus().subscribe((data: DaprComponentStatus[]) => {
       this.componentsStatus = data;
+      this.componentsStatus.forEach(component => {
+        component.img = this.getIconPath(component.type);
+      });
       this.statusLoaded = true;
     });
   }

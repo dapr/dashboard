@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { DaprComponent } from 'src/app/types/types';
 import { ComponentsService } from 'src/app/components/components.service';
 import { ActivatedRoute } from '@angular/router';
+import * as yaml from 'js-yaml';
 
 @Component({
   selector: 'app-dapr-component-detail',
@@ -11,11 +12,12 @@ import { ActivatedRoute } from '@angular/router';
 export class DaprComponentDetailComponent implements OnInit {
 
   private name: string;
-  public component: DaprComponent;
+  public component: any;
   public componentName: string;
-  public componentJSON: string;
+  public componentMetadata: string | object;
+  public componentDeployment: string | object;
   public options: object;
-  public loadedComponent;
+  public loadedComponent: boolean;
 
   constructor(
     private route: ActivatedRoute,
@@ -28,7 +30,8 @@ export class DaprComponentDetailComponent implements OnInit {
       console.log(data);
       this.component = data;
       this.componentName = data.metadata.name;
-      this.componentJSON = JSON.stringify(data.spec.metadata, null, 2);
+      this.componentDeployment = yaml.safeDump(data);
+      this.componentMetadata = yaml.safeDump(data.spec.metadata);
       this.loadedComponent = true;
     });
     this.options = {
