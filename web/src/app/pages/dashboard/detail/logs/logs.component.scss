@@ -1,11 +1,17 @@
 @use '../../../../theme/pages.scss';
+@use '../../../../theme/cards.scss';
 
 mat-checkbox {
     margin-left: 15px;
 }
 
+button {
+    margin-left: 15px;
+}
+
 li {
-    white-space: nowrap;
+    list-style: none;
+    white-space: break-spaces;
     font-weight: 200;
     font-size: 12px;
     color: #666666;

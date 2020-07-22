@@ -13,8 +13,12 @@ const routes: Routes = [{
   component: PagesComponent,
   children: [
     {
-      path: 'dashboard',
+      path: 'overview',
       component: DashboardComponent,
+    },
+    {
+      path: 'overview/:id',
+      component: DetailComponent,
     },
     {
       path: 'components',
@@ -23,10 +27,6 @@ const routes: Routes = [{
     {
       path: 'components/:id',
       component: DaprComponentDetailComponent,
-    },
-    {
-      path: 'detail/:id',
-      component: DetailComponent,
     },
     {
       path: 'configuration',
@@ -38,10 +38,10 @@ const routes: Routes = [{
     },
     {
       path: '',
-      redirectTo: 'dashboard',
+      redirectTo: 'overview',
       pathMatch: 'full',
     },
-    { path: '**', redirectTo: 'dashboard' },
+    { path: '**', redirectTo: 'overview' },
   ],
 }];
 

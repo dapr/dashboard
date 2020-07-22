@@ -1,4 +1,4 @@
-<h2 class="page-header-left" *ngIf="loadedComponent">{{ componentName }}</h2>
+<h2 class="page-header-left" *ngIf="loadedComponent">Component: {{ componentName }}</h2>
 <mat-tab-group>
   <mat-tab label="Summary">
     <mat-card class="card-large mat-elevation-z8" *ngIf="loadedComponent">
@@ -23,6 +23,10 @@
             <tr>
               <td class="table-label">Type</td>
               <td class="table-data">{{ component.spec.type }}</td>
+            </tr>
+            <tr>
+              <td class="table-label">Created</td>
+              <td class="table-data">{{ component.metadata.creationTimestamp }}</td>
             </tr>
           </tbody>
         </table>

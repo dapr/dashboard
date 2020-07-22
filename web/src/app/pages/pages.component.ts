@@ -1,8 +1,8 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { MenuItem, MENU_ITEMS, COMPONENTS_MENU_ITEM, CONFIGURATIONS_MENU_ITEM, CONTROLPLANE_MENU_ITEM } from './pages-menu';
-import { FeaturesService } from '../features/features.service';
+import { FeaturesService } from 'src/app/features/features.service';
 import { MatSidenav } from '@angular/material/sidenav';
-import { GlobalsService } from '../globals/globals.service';
+import { GlobalsService } from 'src/app/globals/globals.service';
 
 @Component({
   selector: 'app-pages',
@@ -11,19 +11,19 @@ import { GlobalsService } from '../globals/globals.service';
 })
 export class PagesComponent implements OnInit {
 
+  public menu: MenuItem[] = MENU_ITEMS;
+  public isMenuOpen = false;
+  public contentMargin = 60;
+
   constructor(
     private featuresService: FeaturesService,
     public globals: GlobalsService,
   ) { }
 
-  public menu: MenuItem[] = MENU_ITEMS;
-  public isMenuOpen = false;
-  public contentMargin = 60;
-
   @ViewChild('drawer', { static: false })
   drawer: MatSidenav;
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getFeatures();
   }
 

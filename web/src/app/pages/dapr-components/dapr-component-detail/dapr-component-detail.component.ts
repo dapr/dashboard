@@ -27,7 +27,6 @@ export class DaprComponentDetailComponent implements OnInit {
   ngOnInit(): void {
     this.name = this.route.snapshot.params.name;
     this.componentsService.getComponent(this.name).subscribe((data: DaprComponent) => {
-      console.log(data);
       this.component = data;
       this.componentName = data.metadata.name;
       this.componentDeployment = yaml.safeDump(data);
