@@ -14,7 +14,7 @@ export class DaprComponentDetailComponent implements OnInit {
   public component: DaprComponent;
   public componentName: string;
   public componentJSON: string;
-  public options: Object;
+  public options: object;
   public loadedComponent;
 
   constructor(

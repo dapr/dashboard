@@ -1,8 +1,8 @@
 export interface MenuItem {
-  title: string,
-  icon: string,
-  link: string,
-  name: string,
+  title: string;
+  icon: string;
+  link: string;
+  name: string;
 }
 
 export const DASHBOARD_MENU_ITEM = {
@@ -33,6 +33,6 @@ export const CONTROLPLANE_MENU_ITEM = {
   name: 'status',
 };
 
-export var MENU_ITEMS: MenuItem[] = [
+export let MENU_ITEMS: MenuItem[] = [
   DASHBOARD_MENU_ITEM,
 ];

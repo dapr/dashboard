@@ -6,7 +6,7 @@ import { GlobalsService } from 'src/app/globals/globals.service';
 import { Metadata, Instance } from 'src/app/types/types';
 
 @Component({
-  selector: 'ngx-detail',
+  selector: 'app-detail',
   templateUrl: 'detail.component.html',
   styleUrls: ['detail.component.scss'],
 })
@@ -16,13 +16,13 @@ export class DetailComponent implements OnInit {
   public model: string;
   public modelYAML: any;
   public annotations: string[];
-  public options: Object;
+  public options: object;
   public instance: Instance;
   public loadedConfiguration: boolean;
   public loadedInstance: boolean;
   public loadedMetadata: boolean;
   public metadata: Metadata[];
-  public metadataDisplayedColumns: string[] = ["type", "count"];
+  public metadataDisplayedColumns: string[] = ['type', 'count'];
 
   constructor(
     private route: ActivatedRoute,

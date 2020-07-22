@@ -3,7 +3,7 @@ import { ComponentsService } from 'src/app/components/components.service';
 import { DaprComponentStatus } from 'src/app/types/types';
 
 @Component({
-  selector: 'ngx-dashboard',
+  selector: 'app-components',
   templateUrl: 'dapr-components.component.html',
   styleUrls: ['dapr-components.component.scss'],
 })
