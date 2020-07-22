@@ -97,12 +97,12 @@
     </mat-card>
   </mat-tab>
   <mat-tab label="Actors">
-    <mat-card class="card-large mat-elevation-z8" *ngIf="loadedConfiguration">
+    <mat-card class="card-large mat-elevation-z8">
       <mat-card-header>
         <mat-card-title>Actors</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <table *ngIf="loadedMetadata && metadata.length > 0; else noActors" mat-table [dataSource]="metadata" class="table-large mat-elevation-z8">
+        <table *ngIf="loadedMetadata && metadata.length > 0; else noActors" mat-table [dataSource]="metadata" class="table-large actor-table mat-elevation-z1">
           <ng-container matColumnDef="type">
             <th mat-header-cell *matHeaderCellDef>Type</th>
             <td mat-cell *matCellDef="let item">{{ item.type }}</td>
