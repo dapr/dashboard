@@ -13,7 +13,9 @@ import (
 // Configurations is an interface to interact with a Dapr configuration
 type Configurations interface {
 	Supported() bool
-	Get() []ConfigurationsOutput
+	GetConfigurations() []v1alpha1.Configuration
+	GetConfiguration(name string) v1alpha1.Configuration
+	GetStatus() []ConfigurationsOutput
 }
 
 type configurations struct {
@@ -43,8 +45,35 @@ func (c *configurations) Supported() bool {
 	return c.daprClient != nil
 }
 
-// Get returns the list of Dapr Configurations
-func (c *configurations) Get() []ConfigurationsOutput {
+// GetConfigurations returns the list of all Dapr Configurations
+func (c *configurations) GetConfigurations() []v1alpha1.Configuration {
+	confs, err := c.daprClient.ConfigurationV1alpha1().Configurations(meta_v1.NamespaceAll).List(meta_v1.ListOptions{})
+	if err != nil {
+		log.Println(err)
+		return []v1alpha1.Configuration{}
+	}
+
+	return confs.Items
+}
+
+// GetConfiguration returns one Dapr configuration
+func (c *configurations) GetConfiguration(name string) v1alpha1.Configuration {
+	confs, err := c.daprClient.ConfigurationV1alpha1().Configurations(meta_v1.NamespaceAll).List(meta_v1.ListOptions{})
+	if err != nil {
+		log.Println(err)
+		return v1alpha1.Configuration{}
+	}
+
+	for _, c := range confs.Items {
+		if c.ObjectMeta.Name == name {
+			return c
+		}
+	}
+	return v1alpha1.Configuration{}
+}
+
+// GetStatus returns the list of Dapr Configurations Statuses
+func (c *configurations) GetStatus() []ConfigurationsOutput {
 	confs, err := c.daprClient.ConfigurationV1alpha1().Configurations(meta_v1.NamespaceAll).List(meta_v1.ListOptions{})
 	if err != nil {
 		log.Println(err)

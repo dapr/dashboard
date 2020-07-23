@@ -11,8 +11,8 @@ export class InstanceService {
 
   constructor(private http: HttpClient) { }
 
-  getInstances() {
-    return this.http.get('/api/instances');
+  getInstances(): Observable<Instance[]> {
+    return this.http.get<Instance[]>('/api/instances');
   }
 
   getInstance(id: string): Observable<Instance> {
@@ -23,8 +23,8 @@ export class InstanceService {
     return this.http.delete<Instance[]>('/api/instances/' + id);
   }
 
-  getConfiguration(id: string): Observable<string> {
-    return this.http.get('/api/configuration/' + id, { responseType: 'text' });
+  getDeployment(id: string): Observable<string> {
+    return this.http.get('/api/deployment/' + id, { responseType: 'text' });
   }
 
   getMetadata(id: string): Observable<Metadata[]> {

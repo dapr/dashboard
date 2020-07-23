@@ -70,8 +70,10 @@ func RunWebServer() {
 	api.HandleFunc("/components", getComponentsHandler).Methods("GET")
 	api.HandleFunc("/componentsstatus", getComponentsStatusHandler).Methods("GET")
 	api.HandleFunc("/components/{name}", getComponentHandler).Methods("GET")
-	api.HandleFunc("/configuration/{id}", getConfigurationHandler).Methods("GET")
-	api.HandleFunc("/daprconfig", getDaprConfigHandler).Methods("GET")
+	api.HandleFunc("/deployment/{id}", getDeploymentHandler).Methods("GET")
+	api.HandleFunc("/configurationsstatus", getConfigurationsStatusHandler).Methods("GET")
+	api.HandleFunc("/configurations", getConfigurationsHandler).Methods("GET")
+	api.HandleFunc("/configurations/{name}", getConfigurationHandler).Methods("GET")
 	api.HandleFunc("/environments", getEnvironmentsHandler).Methods("GET")
 	api.HandleFunc("/controlplanestatus", getControlPlaneHandler).Methods("GET")
 	api.HandleFunc("/metadata/{id}", getMetadataHandler).Methods("GET")
@@ -177,15 +179,27 @@ func getLogsHandler(w http.ResponseWriter, r *http.Request) {
 	respondWithPlainString(w, 200, logs)
 }
 
-func getConfigurationHandler(w http.ResponseWriter, r *http.Request) {
+func getDeploymentHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	details := inst.GetConfiguration(id)
+	details := inst.GetDeployment(id)
 	respondWithPlainString(w, 200, details)
 }
 
-func getDaprConfigHandler(w http.ResponseWriter, r *http.Request) {
-	resp := configs.Get()
+func getConfigurationsStatusHandler(w http.ResponseWriter, r *http.Request) {
+	resp := configs.GetStatus()
+	respondWithJSON(w, 200, resp)
+}
+
+func getConfigurationsHandler(w http.ResponseWriter, r *http.Request) {
+	resp := configs.GetConfigurations()
+	respondWithJSON(w, 200, resp)
+}
+
+func getConfigurationHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	name := vars["name"]
+	resp := configs.GetConfiguration(name)
 	respondWithJSON(w, 200, resp)
 }
 

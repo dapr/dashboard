@@ -28,7 +28,7 @@ type Instances interface {
 	GetInstance(id string) Instance
 	DeleteInstance(id string) error
 	GetLogs(id string) string
-	GetConfiguration(id string) string
+	GetDeployment(id string) string
 	GetControlPlaneStatus() []StatusOutput
 	GetMetadata(id string) MetadataOutput
 	GetActiveActorsCount(metadata MetadataOutput) []MetadataActiveActorsCount
@@ -136,8 +136,8 @@ func (i *instances) GetLogs(id string) string {
 	return ""
 }
 
-// GetConfiguration returns the metadata of a Dapr application in YAML format
-func (i *instances) GetConfiguration(id string) string {
+// GetDeployment returns the metadata of a Dapr application in YAML format
+func (i *instances) GetDeployment(id string) string {
 	if i.kubeClient != nil {
 		resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
 		if err != nil || len(resp.Items) == 0 {

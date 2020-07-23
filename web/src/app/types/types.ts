@@ -60,6 +60,12 @@ export interface DaprComponentStatus {
 
 // DaprConfiguration represent a Dapr configuration
 export interface DaprConfiguration {
+    metadata: any;
+    spec: any;
+}
+
+// DaprConfigurationStatus represent a Dapr configuration Status
+export interface DaprConfigurationStatus {
     name: string;
     tracingEnabled: boolean;
     mtlsEnabled: boolean;

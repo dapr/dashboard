@@ -2,7 +2,7 @@
 <table mat-table [dataSource]="config" class="table-large mat-elevation-z8">
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef>Name</th>
-    <td mat-cell *matCellDef="let item">{{ item.Name }}</td>
+    <td mat-cell *matCellDef="let item"><a routerLink="/configurations/{{item.Name}}">{{ item.Name }}</a></td>
   </ng-container>
   <ng-container matColumnDef="tracing-enabled">
     <th mat-header-cell *matHeaderCellDef>Tracing Enabled</th>

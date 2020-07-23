@@ -1,7 +1,7 @@
-<h2 class="page-header-left" *ngIf="loadedComponent">Component: {{ component.metadata.name }}</h2>
+<h2 class="page-header-left" *ngIf="loadedConfiguration">Configuration: {{ configuration.metadata.name }}</h2>
 <mat-tab-group>
   <mat-tab label="Summary">
-    <mat-card class="card-large mat-elevation-z8" *ngIf="loadedComponent">
+    <mat-card class="card-large mat-elevation-z8" *ngIf="loadedConfiguration">
       <mat-card-header>
         <mat-card-title>Summary</mat-card-title>
       </mat-card-header>
@@ -10,44 +10,40 @@
           <tbody>
             <tr>
               <td class="table-label">Kind</td>
-              <td class="table-data">{{ component.kind }}</td>
+              <td class="table-data">{{ configuration.kind }}</td>
             </tr>
             <tr>
               <td class="table-label">Name</td>
-              <td class="table-data">{{ component.metadata.name }}</td>
+              <td class="table-data">{{ configuration.metadata.name }}</td>
             </tr>
             <tr>
               <td class="table-label">Namespace</td>
-              <td class="table-data">{{ component.metadata.namespace }}</td>
-            </tr>
-            <tr>
-              <td class="table-label">Type</td>
-              <td class="table-data">{{ component.spec.type }}</td>
+              <td class="table-data">{{ configuration.metadata.namespace }}</td>
             </tr>
             <tr>
               <td class="table-label">Created</td>
-              <td class="table-data">{{ component.metadata.creationTimestamp }}</td>
+              <td class="table-data">{{ configuration.metadata.creationTimestamp }}</td>
             </tr>
           </tbody>
         </table>
       </mat-card-content>
     </mat-card>
   </mat-tab>
-  <mat-tab label="Metadata" *ngIf="loadedComponent">
+  <mat-tab label="Metadata" *ngIf="loadedConfiguration">
     <mat-card class="card-large mat-elevation-z8">
       <mat-card-header>
         <mat-card-title>Metadata</mat-card-title>
       </mat-card-header>
-      <ng-monaco-editor style="height: 300px" modelUri="file:metadata.yaml" [options]="options" [(ngModel)]="componentMetadata">
+      <ng-monaco-editor style="height: 300px" modelUri="file:metadata.yaml" [options]="options" [(ngModel)]="configurationMetadata">
       </ng-monaco-editor>
     </mat-card>
   </mat-tab>
-  <mat-tab label="Configuration" *ngIf="loadedComponent">
+  <mat-tab label="Configuration" *ngIf="loadedConfiguration">
     <mat-card class="card-large mat-elevation-z8">
       <mat-card-header>
         <mat-card-title>Deployment</mat-card-title>
       </mat-card-header>
-      <ng-monaco-editor style="height: 300px" modelUri="file:deployment.yaml" [options]="options" [(ngModel)]="componentDeployment">
+      <ng-monaco-editor style="height: 300px" modelUri="file:deployment.yaml" [options]="options" [(ngModel)]="configurationDeployment">
       </ng-monaco-editor>
     </mat-card>
   </mat-tab>

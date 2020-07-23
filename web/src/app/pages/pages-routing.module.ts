@@ -6,6 +6,7 @@ import { DaprComponentsComponent } from './dapr-components/dapr-components.compo
 import { DetailComponent } from './dashboard/detail/detail.component';
 import { DaprComponentDetailComponent } from './dapr-components/dapr-component-detail/dapr-component-detail.component';
 import { ConfigurationComponent } from './configuration/configuration.component';
+import { ConfigurationDetailComponent } from './configuration/configuration-detail/configuration-detail.component';
 import { ControlPlaneComponent } from './controlplane/controlplane.component';
 
 const routes: Routes = [{
@@ -29,8 +30,12 @@ const routes: Routes = [{
       component: DaprComponentDetailComponent,
     },
     {
-      path: 'configuration',
+      path: 'configurations',
       component: ConfigurationComponent,
+    },
+    {
+      path: 'configurations/:name',
+      component: ConfigurationDetailComponent,
     },
     {
       path: 'controlplane',
