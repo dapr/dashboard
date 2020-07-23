@@ -17,6 +17,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   public daprHealthiness: string;
   public daprVersion: string;
   public tableLoaded: boolean;
+  public controlPlaneLoaded: boolean;
   private intervalHandler;
 
   constructor(
@@ -27,6 +28,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.tableLoaded = false;
+    this.controlPlaneLoaded = false;
     this.getInstances();
     this.getControlPlaneData();
     this.globals.getSupportedEnvironments().subscribe(data => {
@@ -70,6 +72,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       data.forEach(service => {
         this.daprVersion = service.version;
       });
+      this.controlPlaneLoaded = true;
     });
   }
 

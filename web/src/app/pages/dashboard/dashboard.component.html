@@ -16,6 +16,7 @@
             </td>
             <td>
               <mat-icon
+                *ngIf="controlPlaneLoaded"
                 [ngClass]="{
                   'green': daprHealthiness === 'Healthy',
                   'red': daprHealthiness !== 'Healthy'
