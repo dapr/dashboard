@@ -68,7 +68,7 @@ func RunWebServer() {
 	api.HandleFunc("/instances/{id}", getInstanceHandler).Methods("GET")
 	api.HandleFunc("/instances/{id}/logs", getLogsHandler).Methods("GET")
 	api.HandleFunc("/components", getComponentsHandler).Methods("GET")
-	api.HandleFunc("/components/status", getComponentsStatusHandler).Methods("GET")
+	api.HandleFunc("/componentsstatus", getComponentsStatusHandler).Methods("GET")
 	api.HandleFunc("/components/{name}", getComponentHandler).Methods("GET")
 	api.HandleFunc("/configuration/{id}", getConfigurationHandler).Methods("GET")
 	api.HandleFunc("/daprconfig", getDaprConfigHandler).Methods("GET")

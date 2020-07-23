@@ -25,7 +25,7 @@ const routes: Routes = [{
       component: DaprComponentsComponent,
     },
     {
-      path: 'components/:id',
+      path: 'components/:name',
       component: DaprComponentDetailComponent,
     },
     {

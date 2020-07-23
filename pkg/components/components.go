@@ -58,7 +58,12 @@ func (c *components) GetComponent(name string) v1alpha1.Component {
 		log.Println(err)
 		return v1alpha1.Component{}
 	}
-	return comps.Items[0]
+	for _, c := range comps.Items {
+		if c.ObjectMeta.Name == name {
+			return c
+		}
+	}
+	return v1alpha1.Component{}
 }
 
 // GetStatus returns returns a list of Dapr component statuses

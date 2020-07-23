@@ -26,18 +26,22 @@ export class DaprComponentDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.name = this.route.snapshot.params.name;
-    this.componentsService.getComponent(this.name).subscribe((data: DaprComponent) => {
-      this.component = data;
-      this.componentName = data.metadata.name;
-      this.componentDeployment = yaml.safeDump(data);
-      this.componentMetadata = yaml.safeDump(data.spec.metadata);
-      this.loadedComponent = true;
-    });
+    this.getComponent(this.name);
     this.options = {
       folding: true,
       minimap: { enabled: true },
       readOnly: false,
       language: 'yaml',
     };
+  }
+
+  getComponent(name: string): void {
+    this.componentsService.getComponent(name).subscribe((data: DaprComponent) => {
+      this.component = data;
+      this.componentName = data.metadata.name;
+      this.componentDeployment = yaml.safeDump(data);
+      this.componentMetadata = yaml.safeDump(data.spec.metadata);
+      this.loadedComponent = true;
+    });
   }
 }
