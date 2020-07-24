@@ -23,8 +23,8 @@ export class InstanceService {
     return this.http.delete<Instance[]>('/api/instances/' + id);
   }
 
-  getDeployment(id: string): Observable<string> {
-    return this.http.get('/api/deployment/' + id, { responseType: 'text' });
+  getDeploymentConfiguration(id: string): Observable<string> {
+    return this.http.get('/api/deploymentconfiguration/' + id, { responseType: 'text' });
   }
 
   getMetadata(id: string): Observable<Metadata[]> {
