@@ -5,7 +5,7 @@ import { Log } from 'src/app/types/types';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
-  selector: 'ngx-logs',
+  selector: 'app-logs',
   templateUrl: 'logs.component.html',
   styleUrls: ['logs.component.scss'],
 })
@@ -41,11 +41,11 @@ export class LogsComponent implements OnInit {
   }
 
   isActive(level: string): boolean {
-    if (level === "info") return this.info;
-    if (level === "debug") return this.debug;
-    if (level === "warning") return this.warning;
-    if (level === "error") return this.error;
-    if (level === "fatal") return this.fatal;
+    if (level === 'info') { return this.info; }
+    if (level === 'debug') { return this.debug; }
+    if (level === 'warning') { return this.warning; }
+    if (level === 'error') { return this.error; }
+    if (level === 'fatal') { return this.fatal; }
     return false;
   }
 

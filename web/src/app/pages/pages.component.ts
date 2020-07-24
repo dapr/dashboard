@@ -1,11 +1,11 @@
 import { Component, ViewChild, OnInit } from '@angular/core';
 import { MenuItem, MENU_ITEMS, COMPONENTS_MENU_ITEM, CONFIGURATIONS_MENU_ITEM, CONTROLPLANE_MENU_ITEM } from './pages-menu';
-import { FeaturesService } from '../features/features.service';
+import { FeaturesService } from 'src/app/features/features.service';
 import { MatSidenav } from '@angular/material/sidenav';
-import { GlobalsService } from '../globals/globals.service';
+import { GlobalsService } from 'src/app/globals/globals.service';
 
 @Component({
-  selector: 'ngx-pages',
+  selector: 'app-pages',
   styleUrls: ['pages.component.scss'],
   templateUrl: 'pages.component.html',
 })
@@ -20,16 +20,16 @@ export class PagesComponent implements OnInit {
     public globals: GlobalsService,
   ) { }
 
-  ngOnInit() {
-    this.getFeatures();
-  }
-
   @ViewChild('drawer', { static: false })
   drawer: MatSidenav;
 
+  ngOnInit(): void {
+    this.getFeatures();
+  }
+
   getFeatures(): void {
     this.featuresService.get().subscribe((data: string[]) => {
-      for (let feature of data) {
+      for (const feature of data) {
         if (feature === COMPONENTS_MENU_ITEM.name) {
           this.menu.push(COMPONENTS_MENU_ITEM);
         }

@@ -1,15 +1,15 @@
 export interface MenuItem {
-  title: string,
-  icon: string,
-  link: string,
-  name: string,
+  title: string;
+  icon: string;
+  link: string;
+  name: string;
 }
 
-export const DASHBOARD_MENU_ITEM = {
+export const OVERVIEW_MENU_ITEM = {
   title: 'Overview',
   icon: 'home',
-  link: '/dashboard',
-  name: 'dashboard',
+  link: '/overview',
+  name: 'overview',
 };
 
 export const COMPONENTS_MENU_ITEM = {
@@ -33,6 +33,6 @@ export const CONTROLPLANE_MENU_ITEM = {
   name: 'status',
 };
 
-export var MENU_ITEMS: MenuItem[] = [
-  DASHBOARD_MENU_ITEM,
+export let MENU_ITEMS: MenuItem[] = [
+  OVERVIEW_MENU_ITEM,
 ];

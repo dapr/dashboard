@@ -3,10 +3,9 @@ module github.com/dapr/dashboard
 go 1.13
 
 require (
-	github.com/dapr/cli v0.8.0
-	github.com/dapr/dapr v0.8.0
+	github.com/dapr/cli v0.9.0
+	github.com/dapr/dapr v0.9.0
 	github.com/dapr/go-sdk v0.0.0-20200312165010-7bb7a2205f3b // indirect
-	github.com/gorilla/handlers v1.4.2
 	github.com/gorilla/mux v1.7.3
 	github.com/joomcode/errorx v1.0.1 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect

@@ -3,7 +3,8 @@ import { NgModule } from '@angular/core';
 import { PagesComponent } from './pages.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { DaprComponentsComponent } from './dapr-components/dapr-components.component';
-import { DetailComponent } from './detail/detail.component';
+import { DetailComponent } from './dashboard/detail/detail.component';
+import { DaprComponentDetailComponent } from './dapr-components/dapr-component-detail/dapr-component-detail.component';
 import { ConfigurationComponent } from './configuration/configuration.component';
 import { ControlPlaneComponent } from './controlplane/controlplane.component';
 
@@ -12,16 +13,20 @@ const routes: Routes = [{
   component: PagesComponent,
   children: [
     {
-      path: 'dashboard',
+      path: 'overview',
       component: DashboardComponent,
+    },
+    {
+      path: 'overview/:id',
+      component: DetailComponent,
     },
     {
       path: 'components',
       component: DaprComponentsComponent,
     },
     {
-      path: 'detail/:id',
-      component: DetailComponent,
+      path: 'components/:name',
+      component: DaprComponentDetailComponent,
     },
     {
       path: 'configuration',
@@ -33,10 +38,10 @@ const routes: Routes = [{
     },
     {
       path: '',
-      redirectTo: 'dashboard',
+      redirectTo: 'overview',
       pathMatch: 'full',
     },
-    { path: '**', redirectTo: 'dashboard' },
+    { path: '**', redirectTo: 'overview' },
   ],
 }];
 

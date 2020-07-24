@@ -15,7 +15,7 @@
     "start:electron": "tsc main.ts && ng build --base-href ./ && electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
-    "postinstall": "electron-builder install-app-deps && ngcc"
+    "electron-postinstall": "electron-builder install-app-deps && ngcc"
   },
   "dependencies": {
     "@angular/animations": "~9.1.11",
@@ -48,6 +48,7 @@
     "codelyzer": "^5.1.2",
     "electron": "^9.0.4",
     "electron-builder": "^22.7.0",
+    "husky": "^4.2.5",
     "jasmine-core": "~3.5.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~5.0.0",
@@ -62,5 +63,10 @@
   },
   "build": {
     "appId": "com.daprio.dapr-dashboard"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "ng lint"
+    }
   }
 }

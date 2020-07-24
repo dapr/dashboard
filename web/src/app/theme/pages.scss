@@ -1,16 +1,18 @@
 .app-header {
     font-size: 32px;
-    font-weight: 300;
+    font-weight: 400;
 }
 
 .page-header {
-    font-size: 30px;
+    font-size: 24px;
     margin-top: 25px;
     margin-left: 5%;
+    font-weight: 400;
 }
 
 .page-header-left {
-    font-size: 30px;
+    font-weight: 400;
+    font-size: 24px;
     margin-top: 25px;
     margin-left: 2%;
 }
@@ -21,4 +23,9 @@
     margin-left: 2%;
     margin-top: 20px;
     margin-bottom: 12px;
+}
+
+.page-text {
+    font-size: 16px;
+    margin-left: 2%;
 }

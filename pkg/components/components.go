@@ -12,7 +12,8 @@ import (
 // Components is an interface to interact with Dapr components
 type Components interface {
 	Supported() bool
-	Get() []v1alpha1.Component
+	GetComponents() []v1alpha1.Component
+	GetComponent(name string) v1alpha1.Component
 	GetStatus() []ComponentsOutput
 }
 
@@ -22,10 +23,10 @@ type components struct {
 
 // ComponentsOutput represent a Dapr component.
 type ComponentsOutput struct {
-	Name    string `csv:"Name"`
-	Type    string `csv:"Type"`
-	Age     string `csv:"AGE"`
-	Created string `csv:"CREATED"`
+	Name    string `json:"name"`
+	Type    string `json:"type"`
+	Age     string `json:"age"`
+	Created string `json:"created"`
 }
 
 // NewComponents returns a new Components instance
@@ -40,14 +41,29 @@ func (c *components) Supported() bool {
 	return c.daprClient != nil
 }
 
-// Get returns the list of Dapr components
-func (c *components) Get() []v1alpha1.Component {
+// GetComponents returns the list of all Dapr components
+func (c *components) GetComponents() []v1alpha1.Component {
 	comps, err := c.daprClient.ComponentsV1alpha1().Components(meta_v1.NamespaceDefault).List(meta_v1.ListOptions{})
 	if err != nil {
 		log.Println(err)
 		return []v1alpha1.Component{}
 	}
 	return comps.Items
+}
+
+// GetComponent returns a specific component based on a supplied component name
+func (c *components) GetComponent(name string) v1alpha1.Component {
+	comps, err := c.daprClient.ComponentsV1alpha1().Components(meta_v1.NamespaceDefault).List(meta_v1.ListOptions{})
+	if err != nil {
+		log.Println(err)
+		return v1alpha1.Component{}
+	}
+	for _, c := range comps.Items {
+		if c.ObjectMeta.Name == name {
+			return c
+		}
+	}
+	return v1alpha1.Component{}
 }
 
 // GetStatus returns returns a list of Dapr component statuses

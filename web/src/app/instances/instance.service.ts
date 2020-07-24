@@ -28,7 +28,7 @@ export class InstanceService {
   }
 
   getMetadata(id: string): Observable<Metadata[]> {
-    return this.http.get<Metadata[]>("/api/metadata/" + id);
+    return this.http.get<Metadata[]>('/api/metadata/' + id);
   }
 
   getControlPlaneStatus(): Observable<Status[]> {
@@ -38,14 +38,14 @@ export class InstanceService {
   getLogs(id: string): Observable<Log[]> {
     return this.http.get('/api/instances/' + id + '/logs', { responseType: 'text' }).pipe(
       map(logData => {
-        let output = [];
+        const output = [];
         logData.split('\n').forEach(log => {
           const regEx = RegExp('(?<=level=).*?(?=\s)', '');
           const level: string[] = regEx.exec(log);
           if (level != null && level.length > 0) {
             const currentLog: Log = {
               level: level[0].replace(' m', ''),
-              log: log,
+              log,
             };
             output.push(currentLog);
           }

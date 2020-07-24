@@ -11,7 +11,7 @@ import { MatTableModule } from '@angular/material/table';
     MatTableModule,
   ],
   declarations: [
-    DaprComponentsComponent,
+    DaprComponentsComponent
   ],
 })
 export class DaprComponentsModule { }
