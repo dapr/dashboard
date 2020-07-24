@@ -14,11 +14,8 @@ export class LogsComponent implements OnInit {
 
   public logs: Log[];
   public id: string;
-  public info: boolean;
-  public debug: boolean;
-  public warning: boolean;
-  public error: boolean;
-  public fatal: boolean;
+  public showFiltered: boolean;
+  public filterValue: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -38,15 +35,6 @@ export class LogsComponent implements OnInit {
         this.showSnackbar('Logs successfully refreshed');
       }
     });
-  }
-
-  isActive(level: string): boolean {
-    if (level === 'info') { return this.info; }
-    if (level === 'debug') { return this.debug; }
-    if (level === 'warning') { return this.warning; }
-    if (level === 'error') { return this.error; }
-    if (level === 'fatal') { return this.fatal; }
-    return false;
   }
 
   showSnackbar(message: string): void {

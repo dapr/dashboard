@@ -2,17 +2,27 @@
     <mat-card-header>
       <mat-card-title>
         Logs
-        <button mat-raised-button (click)="getLogs(true)">Refresh</button>
       </mat-card-title>
     </mat-card-header>
     <mat-card-content>
-        <mat-checkbox [(ngModel)]="info">Info</mat-checkbox>
-        <mat-checkbox [(ngModel)]="debug">Debug</mat-checkbox>
-        <mat-checkbox [(ngModel)]="warning">Warning</mat-checkbox>
-        <mat-checkbox [(ngModel)]="error">Error</mat-checkbox>
-        <mat-checkbox [(ngModel)]="fatal">Fatal</mat-checkbox>
-        <ul *ngFor="let log of logs">
-            <li *ngIf="isActive(log.level)">{{ log.log }}</li>
-        </ul>
+      <mat-form-field class="filter" [style.fontSize.px]=17>
+        <mat-label>Keyword</mat-label>
+        <input matInput type="text" [(ngModel)]="filterValue">
+        <button mat-button *ngIf="filterValue" matSuffix mat-icon-button aria-label="Clear" (click)="filterValue=''">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+        <button mat-raised-button (click)="getLogs(true)">Refresh</button>
+        <mat-checkbox [(ngModel)]="showFiltered">Show only filtered</mat-checkbox>
+        <ng-container *ngIf="showFiltered; else showAll">
+          <ul *ngFor="let log of logs | filter : filterValue : 'log'">
+            <li><p [innerHTML]="log.log | highlight : filterValue"></p></li>
+          </ul>
+        </ng-container>
+        <ng-template #showAll>
+          <ul *ngFor="let log of logs">
+            <li><p [innerHTML]="log.log | highlight : filterValue"></p></li>
+          </ul>
+        </ng-template>
     </mat-card-content>
 </mat-card>
