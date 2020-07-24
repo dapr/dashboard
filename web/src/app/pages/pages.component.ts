@@ -16,7 +16,7 @@ export class PagesComponent implements OnInit {
   public contentMargin = 60;
 
   constructor(
-    private features: FeaturesService,
+    private featuresService: FeaturesService,
     public globals: GlobalsService,
   ) { }
 
@@ -27,8 +27,8 @@ export class PagesComponent implements OnInit {
   @ViewChild('drawer', { static: false })
   drawer: MatSidenav;
 
-  getFeatures() {
-    this.features.get().subscribe((data: string[]) => {
+  getFeatures(): void {
+    this.featuresService.get().subscribe((data: string[]) => {
       for (let feature of data) {
         if (feature === COMPONENTS_MENU_ITEM.name) {
           this.menu.push(COMPONENTS_MENU_ITEM);
@@ -43,7 +43,7 @@ export class PagesComponent implements OnInit {
     });
   }
 
-  onDrawerToggle() {
+  onDrawerToggle(): void {
     this.isMenuOpen = !this.isMenuOpen;
     if (!this.isMenuOpen) {
       this.contentMargin = 60;

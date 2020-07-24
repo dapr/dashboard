@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfigurationService } from '../../configuration/configuration.service';
+import { ConfigurationService } from 'src/app/configuration/configuration.service';
+import { DaprConfiguration } from 'src/app/types/types';
 
 @Component({
   selector: 'app-configuration',
@@ -8,17 +9,17 @@ import { ConfigurationService } from '../../configuration/configuration.service'
 })
 export class ConfigurationComponent implements OnInit {
 
-  public config: any[];
+  public config: DaprConfiguration[];
   public displayedColumns: string[] = ['name', 'tracing-enabled', 'mtls-enabled', 'mtls-workload-ttl', 'mtls-clock-skew', 'age', 'created'];
 
-  constructor(private configService: ConfigurationService) { }
+  constructor(private configurationService: ConfigurationService) { }
 
   ngOnInit(): void {
     this.getConfiguration();
   }
 
-  getConfiguration() {
-    this.configService.getConfiguration().subscribe((data: any[]) => {
+  getConfiguration(): void {
+    this.configurationService.getConfigurations().subscribe((data: DaprConfiguration[]) => {
       this.config = data;
     });
   }

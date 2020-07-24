@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { InstanceService } from '../../../instances/instance.service';
-import { Log } from './log';
+import { InstanceService } from 'src/app/instances/instance.service';
+import { Log } from 'src/app/types/types';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'ngx-logs',
-  templateUrl: './logs.component.html',
-  styleUrls: ['./logs.component.scss'],
+  templateUrl: 'logs.component.html',
+  styleUrls: ['logs.component.scss'],
 })
 
 export class LogsComponent implements OnInit {
@@ -26,16 +26,18 @@ export class LogsComponent implements OnInit {
     private snackbar: MatSnackBar,
   ) { }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.id = this.route.snapshot.params.id;
     this.getLogs(false);
   }
 
-  getLogs(refresh: boolean) {
-    this.logs = this.instances.getLogsArray(this.id);
-    if (refresh) {
-      this.showSnackbar('Logs successfully refreshed');
-    }
+  getLogs(refresh: boolean): void {
+    this.instances.getLogs(this.id).subscribe((data: Log[]) => {
+      this.logs = data;
+      if (refresh) {
+        this.showSnackbar('Logs successfully refreshed');
+      }
+    });
   }
 
   isActive(level: string): boolean {
@@ -47,7 +49,7 @@ export class LogsComponent implements OnInit {
     return false;
   }
 
-  showSnackbar(message: string) {
+  showSnackbar(message: string): void {
     this.snackbar.open(message, '', {
       duration: 2000,
     });
