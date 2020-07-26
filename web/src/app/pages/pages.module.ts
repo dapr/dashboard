@@ -12,6 +12,7 @@ import { MatListModule } from '@angular/material/list';
 import { ConfigurationModule } from './configuration/configuration.module';
 import { ControlPlaneModule } from './controlplane/controlplane.module';
 import { DaprComponentDetailModule } from './dapr-components/dapr-component-detail/dapr-component-detail.module';
+import { ConfigurationDetailModule } from './configuration/configuration-detail/configuration-detail.module';
 
 @NgModule({
   imports: [
@@ -27,6 +28,7 @@ import { DaprComponentDetailModule } from './dapr-components/dapr-component-deta
     ConfigurationModule,
     ControlPlaneModule,
     DaprComponentDetailModule,
+    ConfigurationDetailModule
   ],
   declarations: [
     PagesComponent,

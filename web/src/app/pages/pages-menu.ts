@@ -22,7 +22,7 @@ export const COMPONENTS_MENU_ITEM = {
 export const CONFIGURATIONS_MENU_ITEM = {
   title: 'Configurations',
   icon: 'build',
-  link: '/configuration',
+  link: '/configurations',
   name: 'configurations',
 };
 

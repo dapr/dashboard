@@ -13,7 +13,6 @@ export class DaprComponentDetailComponent implements OnInit {
 
   private name: string;
   public component: any;
-  public componentName: string;
   public componentMetadata: string | object;
   public componentDeployment: string | object;
   public options: object;
@@ -38,7 +37,6 @@ export class DaprComponentDetailComponent implements OnInit {
   getComponent(name: string): void {
     this.componentsService.getComponent(name).subscribe((data: DaprComponent) => {
       this.component = data;
-      this.componentName = data.metadata.name;
       this.componentDeployment = yaml.safeDump(data);
       this.componentMetadata = yaml.safeDump(data.spec.metadata);
       this.loadedComponent = true;
