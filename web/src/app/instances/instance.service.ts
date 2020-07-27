@@ -36,22 +36,6 @@ export class InstanceService {
   }
 
   getLogs(id: string): Observable<Log[]> {
-    return this.http.get('/api/instances/' + id + '/logs', { responseType: 'text' }).pipe(
-      map(logData => {
-        const output = [];
-        logData.split('\n').forEach(log => {
-          const regEx = RegExp('(?<=level=).*?(?=\s)', '');
-          const level: string[] = regEx.exec(log);
-          if (level != null && level.length > 0) {
-            const currentLog: Log = {
-              level: level[0].replace(' m', ''),
-              log,
-            };
-            output.push(currentLog);
-          }
-        });
-        return output;
-      })
-    );
+    return this.http.get<Log[]>('/api/instances/' + id + '/logs');
   }
 }

@@ -15,13 +15,13 @@
         <button mat-raised-button (click)="getLogs(true)">Refresh</button>
         <mat-checkbox [(ngModel)]="showFiltered">Show only filtered</mat-checkbox>
         <ng-container *ngIf="showFiltered; else showAll">
-          <ul *ngFor="let log of logs | filter : filterValue : 'log'">
-            <li><p [innerHTML]="log.log | highlight : filterValue"></p></li>
+          <ul *ngFor="let log of logs | filter : filterValue : 'content'">
+            <li><p [innerHTML]="log.content | highlight : filterValue"></p></li>
           </ul>
         </ng-container>
         <ng-template #showAll>
           <ul *ngFor="let log of logs">
-            <li><p [innerHTML]="log.log | highlight : filterValue"></p></li>
+            <li><p [innerHTML]="log.content | highlight : filterValue"></p></li>
           </ul>
         </ng-template>
     </mat-card-content>

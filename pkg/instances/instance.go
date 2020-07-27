@@ -43,3 +43,11 @@ type MetadataActiveActorsCount struct {
 	Type  string `json:"type"`
 	Count int    `json:"count"`
 }
+
+// Log represents a log message with metadata
+type Log struct {
+	Level     string `json:"level"`
+	Timestamp string `json:"timestamp"`
+	Container string `json:"container"`
+	Content   string `json:"content"`
+}

@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -27,7 +28,7 @@ type Instances interface {
 	GetInstances() []Instance
 	GetInstance(id string) Instance
 	DeleteInstance(id string) error
-	GetLogs(id string) string
+	GetLogs(id string) []Log
 	GetDeployment(id string) string
 	GetControlPlaneStatus() []StatusOutput
 	GetMetadata(id string) MetadataOutput
@@ -85,11 +86,11 @@ func (i *instances) CheckSupportedEnvironments() []string {
 }
 
 // GetLogs returns a string of all logs for the given Dapr app id
-func (i *instances) GetLogs(id string) string {
+func (i *instances) GetLogs(id string) []Log {
 	if i.kubeClient != nil {
 		resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
 		if err != nil || len(resp.Items) == 0 {
-			return ""
+			return []Log{}
 		}
 
 		for _, d := range resp.Items {
@@ -101,39 +102,56 @@ func (i *instances) GetLogs(id string) string {
 					})
 					if err != nil {
 						log.Println(err)
-						return ""
+						return []Log{}
 					}
 
 					if len(pods.Items) > 0 {
 						p := pods.Items[0]
-
 						name := p.ObjectMeta.Name
 
-						options := v1.PodLogOptions{}
-						options.Container = "daprd"
+						out := []Log{}
+						for _, container := range p.Spec.Containers {
+							options := v1.PodLogOptions{}
+							options.Container = container.Name
 
-						logs := i.kubeClient.CoreV1().Pods(p.ObjectMeta.Namespace).GetLogs(name, &options)
-						arr, err := logs.Stream()
-						if err != nil {
-							log.Println(err)
-							return ""
+							res := i.kubeClient.CoreV1().Pods(p.ObjectMeta.Namespace).GetLogs(name, &options)
+							stream, err := res.Stream()
+							if err != nil {
+								log.Println(err)
+								return out
+							}
+
+							buf := new(bytes.Buffer)
+							_, err = buf.ReadFrom(stream)
+							if err != nil {
+								log.Println(err)
+								return out
+							}
+							bufString := buf.String()
+
+							levelExp, _ := regexp.Compile("(level=)[^ ]*")
+							timeExp, _ := regexp.Compile("(time=\")[^ ]*")
+
+							for _, log := range strings.Split(bufString, "\n") {
+								currentLog := Log{
+									Level:     "info",
+									Timestamp: "",
+									Container: container.Name,
+									Content:   log,
+								}
+								currentLog.Level = strings.Replace(levelExp.FindString(log), "level=", "", 1)
+								currentLog.Timestamp = strings.Replace(timeExp.FindString(log), "time=", "", 1)
+								out = append(out, currentLog)
+							}
 						}
 
-						buf := new(bytes.Buffer)
-						_, err = buf.ReadFrom(arr)
-						if err != nil {
-							log.Println(err)
-							return ""
-						}
-						logsStr := buf.String()
-
-						return logsStr
+						return out
 					}
 				}
 			}
 		}
 	}
-	return ""
+	return []Log{}
 }
 
 // GetDeployment returns the metadata of a Dapr application in YAML format
