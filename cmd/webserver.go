@@ -70,7 +70,7 @@ func RunWebServer() {
 	api.HandleFunc("/components", getComponentsHandler).Methods("GET")
 	api.HandleFunc("/componentsstatus", getComponentsStatusHandler).Methods("GET")
 	api.HandleFunc("/components/{name}", getComponentHandler).Methods("GET")
-	api.HandleFunc("/deployment/{id}", getDeploymentHandler).Methods("GET")
+	api.HandleFunc("/deploymentconfiguration/{id}", getDeploymentConfigurationHandler).Methods("GET")
 	api.HandleFunc("/configurationsstatus", getConfigurationsStatusHandler).Methods("GET")
 	api.HandleFunc("/configurations", getConfigurationsHandler).Methods("GET")
 	api.HandleFunc("/configurations/{name}", getConfigurationHandler).Methods("GET")
@@ -179,10 +179,10 @@ func getLogsHandler(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, 200, logs)
 }
 
-func getDeploymentHandler(w http.ResponseWriter, r *http.Request) {
+func getDeploymentConfigurationHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	details := inst.GetDeployment(id)
+	details := inst.GetDeploymentConfiguration(id)
 	respondWithPlainString(w, 200, details)
 }
 

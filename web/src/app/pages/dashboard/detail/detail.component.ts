@@ -47,7 +47,7 @@ export class DetailComponent implements OnInit {
   }
 
   getConfiguration(id: string): void {
-    this.instanceService.getDeployment(id).subscribe((data: string) => {
+    this.instanceService.getDeploymentConfiguration(id).subscribe((data: string) => {
       this.model = data;
       try {
         this.modelYAML = yaml.safeLoad(data);
