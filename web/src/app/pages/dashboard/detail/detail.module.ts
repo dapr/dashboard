@@ -13,6 +13,9 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { LogsComponent } from './logs/logs.component';
 import { FilterPipe } from './logs/filter.pipe';
 import { HighlightPipe } from './logs/highlight.pipe';
+import { MatSelectModule } from '@angular/material/select';
+import { ContainerPipe } from './logs/container.pipe';
+import { SortPipe } from './logs/sort.pipe';
 
 @NgModule({
   imports: [
@@ -26,12 +29,15 @@ import { HighlightPipe } from './logs/highlight.pipe';
     MatInputModule,
     MatIconModule,
     MatCheckboxModule,
+    MatSelectModule,
   ],
   declarations: [
     DetailComponent,
     LogsComponent,
     FilterPipe,
     HighlightPipe,
+    ContainerPipe,
+    SortPipe,
   ],
 })
 export class DetailModule { }

@@ -7,6 +7,7 @@ mat-checkbox {
 
 button {
     margin-left: 15px;
+    margin-bottom: 12px;
 }
 
 li {
@@ -17,7 +18,22 @@ li {
     color: #666666;
 }
 
-button {
-    margin-left: 15px;
-    margin-bottom: 12px;
+.filterFormField {
+    width: 300px;
+}
+
+.containerFormField {
+    width: 300px;
+    display: block;
+}
+
+.logList {
+    width: 100%;
+    height: 100vh;
+    display: block;
+    overflow: auto;
+    border-style: solid;
+    border-color: #aaaaaa;
+    border-width: thin;
+    border-radius: 5px;
 }

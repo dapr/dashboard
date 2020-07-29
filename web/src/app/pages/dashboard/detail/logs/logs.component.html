@@ -1,28 +1,39 @@
 <mat-card class="card-large mat-elevation-z8">
-    <mat-card-header>
-      <mat-card-title>
-        Logs
-      </mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <mat-form-field class="filter" [style.fontSize.px]=17>
-        <mat-label>Keyword</mat-label>
-        <input matInput type="text" [(ngModel)]="filterValue">
-        <button mat-button *ngIf="filterValue" matSuffix mat-icon-button aria-label="Clear" (click)="filterValue=''">
-          <mat-icon>close</mat-icon>
-        </button>
-      </mat-form-field>
-        <button mat-raised-button (click)="getLogs(true)">Refresh</button>
-        <mat-checkbox [(ngModel)]="showFiltered">Show only filtered</mat-checkbox>
-        <ng-container *ngIf="showFiltered; else showAll">
-          <ul *ngFor="let log of logs | filter : filterValue : 'content'">
-            <li><p [innerHTML]="log.content | highlight : filterValue"></p></li>
-          </ul>
-        </ng-container>
-        <ng-template #showAll>
-          <ul *ngFor="let log of logs">
-            <li><p [innerHTML]="log.content | highlight : filterValue"></p></li>
-          </ul>
-        </ng-template>
-    </mat-card-content>
+  <mat-card-header>
+    <mat-card-title>
+      Logs
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-form-field class="filterFormField">
+      <mat-label>Keyword</mat-label>
+      <input matInput type="text" [(ngModel)]=filterValue>
+      <button mat-button *ngIf="filterValue" matSuffix mat-icon-button aria-label="Clear" (click)="filterValue=''">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+    <mat-checkbox [(ngModel)]="showFiltered">Show only filtered</mat-checkbox>
+    <button mat-raised-button (click)="getLogs(true)">Refresh</button>
+    <br>
+    <mat-form-field class="containerFormField">
+      <mat-select [(ngModel)]="containerValue" name="contain" placeholder="Container">
+        <mat-option *ngFor="let contain of containers" [value]="contain">
+          {{ contain }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="dateFormField">
+      <mat-select [(ngModel)]="dateOrder" placeholder="Order By">
+        <mat-option value="asc">Date (asc)</mat-option>
+        <mat-option value="desc">Date (desc)</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <div class="logList">
+      <ul *ngFor="let log of logs | container : containerValue | filter : filterValue : showFiltered | sort : dateOrder">
+        <li>
+          <p [innerHTML]="log.content | highlight : filterValue"></p>
+        </li>
+      </ul>
+    </div>
+  </mat-card-content>
 </mat-card>

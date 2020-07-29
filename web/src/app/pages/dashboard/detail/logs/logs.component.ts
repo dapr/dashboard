@@ -14,8 +14,11 @@ export class LogsComponent implements OnInit {
 
   public logs: Log[];
   public id: string;
+  public containers: string[];
   public showFiltered: boolean;
-  public filterValue: string;
+  public filterValue: string = "";
+  public containerValue: string = "\[all containers\]";
+  public dateOrder = "";
 
   constructor(
     private route: ActivatedRoute,
@@ -31,6 +34,8 @@ export class LogsComponent implements OnInit {
   getLogs(refresh: boolean): void {
     this.instances.getLogs(this.id).subscribe((data: Log[]) => {
       this.logs = data;
+      this.containers = data.map(log => log.container).filter((value, index, self) => self.indexOf(value) === index);
+      this.containers.unshift("\[all containers\]");
       if (refresh) {
         this.showSnackbar('Logs successfully refreshed');
       }
@@ -41,5 +46,9 @@ export class LogsComponent implements OnInit {
     this.snackbar.open(message, '', {
       duration: 2000,
     });
+  }
+
+  onChange(): void {
+    console.log(this.containerValue);
   }
 }

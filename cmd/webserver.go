@@ -245,7 +245,6 @@ func respondWithPlainString(w http.ResponseWriter, code int, payload string) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 }
 
 func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
