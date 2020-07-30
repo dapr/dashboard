@@ -12,6 +12,8 @@ import (
 	"strings"
 	"sync"
 
+	"time"
+
 	"github.com/dapr/cli/pkg/standalone"
 	"github.com/dapr/dashboard/pkg/age"
 	v1 "k8s.io/api/core/v1"
@@ -45,8 +47,6 @@ const (
 	daprEnabledAnnotation = "dapr.io/enabled"
 	daprIDAnnotation      = "dapr.io/id"
 	daprPortAnnotation    = "dapr.io/port"
-
-	timeLayout = "Mon Jan 2 15:04:05 -0700 MST 2006"
 )
 
 var (
@@ -112,9 +112,7 @@ func (i *instances) GetLogs(id string) []Log {
 						name := p.ObjectMeta.Name
 
 						out := []Log{}
-						fmt.Printf("hi%v", len(p.Spec.Containers))
 						for _, container := range p.Spec.Containers {
-							fmt.Println(container.Name)
 							options := v1.PodLogOptions{}
 							options.Container = container.Name
 							options.Timestamps = true
@@ -134,24 +132,30 @@ func (i *instances) GetLogs(id string) []Log {
 							}
 							bufString := buf.String()
 
-							fmt.Println(bufString)
-
 							levelExp, _ := regexp.Compile("(level=)[^ ]*")
 							timeExp, _ := regexp.Compile("^[^ ]+")
 
 							for _, content := range strings.Split(bufString, "\n") {
 								currentLog := Log{
 									Level:     "info",
-									Timestamp: "",
+									Timestamp: 0,
 									Container: container.Name,
 									Content:   content,
 								}
+
 								currentLog.Level = strings.Replace(levelExp.FindString(content), "level=", "", 1)
 								if err != nil {
 									log.Println(err)
 									continue
 								}
-								currentLog.Timestamp = timeExp.FindString(content)
+
+								timestamp, err := time.Parse(time.RFC3339Nano, timeExp.FindString(content))
+								if err != nil {
+									log.Println(err)
+									continue
+								}
+
+								currentLog.Timestamp = timestamp.UnixNano()
 								out = append(out, currentLog)
 							}
 						}

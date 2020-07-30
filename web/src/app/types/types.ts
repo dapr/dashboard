@@ -38,7 +38,7 @@ export interface Metadata {
 // Log represents a log object supporting log metadata
 export interface Log {
     level: string;
-    timestamp: string;
+    timestamp: number;
     container: string;
     content: string;
 }

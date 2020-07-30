@@ -35,7 +35,7 @@ export class LogsComponent implements OnInit {
   getLogs(refresh: boolean): void {
     this.instances.getLogs(this.id).subscribe((data: Log[]) => {
       const comparator = (a: Log, b: Log) => {
-        return Date.parse(a.timestamp) - Date.parse(b.timestamp);
+        return a.timestamp - b.timestamp;
       }
       this.logs = data.sort(comparator);
       this.containers = data.map(log => log.container).filter((value, index, self) => self.indexOf(value) === index);
