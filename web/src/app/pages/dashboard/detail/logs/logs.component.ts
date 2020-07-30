@@ -18,8 +18,10 @@ export class LogsComponent implements OnInit {
   public showFiltered = false;
   public filterValue = '';
   public containerValue = '\[all containers\]';
-  public dateOrder  = 'desc';
+  public dateOrder = 'desc';
   public showTimestamps = false;
+  public since: number;
+  public sinceUnit = '';
 
   constructor(
     private route: ActivatedRoute,

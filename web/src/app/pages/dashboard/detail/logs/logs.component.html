@@ -29,8 +29,19 @@
       </mat-select>
     </mat-form-field>
     <mat-checkbox [(ngModel)]="showTimestamps">Display Timestamps</mat-checkbox>
+    <mat-form-field class="timeSinceForm">
+      <mat-label>Logs Since</mat-label>
+      <input matInput placeholder="Length" [(ngModel)]="since" class="sinceInput">
+      <mat-select [(ngModel)]="sinceUnit" class="sinceUnitSelect">
+        <mat-option value=""></mat-option>
+        <mat-option value="seconds">seconds</mat-option>
+        <mat-option value="minutes">minutes</mat-option>
+        <mat-option value="hours">hours</mat-option>
+        <mat-option value="days">days</mat-option>
+      </mat-select>
+    </mat-form-field>
     <div class="logList">
-      <ul *ngFor="let log of logs | container : containerValue | filter : filterValue : showFiltered | sort : dateOrder">
+      <ul *ngFor="let log of logs | timeSince : since : sinceUnit | container : containerValue | filter : filterValue : showFiltered | sort : dateOrder">
         <li>
           <p [innerHTML]="log.content | timestamp : showTimestamps | highlight : filterValue"></p>
         </li>

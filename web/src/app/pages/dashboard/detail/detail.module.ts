@@ -17,6 +17,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { ContainerPipe } from './logs/container.pipe';
 import { SortPipe } from './logs/sort.pipe';
 import { TimestampPipe } from './logs/timestamp.pipe';
+import { TimeSincePipe } from './logs/timeSince.pipe';
 
 @NgModule({
   imports: [
@@ -40,6 +41,7 @@ import { TimestampPipe } from './logs/timestamp.pipe';
     ContainerPipe,
     SortPipe,
     TimestampPipe,
+    TimeSincePipe,
   ],
 })
 export class DetailModule { }
