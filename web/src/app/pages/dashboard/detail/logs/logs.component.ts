@@ -15,11 +15,11 @@ export class LogsComponent implements OnInit {
   public logs: Log[];
   public id: string;
   public containers: string[];
-  public showFiltered: boolean = false;
-  public filterValue: string = "";
-  public containerValue: string = "\[all containers\]";
-  public dateOrder: string  = "desc";
-  public showTimestamps: boolean = false;
+  public showFiltered = false;
+  public filterValue = '';
+  public containerValue = '\[all containers\]';
+  public dateOrder  = 'desc';
+  public showTimestamps = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -36,10 +36,10 @@ export class LogsComponent implements OnInit {
     this.instances.getLogs(this.id).subscribe((data: Log[]) => {
       const comparator = (a: Log, b: Log) => {
         return a.timestamp - b.timestamp;
-      }
+      };
       this.logs = data.sort(comparator);
       this.containers = data.map(log => log.container).filter((value, index, self) => self.indexOf(value) === index);
-      this.containers.unshift("\[all containers\]");
+      this.containers.unshift('\[all containers\]');
       if (refresh) {
         this.showSnackbar('Logs successfully refreshed');
       }

@@ -11,7 +11,7 @@ export class SortPipe implements PipeTransform {
         }
         const comparator = (a: Log, b: Log) => {
             return a.timestamp - b.timestamp;
-        }
+        };
         if (order === 'asc') {
             return logs.sort(comparator);
         } else {
