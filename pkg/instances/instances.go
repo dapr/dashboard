@@ -45,6 +45,8 @@ const (
 	daprEnabledAnnotation = "dapr.io/enabled"
 	daprIDAnnotation      = "dapr.io/id"
 	daprPortAnnotation    = "dapr.io/port"
+
+	timeLayout = "Mon Jan 2 15:04:05 -0700 MST 2006"
 )
 
 var (
@@ -110,9 +112,12 @@ func (i *instances) GetLogs(id string) []Log {
 						name := p.ObjectMeta.Name
 
 						out := []Log{}
+						fmt.Printf("hi%v", len(p.Spec.Containers))
 						for _, container := range p.Spec.Containers {
+							fmt.Println(container.Name)
 							options := v1.PodLogOptions{}
 							options.Container = container.Name
+							options.Timestamps = true
 
 							res := i.kubeClient.CoreV1().Pods(p.ObjectMeta.Namespace).GetLogs(name, &options)
 							stream, err := res.Stream()
@@ -129,22 +134,27 @@ func (i *instances) GetLogs(id string) []Log {
 							}
 							bufString := buf.String()
 
-							levelExp, _ := regexp.Compile("(level=)[^ ]*")
-							timeExp, _ := regexp.Compile("(time=\")[^ ]*")
+							fmt.Println(bufString)
 
-							for _, log := range strings.Split(bufString, "\n") {
+							levelExp, _ := regexp.Compile("(level=)[^ ]*")
+							timeExp, _ := regexp.Compile("^[^ ]+")
+
+							for _, content := range strings.Split(bufString, "\n") {
 								currentLog := Log{
 									Level:     "info",
 									Timestamp: "",
 									Container: container.Name,
-									Content:   log,
+									Content:   content,
 								}
-								currentLog.Level = strings.Replace(levelExp.FindString(log), "level=", "", 1)
-								currentLog.Timestamp = strings.Replace(timeExp.FindString(log), "time=", "", 1)
+								currentLog.Level = strings.Replace(levelExp.FindString(content), "level=", "", 1)
+								if err != nil {
+									log.Println(err)
+									continue
+								}
+								currentLog.Timestamp = timeExp.FindString(content)
 								out = append(out, currentLog)
 							}
 						}
-
 						return out
 					}
 				}

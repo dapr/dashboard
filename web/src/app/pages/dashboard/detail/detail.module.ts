@@ -16,6 +16,7 @@ import { HighlightPipe } from './logs/highlight.pipe';
 import { MatSelectModule } from '@angular/material/select';
 import { ContainerPipe } from './logs/container.pipe';
 import { SortPipe } from './logs/sort.pipe';
+import { TimestampPipe } from './logs/timestamp.pipe';
 
 @NgModule({
   imports: [
@@ -38,6 +39,7 @@ import { SortPipe } from './logs/sort.pipe';
     HighlightPipe,
     ContainerPipe,
     SortPipe,
+    TimestampPipe,
   ],
 })
 export class DetailModule { }

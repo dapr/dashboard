@@ -15,10 +15,11 @@ export class LogsComponent implements OnInit {
   public logs: Log[];
   public id: string;
   public containers: string[];
-  public showFiltered: boolean;
+  public showFiltered: boolean = false;
   public filterValue: string = "";
   public containerValue: string = "\[all containers\]";
-  public dateOrder = "";
+  public dateOrder: string  = "desc";
+  public showTimestamps: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -33,7 +34,10 @@ export class LogsComponent implements OnInit {
 
   getLogs(refresh: boolean): void {
     this.instances.getLogs(this.id).subscribe((data: Log[]) => {
-      this.logs = data;
+      const comparator = (a: Log, b: Log) => {
+        return Date.parse(a.timestamp) - Date.parse(b.timestamp);
+      }
+      this.logs = data.sort(comparator);
       this.containers = data.map(log => log.container).filter((value, index, self) => self.indexOf(value) === index);
       this.containers.unshift("\[all containers\]");
       if (refresh) {
@@ -46,9 +50,5 @@ export class LogsComponent implements OnInit {
     this.snackbar.open(message, '', {
       duration: 2000,
     });
-  }
-
-  onChange(): void {
-    console.log(this.containerValue);
   }
 }
