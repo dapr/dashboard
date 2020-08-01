@@ -16,7 +16,7 @@ export class ThemeService {
 
     changeTheme(): void {
         this.themeIndex = this.themeIndex + 1;
-        if (this.themeIndex >= this.themes.length) this.themeIndex = 0;
+        if (this.themeIndex >= this.themes.length) { this.themeIndex = 0; }
     }
 }
 
