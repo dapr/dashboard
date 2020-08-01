@@ -70,13 +70,11 @@ do
     
     tar -zcf ${platform_artifact_archive}.tar.gz ${platform_release_dir}
     
-    # for windows generate .zip also (needs zip to be installed)
-    if [ $GOOS = "windows" ]; then     
-      if hash zip 2>/dev/null; then
-        zip -r -q ${platform_artifact_archive}.zip ${platform_release_dir}
-      else
-       echo skipping generation of ${platform_artifact_archive}.zip as zip is not installed. 
-      fi  
+    # generate .zip also (if zip is installed)
+    if hash zip 2>/dev/null; then
+      zip -r -q ${platform_artifact_archive}.zip ${platform_release_dir}
+    else
+      echo skipping generation of ${platform_artifact_archive}.zip as zip is not installed. 
     fi
   fi
 done
