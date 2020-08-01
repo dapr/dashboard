@@ -31,6 +31,8 @@
     "@types/js-yaml": "^3.12.5",
     "js-yaml": "^3.14.0",
     "lodash-es": "^4.17.15",
+    "moment": "^2.27.0",
+    "moment-timezone": "^0.5.31",
     "monaco-editor": "^0.20.0",
     "ng-monaco-editor": "^2.2.2",
     "rxjs": "~6.5.4",
