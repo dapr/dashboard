@@ -35,10 +35,12 @@ export interface Metadata {
     count: number;
 }
 
-// Log represents a log object supporting log level and content
+// Log represents a log object supporting log metadata
 export interface Log {
     level: string;
-    log: string;
+    timestamp: number;
+    container: string;
+    content: string;
 }
 
 // DaprComponent describes an Dapr component type

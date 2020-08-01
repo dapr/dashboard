@@ -176,7 +176,7 @@ func getLogsHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	logs := inst.GetLogs(id)
-	respondWithPlainString(w, 200, logs)
+	respondWithJSON(w, 200, logs)
 }
 
 func getDeploymentConfigurationHandler(w http.ResponseWriter, r *http.Request) {
@@ -245,7 +245,6 @@ func respondWithPlainString(w http.ResponseWriter, code int, payload string) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 }
 
 func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {

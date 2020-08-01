@@ -14,11 +14,18 @@ export class LogsComponent implements OnInit {
 
   public logs: Log[];
   public id: string;
-  public info: boolean;
-  public debug: boolean;
-  public warning: boolean;
-  public error: boolean;
-  public fatal: boolean;
+  public containers: string[];
+  public showFiltered = false;
+  public filterValue = '';
+  public containerValue = '\[all containers\]';
+  public dateOrder = 'desc';
+  public showTimestamps = false;
+  public since: number;
+  public sinceUnit = '';
+  public dateFrom: Date;
+  public dateTo: Date;
+  public timeFrom: string;
+  public timeTo: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -33,20 +40,32 @@ export class LogsComponent implements OnInit {
 
   getLogs(refresh: boolean): void {
     this.instances.getLogs(this.id).subscribe((data: Log[]) => {
-      this.logs = data;
+      const comparator = (a: Log, b: Log) => {
+        return a.timestamp - b.timestamp;
+      };
+      this.logs = data.sort(comparator);
+      this.containers = data.map(log => log.container).filter((value, index, self) => self.indexOf(value) === index);
+      this.containers.unshift('\[all containers\]');
       if (refresh) {
         this.showSnackbar('Logs successfully refreshed');
       }
     });
   }
 
-  isActive(level: string): boolean {
-    if (level === 'info') { return this.info; }
-    if (level === 'debug') { return this.debug; }
-    if (level === 'warning') { return this.warning; }
-    if (level === 'error') { return this.error; }
-    if (level === 'fatal') { return this.fatal; }
-    return false;
+  resetFilters(): void {
+    this.showFiltered = false;
+    this.filterValue = '';
+    this.containerValue = '\[all containers\]';
+    this.dateOrder = 'desc';
+    this.showTimestamps = false;
+    this.since = undefined;
+    this.sinceUnit = '';
+    this.dateFrom = undefined;
+    this.dateTo = undefined;
+    this.timeFrom = undefined;
+    this.timeTo = undefined;
+
+    this.showSnackbar('Filters Reset');
   }
 
   showSnackbar(message: string): void {
