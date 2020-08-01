@@ -16,10 +16,6 @@ mat-icon:hover {
   cursor: pointer;
 }
 
-mat-icon {
-  color: #888888;
-}
-
 .mat-elevation-z5 {
   position: relative;
   z-index: 2;
@@ -29,19 +25,9 @@ mat-icon {
   height: 85%;
 }
 
-.navigation-item.active {
-  background: #d9dffc;
-  color: #062639;
-}
-
 mat-nav-list {
   padding: 0;
   overflow: hidden;
-}
-
-.navigation-item-label {
-  color: #444444;
-  padding-left: 20px;
 }
 
 .sidenav.menu-close {
@@ -50,4 +36,12 @@ mat-nav-list {
 
 .sidenav.menu-open {
   width: 200px;
+}
+
+mat-icon {
+  color: #888888;
+}
+
+.navigation-item-label {
+  padding-left: 20px;
 }

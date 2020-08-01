@@ -1,8 +1,9 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit, HostBinding } from '@angular/core';
 import { MenuItem, MENU_ITEMS, COMPONENTS_MENU_ITEM, CONFIGURATIONS_MENU_ITEM, CONTROLPLANE_MENU_ITEM } from './pages-menu';
 import { FeaturesService } from 'src/app/features/features.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { GlobalsService } from 'src/app/globals/globals.service';
+import { OverlayContainer } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'app-pages',
@@ -14,10 +15,12 @@ export class PagesComponent implements OnInit {
   public menu: MenuItem[] = MENU_ITEMS;
   public isMenuOpen = false;
   public contentMargin = 60;
+  public isLightMode = true;
 
   constructor(
     private featuresService: FeaturesService,
     public globals: GlobalsService,
+    public overlayContainer: OverlayContainer,
   ) { }
 
   @ViewChild('drawer', { static: false })
@@ -25,6 +28,9 @@ export class PagesComponent implements OnInit {
 
   ngOnInit(): void {
     this.getFeatures();
+    let theme = 'dashboard-light-theme';
+    this.overlayContainer.getContainerElement().classList.add(theme);
+    this.componentCssClass = theme;
   }
 
   getFeatures(): void {
@@ -51,5 +57,17 @@ export class PagesComponent implements OnInit {
     else {
       this.contentMargin = 240;
     }
+  }
+
+  @HostBinding('class') componentCssClass;
+
+  onThemeChange() {
+    this.isLightMode = !this.isLightMode;
+    let theme = 'dashboard-light-theme';
+    if (!this.isLightMode) {
+      theme = 'dashboard-dark-theme';
+    }
+    this.overlayContainer.getContainerElement().classList.add(theme);
+    this.componentCssClass = theme;
   }
 }

@@ -1,0 +1,19 @@
+@import "~@angular/material/theming";
+
+@mixin pages-theme($theme) {
+    $primary: map-get($theme, primary);
+    $accent: map-get($theme, accent);
+
+    .page-subheader {
+        font-size: 20px;
+        color: mat-color($accent, default-contrast);
+        margin-left: 2%;
+        margin-top: 20px;
+        margin-bottom: 12px;
+    }
+
+    .highlighted {
+        color: white;
+        background: mat-color($primary);
+    }
+}

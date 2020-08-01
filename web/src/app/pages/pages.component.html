@@ -3,25 +3,28 @@
   <h1 class="app-header">Dashboard</h1>
 </mat-toolbar>
 <mat-sidenav-container class="sidenav-container">
-  <mat-sidenav #drawer class="sidenav"
-      mode="side"
-      [class.menu-open]="isMenuOpen"
-      [class.menu-close]="!isMenuOpen"
-      opened>
+  <mat-sidenav #drawer class="sidenav" mode="side" [class.menu-open]="isMenuOpen" [class.menu-close]="!isMenuOpen"
+    opened>
     <mat-nav-list class="navigation-list">
       <a class="navigation-item" mat-list-item (click)="onDrawerToggle()">
-        <mat-icon class="material-icons">{{ isMenuOpen? 'chevron_left' : 'chevron_right' }}</mat-icon><span class="navigation-item-label"></span>
+        <mat-icon class="material-icons">{{ isMenuOpen? 'chevron_left' : 'chevron_right' }}</mat-icon><span
+          class="navigation-item-label"></span>
       </a>
       <ng-container *ngFor="let component of menu">
         <mat-divider class="navigation-divider"></mat-divider>
         <a class="navigation-item" mat-list-item [routerLink]="component.link" routerLinkActive="active">
-          <mat-icon class="material-icons">{{ component.icon }}</mat-icon><span class="navigation-item-label">{{ component.title }}</span>
+          <mat-icon class="material-icons">{{ component.icon }}</mat-icon><span
+            class="navigation-item-label">{{ component.title }}</span>
         </a>
       </ng-container>
+      <mat-divider class="navigation-divider"></mat-divider>
+      <a class="navigation-item themeSelector" mat-list-item (click)="onThemeChange()">
+        <mat-icon class="material-icons">{{ isLightMode ? 'nights_stay' : 'wb_sunny' }}</mat-icon><span
+          class="navigation-item-label">{{ isLightMode ?  'Dark Mode' : 'Light Mode' }}</span>
+      </a>
     </mat-nav-list>
   </mat-sidenav>
-  <mat-sidenav-content
-    [ngStyle]="{ 'margin-left.px': contentMargin }">
+  <mat-sidenav-content [ngStyle]="{ 'margin-left.px': contentMargin }">
     <router-outlet></router-outlet>
   </mat-sidenav-content>
 </mat-sidenav-container>

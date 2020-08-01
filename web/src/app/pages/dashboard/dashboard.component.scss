@@ -2,17 +2,12 @@
 @use '../../theme/tables.scss';
 @use '../../theme/cards.scss';
 
-a {
-    text-decoration: none;
-    color: #0d2192;
+.delete:hover {
+    cursor: pointer;
 }
 
 a:hover {
     text-decoration: underline;
-}
-
-.delete:hover {
-    cursor: pointer;
 }
 
 .delete {
