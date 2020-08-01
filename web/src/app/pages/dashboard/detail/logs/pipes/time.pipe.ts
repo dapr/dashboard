@@ -16,9 +16,9 @@ export class TimePipe implements PipeTransform {
             }
         }
         if (!timeFrom) {
-            timeFrom = "00:00";
+            timeFrom = '00:00';
         }
-        let from = moment(`${dateFrom.getFullYear()}-${dateFrom.getMonth() + 1}-${dateFrom.getDate()} ${timeFrom}`);
+        const from = moment(`${dateFrom.getFullYear()}-${dateFrom.getMonth() + 1}-${dateFrom.getDate()} ${timeFrom}`);
         let to = moment();
         if (!dateTo) {
             if (timeTo) {
