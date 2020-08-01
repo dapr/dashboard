@@ -72,7 +72,7 @@ $dapr-accent-color: (
 );
 
 $dashboard-light-primary: mat-palette($dapr-primary-color, 900);
-$dashboard-dark-primary: mat-palette($dapr-primary-color, 400);
+$dashboard-dark-primary: mat-palette($dapr-primary-color, 300);
 $dashboard-light-accent: mat-palette($dapr-accent-color, 400);
 $dashboard-dark-accent: mat-palette($dapr-accent-color, 900);
 $dashboard-warn: mat-palette($mat-red);
@@ -95,3 +95,9 @@ $dashboard-dark-theme: mat-dark-theme($dashboard-dark-primary, $dashboard-dark-a
     @include cards-theme($dashboard-dark-theme);
     @include pages-component-theme($dashboard-dark-theme);
 }
+
+$dashboard-typography: mat-typography-config(
+  $font-family: 'Open Sans, sans-serif'
+);
+
+@include angular-material-typography($dashboard-typography);
