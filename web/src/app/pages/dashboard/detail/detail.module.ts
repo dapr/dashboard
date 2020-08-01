@@ -10,14 +10,17 @@ import { MatTableModule } from '@angular/material/table';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { LogsComponent } from './logs/logs.component';
-import { FilterPipe } from './logs/filter.pipe';
-import { HighlightPipe } from './logs/highlight.pipe';
+import { FilterPipe } from './logs/pipes/filter.pipe';
+import { HighlightPipe } from './logs/pipes/highlight.pipe';
 import { MatSelectModule } from '@angular/material/select';
-import { ContainerPipe } from './logs/container.pipe';
-import { SortPipe } from './logs/sort.pipe';
-import { TimestampPipe } from './logs/timestamp.pipe';
-import { TimeSincePipe } from './logs/timeSince.pipe';
+import { ContainerPipe } from './logs/pipes/container.pipe';
+import { SortPipe } from './logs/pipes/sort.pipe';
+import { TimestampPipe } from './logs/pipes/timestamp.pipe';
+import { TimeSincePipe } from './logs/pipes/timeSince.pipe';
+import { MatNativeDateModule } from '@angular/material/core';
+import { TimePipe } from './logs/pipes/time.pipe';
 
 @NgModule({
   imports: [
@@ -32,6 +35,8 @@ import { TimeSincePipe } from './logs/timeSince.pipe';
     MatIconModule,
     MatCheckboxModule,
     MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
   ],
   declarations: [
     DetailComponent,
@@ -42,6 +47,7 @@ import { TimeSincePipe } from './logs/timeSince.pipe';
     SortPipe,
     TimestampPipe,
     TimeSincePipe,
+    TimePipe
   ],
 })
 export class DetailModule { }

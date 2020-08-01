@@ -15,13 +15,17 @@ export class LogsComponent implements OnInit {
   public logs: Log[];
   public id: string;
   public containers: string[];
-  public showFiltered = false;
-  public filterValue = '';
-  public containerValue = '\[all containers\]';
-  public dateOrder = 'desc';
-  public showTimestamps = false;
+  public showFiltered: boolean = false;
+  public filterValue: string = '';
+  public containerValue: string = '\[all containers\]';
+  public dateOrder: string = 'desc';
+  public showTimestamps: boolean = false;
   public since: number;
-  public sinceUnit = '';
+  public sinceUnit: string = '';
+  public dateFrom: Date;
+  public dateTo: Date;
+  public timeFrom: string;
+  public timeTo: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -46,6 +50,22 @@ export class LogsComponent implements OnInit {
         this.showSnackbar('Logs successfully refreshed');
       }
     });
+  }
+
+  resetFilters(): void {
+    this.showFiltered = false;
+    this.filterValue = '';
+    this.containerValue = '\[all containers\]';
+    this.dateOrder = 'desc';
+    this.showTimestamps = false;
+    this.since = undefined;
+    this.sinceUnit = '';
+    this.dateFrom = undefined;
+    this.dateTo = undefined;
+    this.timeFrom = undefined;
+    this.timeTo = undefined;
+
+    this.showSnackbar('Filters Reset');
   }
 
   showSnackbar(message: string): void {

@@ -1,7 +1,11 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { Log } from 'src/app/types/types';
+import * as moment from 'moment';
 
+// number of nanoseconds in a second
 const nano = 1000000000;
+
+// number of nanoseconds in a millisecond
 const nanoMilli = 1000000;
 
 @Pipe({
@@ -12,14 +16,13 @@ export class TimeSincePipe implements PipeTransform {
         if (!items) { return []; }
         if (!since || !sinceUnit) { return items; }
         return items.filter(item => {
-            return ((Date.now() * nanoMilli) - item.timestamp) < getNanoseconds(since, sinceUnit);
+            return ((moment().utc().valueOf() * nanoMilli) - item.timestamp) < getNanoseconds(since, sinceUnit);
         });
     }
 }
 
 // Get number of nanoseconds since given time
 function getNanoseconds(since: number, sinceUnit: string): number {
-    // number of nanoseconds in a second
     switch (sinceUnit) {
         case 'seconds':
             return since * nano;
