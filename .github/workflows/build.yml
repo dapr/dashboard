@@ -54,7 +54,8 @@ jobs:
       run: npm install -g @angular/cli > /dev/null    
     - name: Build and prepare release
       run: |
-        ./build.sh
+        sudo apt install zip
+        ./build.sh --generate-artifacts
     - name: upload artifacts
       uses: actions/upload-artifact@master
       with:
