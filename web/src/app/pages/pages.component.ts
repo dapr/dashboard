@@ -4,6 +4,7 @@ import { FeaturesService } from 'src/app/features/features.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { GlobalsService } from 'src/app/globals/globals.service';
 import { ThemeService } from 'src/app/theme/theme.service';
+import { OverlayContainer } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'app-pages',
@@ -25,6 +26,7 @@ export class PagesComponent implements OnInit {
     private featuresService: FeaturesService,
     public globals: GlobalsService,
     private themeService: ThemeService,
+    private overlayContainer: OverlayContainer,
   ) { }
 
   ngOnInit(): void {
@@ -63,6 +65,10 @@ export class PagesComponent implements OnInit {
     this.themeService.changeTheme();
     this.componentCssClass = this.themeService.getTheme();
     this.isLightMode = !this.isLightMode;
+    this.themeService.getThemes().forEach(theme => {
+      this.overlayContainer.getContainerElement().classList.remove(theme);
+    });
+    this.overlayContainer.getContainerElement().classList.add(this.themeService.getTheme());
     if (this.isLightMode) {
       this.imgPath = '../../assets/images/logo.svg';
     } else {
