@@ -36,7 +36,6 @@ export class ConfigurationDetailComponent implements OnInit {
 
   getConfiguration(name: string): void {
     this.configurationsService.getConfiguration(name).subscribe((data: DaprConfiguration) => {
-      console.log(data);
       this.configuration = data;
       this.configurationDeployment = yaml.safeDump(data);
       this.configurationMetadata = yaml.safeDump(data.spec);

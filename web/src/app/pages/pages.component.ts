@@ -30,7 +30,7 @@ export class PagesComponent implements OnInit {
   ngOnInit(): void {
     this.getFeatures();
     this.componentCssClass = this.themeService.getTheme();
-    this.imgPath = "../../assets/images/logo.svg";
+    this.imgPath = '../../assets/images/logo.svg';
   }
 
   getFeatures(): void {
@@ -64,9 +64,9 @@ export class PagesComponent implements OnInit {
     this.componentCssClass = this.themeService.getTheme();
     this.isLightMode = !this.isLightMode;
     if (this.isLightMode) {
-      this.imgPath = "../../assets/images/logo.svg";
+      this.imgPath = '../../assets/images/logo.svg';
     } else {
-      this.imgPath = "../../assets/images/logo-white.svg";
+      this.imgPath = '../../assets/images/logo-white.svg';
     }
   }
 }
