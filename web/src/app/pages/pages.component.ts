@@ -19,6 +19,7 @@ export class PagesComponent implements OnInit {
   public isMenuOpen = false;
   public contentMargin = 60;
   public isLightMode = true;
+  public imgPath: string;
 
   constructor(
     private featuresService: FeaturesService,
@@ -29,6 +30,7 @@ export class PagesComponent implements OnInit {
   ngOnInit(): void {
     this.getFeatures();
     this.componentCssClass = this.themeService.getTheme();
+    this.imgPath = "../../assets/images/logo.svg";
   }
 
   getFeatures(): void {
@@ -61,5 +63,10 @@ export class PagesComponent implements OnInit {
     this.themeService.changeTheme();
     this.componentCssClass = this.themeService.getTheme();
     this.isLightMode = !this.isLightMode;
+    if (this.isLightMode) {
+      this.imgPath = "../../assets/images/logo.svg";
+    } else {
+      this.imgPath = "../../assets/images/logo-white.svg";
+    }
   }
 }
