@@ -6,12 +6,25 @@
   height: 15%;
 }
 
+#imgWrapper {
+  height: 100%;
+  width: 15%;
+  text-align: center;
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+}
+
 #header-image {
   height: 150%;
   width: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
-mat-icon:hover {
+.navigation-item:hover {
   cursor: pointer;
 }
 
@@ -22,6 +35,10 @@ mat-icon:hover {
 
 .sidenav-container {
   height: 85%;
+}
+
+mat-sidenav {
+  overflow: hidden;
 }
 
 mat-nav-list {
