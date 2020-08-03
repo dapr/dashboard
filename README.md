@@ -35,7 +35,7 @@ This repo is under heavy development, all devs and web developers in particular 
 #### Kubernetes
 If Dapr was installed with [Helm](https://github.com/dapr/docs/blob/master/getting-started/environment-setup.md#using-helm-advanced), run `dapr dashboard -k`, or if you installed Dapr in a non-default namespace, `dapr dashboard -k -n your-namespace`
 
-If Dapr was installed with `dapr init -k`, run `dapr-dashboard -k`
+If Dapr was installed with `dapr init -k`, run `dapr dashboard -k`
 
 #### Standalone
 Running the dashboard locally will work with Dapr instances running on the local machine.

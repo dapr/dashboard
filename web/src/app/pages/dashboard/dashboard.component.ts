@@ -5,9 +5,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Instance, Status } from 'src/app/types/types';
 
 @Component({
-  selector: 'ngx-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss'],
+  selector: 'app-dashboard',
+  templateUrl: 'dashboard.component.html',
+  styleUrls: ['dashboard.component.scss'],
 })
 
 export class DashboardComponent implements OnInit, OnDestroy {
@@ -17,6 +17,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   public daprHealthiness: string;
   public daprVersion: string;
   public tableLoaded: boolean;
+  public controlPlaneLoaded: boolean;
   private intervalHandler;
 
   constructor(
@@ -27,15 +28,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.tableLoaded = false;
+    this.controlPlaneLoaded = false;
     this.getInstances();
     this.getControlPlaneData();
     this.globals.getSupportedEnvironments().subscribe(data => {
-      let supportedEnvironments = <Array<any>>data;
-      if (supportedEnvironments.includes("kubernetes")) {
+      const supportedEnvironments = data as Array<any>;
+      if (supportedEnvironments.includes('kubernetes')) {
         this.globals.kubernetesEnabled = true;
         this.displayedColumns = ['name', 'labels', 'status', 'age', 'selector'];
       }
-      else if (supportedEnvironments.includes("standalone")) {
+      else if (supportedEnvironments.includes('standalone')) {
         this.globals.standaloneEnabled = true;
         this.displayedColumns = ['name', 'age', 'actions'];
       }
@@ -65,11 +67,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   getControlPlaneData(): void {
     this.instanceService.getControlPlaneStatus().subscribe((data: Status[]) => {
       this.daprHealthiness = data.every((service) => {
-        return service.healthy == 'True'
+        return service.healthy === 'True';
       }) ? 'Healthy' : 'Unhealthy';
       data.forEach(service => {
         this.daprVersion = service.version;
       });
+      this.controlPlaneLoaded = true;
     });
   }
 

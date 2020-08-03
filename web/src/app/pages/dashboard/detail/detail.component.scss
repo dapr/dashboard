@@ -1,0 +1,11 @@
+@use '../../../theme/pages.scss';
+@use '../../../theme/tables.scss';
+@use '../../../theme/cards.scss';
+
+td {
+    vertical-align: top;
+}
+
+a:hover {
+    text-decoration: underline;
+}

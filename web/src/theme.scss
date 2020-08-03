@@ -1,0 +1,103 @@
+@import "~@angular/material/theming";
+@import "./app/theme/tables-theme.scss";
+@import "./app/theme/pages-theme.scss";
+@import "./app/theme/cards-theme.scss";
+@import "./app/pages/pages-component-theme.scss";
+@include mat-core();
+
+$dapr-primary-color: (
+    900: #0d2192,
+    800: #2134a6,
+    700: #2a3fb1,
+    600: #3449be,
+    500: #3a52c8,
+    400: #5a6cd1,
+    300: #7887d9,
+    200: #a0a9e4,
+    100: #c6cbef,
+    50: #e8eaf9,
+    A700: #1b95c7,
+    A400: #45c1e9,
+    A200: #8adbf0,
+    A100: #b7e9f5,
+    contrast: (
+        50 : rgba(black, 0.87),
+        100 : rgba(black, 0.87),
+        200 : rgba(black, 0.87),
+        300 : rgba(black, 0.87),
+        400 : rgba(black, 0.87),
+        500 : #ffffff,
+        600 : #ffffff,
+        700 : #ffffff,
+        800 : #ffffff,
+        900 : #ffffff,
+        A100 : rgba(black, 0.87),
+        A200 : rgba(black, 0.87),
+        A400 : rgba(black, 0.87),
+        A700 : rgba(black, 0.87),
+    )
+);
+
+$dapr-accent-color: (
+    900: #004d94,
+    800: #006cb3,
+    700: #007dc6,
+    600: #008fd8,
+    500: #009de5,
+    400: #00abe7,
+    300: #00bae9,
+    200: #55ceef,
+    100: #a0e1f4,
+    50: #daf4fb,
+    A700: #516eda,
+    A400: #61a0ff,
+    A200: #9bc7ff,
+    A100: #c1dcff,
+    contrast: (
+        50 : rgba(black, 0.87),
+        100 : rgba(black, 0.87),
+        200 : rgba(black, 0.87),
+        300 : rgba(black, 0.87),
+        400 : rgba(black, 0.87),
+        500 : #ffffff,
+        600 : #ffffff,
+        700 : #ffffff,
+        800 : #ffffff,
+        900 : #ffffff,
+        A100 : rgba(black, 0.87),
+        A200 : rgba(black, 0.87),
+        A400 : rgba(black, 0.87),
+        A700 : rgba(black, 0.87),
+    )
+);
+
+$dashboard-light-primary: mat-palette($dapr-primary-color, 900);
+$dashboard-dark-primary: mat-palette($dapr-primary-color, 300);
+$dashboard-light-accent: mat-palette($dapr-accent-color, 400);
+$dashboard-dark-accent: mat-palette($dapr-accent-color, 900);
+$dashboard-warn: mat-palette($mat-red);
+
+$dashboard-light-theme: mat-light-theme($dashboard-light-primary, $dashboard-light-accent, $dashboard-warn);
+$dashboard-dark-theme: mat-dark-theme($dashboard-dark-primary, $dashboard-dark-accent, $dashboard-warn);
+
+.dashboard-light-theme {
+    @include angular-material-theme($dashboard-light-theme);
+    @include tables-theme($dashboard-light-theme);
+    @include pages-theme($dashboard-light-theme);
+    @include cards-theme($dashboard-light-theme);
+    @include pages-component-theme($dashboard-light-theme);
+}
+  
+.dashboard-dark-theme {
+    @include angular-material-theme($dashboard-dark-theme);
+    @include tables-theme($dashboard-dark-theme);
+    @include pages-theme($dashboard-dark-theme);
+    @include cards-theme($dashboard-dark-theme);
+    @include pages-component-theme($dashboard-dark-theme);
+}
+
+$dashboard-typography: mat-typography-config(
+  $font-family: 'Open Sans, sans-serif'
+);
+
+@include angular-material-typography($dashboard-typography);

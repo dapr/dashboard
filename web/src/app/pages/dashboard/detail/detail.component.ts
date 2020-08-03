@@ -4,9 +4,11 @@ import { ActivatedRoute } from '@angular/router';
 import * as yaml from 'js-yaml';
 import { GlobalsService } from 'src/app/globals/globals.service';
 import { Metadata, Instance } from 'src/app/types/types';
+import { ThemeService } from 'src/app/theme/theme.service';
+import { YamlViewerOptions } from 'src/app/types/types';
 
 @Component({
-  selector: 'ngx-detail',
+  selector: 'app-detail',
   templateUrl: 'detail.component.html',
   styleUrls: ['detail.component.scss'],
 })
@@ -16,18 +18,19 @@ export class DetailComponent implements OnInit {
   public model: string;
   public modelYAML: any;
   public annotations: string[];
-  public options: Object;
   public instance: Instance;
   public loadedConfiguration: boolean;
   public loadedInstance: boolean;
   public loadedMetadata: boolean;
   public metadata: Metadata[];
-  public metadataDisplayedColumns: string[] = ["type", "count"];
+  public metadataDisplayedColumns: string[] = ['type', 'count'];
+  public options: YamlViewerOptions;
 
   constructor(
     private route: ActivatedRoute,
     private instanceService: InstanceService,
     public globals: GlobalsService,
+    private themeService: ThemeService,
   ) { }
 
   ngOnInit(): void {
@@ -43,11 +46,18 @@ export class DetailComponent implements OnInit {
       minimap: { enabled: true },
       readOnly: false,
       language: 'yaml',
+      theme: this.themeService.getTheme().includes('dark') ? 'vs-dark' : 'vs',
     };
+    this.themeService.themeChanged.subscribe((newTheme: string) => {
+      this.options = {
+        ...this.options,
+        theme: newTheme.includes('dark') ? 'vs-dark' : 'vs',
+      };
+    });
   }
 
   getConfiguration(id: string): void {
-    this.instanceService.getConfiguration(id).subscribe((data: string) => {
+    this.instanceService.getDeploymentConfiguration(id).subscribe((data: string) => {
       this.model = data;
       try {
         this.modelYAML = yaml.safeLoad(data);

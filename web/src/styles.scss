@@ -1,5 +1,3 @@
-@use './app/theme/typography.scss';
-
 html,
 body {
     height: 100%;
@@ -9,7 +7,7 @@ body {
     margin: 0;
 }
 
-ngx-app {
+app-root {
     position: relative;
     height: 100%;
 }

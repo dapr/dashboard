@@ -16,6 +16,7 @@
             </td>
             <td>
               <mat-icon
+                *ngIf="controlPlaneLoaded"
                 [ngClass]="{
                   'green': daprHealthiness === 'Healthy',
                   'red': daprHealthiness !== 'Healthy'
@@ -26,8 +27,8 @@
         </tbody>
       </table>
     </mat-card-content>
-    <mat-card-actions>
-      <button mat-raised-button routerLink="/controlplane">More Information</button>
+    <mat-card-actions id="actions">
+      <button mat-raised-button routerLink="/controlplane" id="controlPlaneLink">More Information</button>
     </mat-card-actions>
   </mat-card>
 </ng-container>
@@ -35,7 +36,7 @@
 <table *ngIf="tableLoaded" mat-table [dataSource]="instances" class="table-large mat-elevation-z8">
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef>Name</th>
-    <td mat-cell *matCellDef="let item"><a routerLink="/detail/{{item.appID}}">{{ item.appID }}</a></td>
+    <td mat-cell *matCellDef="let item"><a routerLink="/overview/{{item.appID}}">{{ item.appID }}</a></td>
   </ng-container>
   <ng-container matColumnDef="labels">
     <th mat-header-cell *matHeaderCellDef>Labels</th>

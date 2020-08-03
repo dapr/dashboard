@@ -54,7 +54,9 @@ jobs:
       run: npm install -g @angular/cli > /dev/null    
     - name: Build and prepare release
       run: |
-        ./build.sh
+        # zip is already installed in latest ubuntu in github actions, if it changes in future, uncomment following line to install explicitly.
+        # sudo apt install zip
+        ./build.sh --generate-artifacts
     - name: upload artifacts
       uses: actions/upload-artifact@master
       with:

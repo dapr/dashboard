@@ -6,11 +6,14 @@ import { CommonModule } from '@angular/common';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
-import { DetailModule } from './detail/detail.module';
+import { DetailModule } from './dashboard/detail/detail.module';
 import { DaprComponentsModule } from './dapr-components/dapr-components.module';
 import { MatListModule } from '@angular/material/list';
 import { ConfigurationModule } from './configuration/configuration.module';
 import { ControlPlaneModule } from './controlplane/controlplane.module';
+import { DaprComponentDetailModule } from './dapr-components/dapr-component-detail/dapr-component-detail.module';
+import { ConfigurationDetailModule } from './configuration/configuration-detail/configuration-detail.module';
+import { OverlayModule } from '@angular/cdk/overlay';
 
 @NgModule({
   imports: [
@@ -25,6 +28,9 @@ import { ControlPlaneModule } from './controlplane/controlplane.module';
     MatListModule,
     ConfigurationModule,
     ControlPlaneModule,
+    DaprComponentDetailModule,
+    ConfigurationDetailModule,
+    OverlayModule,
   ],
   declarations: [
     PagesComponent,

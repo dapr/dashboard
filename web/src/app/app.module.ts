@@ -5,6 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { MonacoEditorModule, MonacoProviderService } from 'ng-monaco-editor';
+import { OverlayContainer } from '@angular/cdk/overlay';
 
 @NgModule({
   declarations: [AppComponent],
@@ -25,4 +26,8 @@ import { MonacoEditorModule, MonacoProviderService } from 'ng-monaco-editor';
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {
+  constructor(overlayContainer: OverlayContainer) {
+    overlayContainer.getContainerElement().classList.add('dashboard-light-theme');
+  }
+}

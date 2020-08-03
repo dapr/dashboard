@@ -1,0 +1,76 @@
+<mat-card class="card-large mat-elevation-z8">
+  <mat-card-header>
+    <mat-card-title>
+      Logs
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div id="optionButtons">
+      <button mat-raised-button (click)="getLogs(true)">Refresh Logs</button>
+      <button mat-raised-button (click)="resetFilters()">Reset Filters</button>
+      <mat-checkbox [(ngModel)]="showFiltered">Only show filtered items</mat-checkbox>
+      <mat-checkbox [(ngModel)]="showTimestamps">Display Timestamps</mat-checkbox>
+    </div>
+    <br>
+    <mat-form-field class="filterFormField">
+      <mat-label>Keyword</mat-label>
+      <input matInput type="text" [(ngModel)]=filterValue>
+      <button mat-button *ngIf="filterValue" matSuffix mat-icon-button aria-label="Clear" (click)="filterValue=''">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+    <mat-form-field class="containerFormField">
+      <mat-select [(ngModel)]="containerValue" name="contain" placeholder="Container">
+        <mat-option *ngFor="let contain of containers" [value]="contain">
+          {{ contain }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <br>
+    <mat-form-field class="timeSinceForm">
+      <mat-label>Logs Since</mat-label>
+      <input matInput placeholder="Length" [(ngModel)]="since" class="sinceInput">
+      <mat-select [(ngModel)]="sinceUnit" class="sinceUnitSelect" placeholder="Unit">
+        <mat-option value=""></mat-option>
+        <mat-option value="seconds">seconds</mat-option>
+        <mat-option value="minutes">minutes</mat-option>
+        <mat-option value="hours">hours</mat-option>
+        <mat-option value="days">days</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="dateFormField">
+      <mat-select [(ngModel)]="dateOrder" placeholder="Order By">
+        <mat-option value="asc">Date (Oldest First)</mat-option>
+        <mat-option value="desc">Date (Newest First)</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <br>
+    <div class="timeFromForm">
+      <mat-form-field>
+        <input matInput [matDatepicker]="dateFromPicker" [(ngModel)]="dateFrom" placeholder="From Date">
+        <mat-datepicker-toggle matSuffix [for]="dateFromPicker"></mat-datepicker-toggle>
+        <mat-datepicker #dateFromPicker></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput type="time" [(ngModel)]="timeFrom" placeholder="From Time">
+      </mat-form-field>
+    </div>
+    <div class="timeToForm">
+      <mat-form-field>
+        <input matInput [matDatepicker]="dateToPicker" [(ngModel)]="dateTo" placeholder="To Date">
+        <mat-datepicker-toggle matSuffix [for]="dateToPicker"></mat-datepicker-toggle>
+        <mat-datepicker #dateToPicker></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput type="time" [(ngModel)]="timeTo" placeholder="To Time">
+      </mat-form-field>
+    </div>
+    <div class="logList">
+      <ul *ngFor="let log of logs | timeSince : since : sinceUnit | container : containerValue | filter : filterValue : showFiltered | time : dateFrom : timeFrom : dateTo : timeTo | sort : dateOrder">
+        <li>
+          <p [innerHTML]="log.content | timestamp : showTimestamps | highlight : filterValue"></p>
+        </li>
+      </ul>
+    </div>
+  </mat-card-content>
+</mat-card>

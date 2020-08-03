@@ -1,2 +1,6 @@
 @use '../../theme/pages.scss';
 @use '../../theme/tables.scss';
+
+a:hover {
+    text-decoration: underline;
+}
