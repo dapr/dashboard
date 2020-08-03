@@ -1,11 +1,6 @@
 @use '../../theme/pages.scss';
 @use '../../theme/tables.scss';
 
-a {
-    text-decoration: none;
-    color: #0d2192;
-}
-
 a:hover {
     text-decoration: underline;
 }

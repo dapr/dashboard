@@ -1,5 +1,3 @@
-@use './app/theme/typography.scss';
-
 html,
 body {
     height: 100%;
@@ -37,14 +35,4 @@ app-root {
     100% {
         transform: rotate(360deg);
     }
-}
-
-.highlighted {
-    color: white;
-    background: #0078d7;
-}
-
-.timestamp {
-    color: #111111;
-    font-weight: 500;
 }

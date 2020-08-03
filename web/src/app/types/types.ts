@@ -51,7 +51,7 @@ export interface DaprComponent {
     scopes: any;
 }
 
-// DaprComponentStatus represent a Dapr component status
+// DaprComponentStatus represents a Dapr component status
 export interface DaprComponentStatus {
     img: string;
     name: string;
@@ -60,13 +60,13 @@ export interface DaprComponentStatus {
     created: string;
 }
 
-// DaprConfiguration represent a Dapr configuration
+// DaprConfiguration represents a Dapr configuration
 export interface DaprConfiguration {
     metadata: any;
     spec: any;
 }
 
-// DaprConfigurationStatus represent a Dapr configuration Status
+// DaprConfigurationStatus represents a Dapr configuration Status
 export interface DaprConfigurationStatus {
     name: string;
     tracingEnabled: boolean;
@@ -76,3 +76,12 @@ export interface DaprConfigurationStatus {
     age: string;
     created: string;
 }
+
+// YamlViewerOptions describes an options object for the NgMonacoEditor component
+export interface YamlViewerOptions {
+    folding: boolean;
+    minimap: object;
+    readOnly: boolean;
+    language: string;
+    theme: string;
+  }

@@ -1,0 +1,11 @@
+@import "~@angular/material/theming";
+
+@mixin tables-theme($theme) {
+    $primary: map-get($theme, primary);
+    $accent: map-get($theme, accent);
+
+    a {
+        color: mat-color($primary);
+        text-decoration: none;
+    }
+}
