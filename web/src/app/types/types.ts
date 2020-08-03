@@ -79,9 +79,9 @@ export interface DaprConfigurationStatus {
 
 // YamlViewerOptions describes an options object for the NgMonacoEditor component
 export interface YamlViewerOptions {
-    folding: boolean,
-    minimap: object,
-    readOnly: boolean,
-    language: string,
-    theme: string,
+    folding: boolean;
+    minimap: object;
+    readOnly: boolean;
+    language: string;
+    theme: string;
   }

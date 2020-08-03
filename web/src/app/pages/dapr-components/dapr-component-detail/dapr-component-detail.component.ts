@@ -37,7 +37,7 @@ export class DaprComponentDetailComponent implements OnInit {
       theme: this.themeService.getTheme().includes('dark') ? 'vs-dark' : 'vs',
     };
     this.themeService.themeChanged.subscribe((newTheme: string) => {
-      console.log(this.options)
+      console.log(this.options);
       this.options = {
         ...this.options,
         theme: newTheme.includes('dark') ? 'vs-dark' : 'vs',
