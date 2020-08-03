@@ -1,0 +1,14 @@
+@import "~@angular/material/theming";
+
+@mixin cards-theme($theme) {
+    $primary: map-get($theme, primary);
+    $accent: map-get($theme, accent);
+
+    .card-header {
+        font-size: 20px;
+        color: mat-color($accent, default-contrast);
+        margin-left: 5%;
+        margin-top: 50px;
+        margin-bottom: 12px;
+    }
+}

@@ -13,6 +13,7 @@ import { ConfigurationModule } from './configuration/configuration.module';
 import { ControlPlaneModule } from './controlplane/controlplane.module';
 import { DaprComponentDetailModule } from './dapr-components/dapr-component-detail/dapr-component-detail.module';
 import { ConfigurationDetailModule } from './configuration/configuration-detail/configuration-detail.module';
+import { OverlayModule } from '@angular/cdk/overlay';
 
 @NgModule({
   imports: [
@@ -28,7 +29,8 @@ import { ConfigurationDetailModule } from './configuration/configuration-detail/
     ConfigurationModule,
     ControlPlaneModule,
     DaprComponentDetailModule,
-    ConfigurationDetailModule
+    ConfigurationDetailModule,
+    OverlayModule,
   ],
   declarations: [
     PagesComponent,
