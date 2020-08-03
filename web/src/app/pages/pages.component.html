@@ -20,7 +20,7 @@
         </a>
       </ng-container>
       <mat-divider class="navigation-divider"></mat-divider>
-      <a id="theme-selector" class="navigation-item" mat-list-item (click)="onThemeChange()">
+      <a *ngIf="router.url === '/overview'" id="theme-selector" class="navigation-item" mat-list-item (click)="onThemeChange()">
         <mat-icon class="material-icons">{{ isLightMode ? 'nights_stay' : 'wb_sunny' }}</mat-icon><span
           class="navigation-item-label">{{ isLightMode ? 'Dark Theme' : 'Light Theme' }}</span>
       </a>

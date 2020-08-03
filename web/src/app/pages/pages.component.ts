@@ -5,6 +5,7 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { GlobalsService } from 'src/app/globals/globals.service';
 import { ThemeService } from 'src/app/theme/theme.service';
 import { OverlayContainer } from '@angular/cdk/overlay';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-pages',
@@ -21,12 +22,14 @@ export class PagesComponent implements OnInit {
   public contentMargin = 60;
   public isLightMode = true;
   public imgPath: string;
+  public themeSelectorEnabled: boolean;
 
   constructor(
     private featuresService: FeaturesService,
     public globals: GlobalsService,
     private themeService: ThemeService,
     private overlayContainer: OverlayContainer,
+    public router: Router,
   ) { }
 
   ngOnInit(): void {

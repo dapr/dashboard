@@ -3,6 +3,8 @@ import { DaprComponent } from 'src/app/types/types';
 import { ComponentsService } from 'src/app/components/components.service';
 import { ActivatedRoute } from '@angular/router';
 import * as yaml from 'js-yaml';
+import { ThemeService } from 'src/app/theme/theme.service';
+import { YamlViewerOptions } from 'src/app/types/types';
 
 @Component({
   selector: 'app-dapr-component-detail',
@@ -15,12 +17,13 @@ export class DaprComponentDetailComponent implements OnInit {
   public component: any;
   public componentMetadata: string | object;
   public componentDeployment: string | object;
-  public options: object;
+  public options: YamlViewerOptions;
   public loadedComponent: boolean;
 
   constructor(
     private route: ActivatedRoute,
-    private componentsService: ComponentsService
+    private componentsService: ComponentsService,
+    private themeService: ThemeService,
   ) { }
 
   ngOnInit(): void {
@@ -31,7 +34,15 @@ export class DaprComponentDetailComponent implements OnInit {
       minimap: { enabled: true },
       readOnly: false,
       language: 'yaml',
+      theme: this.themeService.getTheme().includes('dark') ? 'vs-dark' : 'vs',
     };
+    this.themeService.themeChanged.subscribe((newTheme: string) => {
+      console.log(this.options)
+      this.options = {
+        ...this.options,
+        theme: newTheme.includes('dark') ? 'vs-dark' : 'vs',
+      };
+    });
   }
 
   getComponent(name: string): void {
