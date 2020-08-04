@@ -45,19 +45,14 @@ export interface Log {
 
 // DaprComponent describes an Dapr component type
 export interface DaprComponent {
-    metadata: any;
-    spec: any;
-    auth: any;
-    scopes: any;
-}
-
-// DaprComponentStatus represents a Dapr component status
-export interface DaprComponentStatus {
-    img: string;
     name: string;
+    kind: string;
     type: string;
-    age: string;
     created: string;
+    age: string;
+    scopes: string[];
+    manifest: any;
+    img: string;
 }
 
 // DaprConfiguration represents a Dapr configuration

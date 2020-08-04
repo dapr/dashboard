@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ComponentsService } from 'src/app/components/components.service';
-import { DaprComponentStatus } from 'src/app/types/types';
+import { DaprComponent } from 'src/app/types/types';
 
 @Component({
   selector: 'app-components',
@@ -9,8 +9,8 @@ import { DaprComponentStatus } from 'src/app/types/types';
 })
 export class DaprComponentsComponent implements OnInit {
 
-  public componentsStatus: DaprComponentStatus[];
-  public statusLoaded: boolean;
+  public components: DaprComponent[];
+  public componentsLoaded: boolean;
   public displayedColumns: string[] = ['img', 'name', 'status', 'age', 'created'];
 
   constructor(private componentsService: ComponentsService) { }
@@ -20,13 +20,12 @@ export class DaprComponentsComponent implements OnInit {
   }
 
   getComponents(): void {
-    this.statusLoaded = false;
-    this.componentsService.getComponentsStatus().subscribe((data: DaprComponentStatus[]) => {
-      this.componentsStatus = data;
-      this.componentsStatus.forEach(component => {
+    this.componentsService.getComponents().subscribe((data: DaprComponent[]) => {
+      this.components = data;
+      this.components.forEach(component => {
         component.img = this.getIconPath(component.type);
       });
-      this.statusLoaded = true;
+      this.componentsLoaded = true;
     });
   }
 
@@ -41,6 +40,8 @@ export class DaprComponentsComponent implements OnInit {
       return 'assets/images/pubsub.png';
     } else if (type.includes('exporters')) {
       return 'assets/images/tracing.png';
+    } else {
+      return 'assets/images/secretstores.png'
     }
   }
 }
