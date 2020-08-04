@@ -434,6 +434,9 @@ func (i *instances) getStandaloneInstances() []Instance {
 		log.Println(err)
 	} else {
 		for _, o := range output {
+			if o.AppID == "" {
+				continue
+			}
 			list = append(list, Instance{
 				AppID:            o.AppID,
 				HTTPPort:         o.HTTPPort,
