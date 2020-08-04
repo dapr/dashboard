@@ -57,19 +57,16 @@ export interface DaprComponent {
 
 // DaprConfiguration represents a Dapr configuration
 export interface DaprConfiguration {
-    metadata: any;
-    spec: any;
-}
-
-// DaprConfigurationStatus represents a Dapr configuration Status
-export interface DaprConfigurationStatus {
     name: string;
-    tracingEnabled: boolean;
-    mtlsEnabled: boolean;
-    workloadCertTTL: string;
-    clockSkew: string;
-    age: string;
+    kind: string;
     created: string;
+    age: string;
+    tracingEnabled: boolean;
+    samplingRate: string;
+    mtlsEnabled: boolean;
+    mtlsWorkloadTTL: string;
+    mtlsClockSkew: string;
+    manifest: any;
 }
 
 // YamlViewerOptions describes an options object for the NgMonacoEditor component

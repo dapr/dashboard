@@ -42,7 +42,7 @@ func NewComponents(platform string, daprClient scheme.Interface) Components {
 	return &c
 }
 
-// Component represents a platform-independent Dapr component
+// Component represents a Dapr component
 type Component struct {
 	Name     string      `json:"name"`
 	Kind     string      `json:"kind"`
@@ -97,6 +97,7 @@ func (c *components) getKubernetesComponents() []Component {
 	return out
 }
 
+// getStandaloneComponents returns the list of all locally-hosted Dapr components
 func (c *components) getStandaloneComponents() []Component {
 	componentsDirectory := standalone.DefaultComponentsDirPath()
 	standaloneComponents := []Component{}

@@ -45,7 +45,6 @@ export class DaprComponentDetailComponent implements OnInit {
 
   getComponent(name: string): void {
     this.componentsService.getComponent(name).subscribe((data: DaprComponent) => {
-      console.log(data)
       this.component = data;
       this.componentManifest = yaml.safeDump(data.manifest);
       this.loadedComponent = true;

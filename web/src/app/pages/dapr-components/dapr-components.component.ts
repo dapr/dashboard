@@ -41,7 +41,7 @@ export class DaprComponentsComponent implements OnInit {
     } else if (type.includes('exporters')) {
       return 'assets/images/tracing.png';
     } else {
-      return 'assets/images/secretstores.png'
+      return 'assets/images/secretstores.png';
     }
   }
 }

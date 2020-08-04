@@ -64,7 +64,7 @@ func RunWebServer() {
 
 	inst = instances.NewInstances(kubeClient)
 	comps = components.NewComponents(platform, daprClient)
-	configs = configurations.NewConfigurations(daprClient)
+	configs = configurations.NewConfigurations(platform, daprClient)
 
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api/").Subrouter()
@@ -76,7 +76,6 @@ func RunWebServer() {
 	api.HandleFunc("/components", getComponentsHandler).Methods("GET")
 	api.HandleFunc("/components/{name}", getComponentHandler).Methods("GET")
 	api.HandleFunc("/deploymentconfiguration/{id}", getDeploymentConfigurationHandler).Methods("GET")
-	api.HandleFunc("/configurationsstatus", getConfigurationsStatusHandler).Methods("GET")
 	api.HandleFunc("/configurations", getConfigurationsHandler).Methods("GET")
 	api.HandleFunc("/configurations/{name}", getConfigurationHandler).Methods("GET")
 	api.HandleFunc("/environments", getEnvironmentsHandler).Methods("GET")
@@ -182,11 +181,6 @@ func getDeploymentConfigurationHandler(w http.ResponseWriter, r *http.Request) {
 	id := vars["id"]
 	details := inst.GetDeploymentConfiguration(id)
 	respondWithPlainString(w, 200, details)
-}
-
-func getConfigurationsStatusHandler(w http.ResponseWriter, r *http.Request) {
-	resp := configs.GetStatus()
-	respondWithJSON(w, 200, resp)
 }
 
 func getConfigurationsHandler(w http.ResponseWriter, r *http.Request) {
