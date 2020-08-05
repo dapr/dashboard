@@ -1,10 +1,10 @@
 package configurations
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 
 	"github.com/dapr/cli/pkg/standalone"
@@ -106,40 +106,53 @@ func (c *configurations) getKubernetesConfigurations() []Configuration {
 
 // getStandaloneConfigurations returns the list of Dapr Configurations Statuses
 func (c *configurations) getStandaloneConfigurations() []Configuration {
-	configurationFile := standalone.DefaultConfigFilePath()
-	content, err := ioutil.ReadFile(configurationFile)
-	if err != nil {
-		log.Printf("Failure reading file %s: %v\n", configurationFile, err)
-		return []Configuration{}
-	}
-
-	info, err := os.Stat(configurationFile)
-	if err != nil {
-		log.Printf("Failure reading file info from %s: %v\n", configurationFile, err)
-		return []Configuration{}
-	}
-
-	comp := v1alpha1.Configuration{}
-	err = yaml.Unmarshal(content, &comp)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
-	newConfiguration := Configuration{
-		Name:            comp.Name,
-		Kind:            comp.Kind,
-		Created:         info.ModTime().Format("2006-01-02 15:04.05"),
-		Age:             age.GetAge(info.ModTime()),
-		TracingEnabled:  tracingEnabled(comp.Spec.TracingSpec),
-		SamplingRate:    comp.Spec.TracingSpec.SamplingRate,
-		MTLSEnabled:     comp.Spec.MTLSSpec.Enabled,
-		WorkloadCertTTL: comp.Spec.MTLSSpec.WorkloadCertTTL,
-		ClockSkew:       comp.Spec.MTLSSpec.AllowedClockSkew,
-		Manifest:        string(content),
-	}
-
+	configurationsDirectory := filepath.Dir(standalone.DefaultConfigFilePath())
 	standaloneConfigurations := []Configuration{}
-	return append(standaloneConfigurations, newConfiguration)
+	err := filepath.Walk(configurationsDirectory, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			log.Printf("Failure accessing path %s: %v\n", path, err)
+			return err
+		}
+		if info.IsDir() && info.Name() != filepath.Base(configurationsDirectory) {
+			return filepath.SkipDir
+		} else if !info.IsDir() && filepath.Ext(path) == ".yaml" {
+			content, err := ioutil.ReadFile(path)
+			if err != nil {
+				log.Printf("Failure reading file %s: %v\n", path, err)
+				return err
+			}
+
+			comp := v1alpha1.Configuration{}
+			err = yaml.Unmarshal(content, &comp)
+			if err != nil {
+				log.Printf("Failure unmarshalling %s into Configuration: %s\n", path, err.Error())
+			}
+
+			newConfiguration := Configuration{
+				Name:            comp.Name,
+				Kind:            comp.Kind,
+				Created:         info.ModTime().Format("2006-01-02 15:04.05"),
+				Age:             age.GetAge(info.ModTime()),
+				TracingEnabled:  tracingEnabled(comp.Spec.TracingSpec),
+				SamplingRate:    comp.Spec.TracingSpec.SamplingRate,
+				MTLSEnabled:     comp.Spec.MTLSSpec.Enabled,
+				WorkloadCertTTL: comp.Spec.MTLSSpec.WorkloadCertTTL,
+				ClockSkew:       comp.Spec.MTLSSpec.AllowedClockSkew,
+				Manifest:        string(content),
+			}
+
+			if newConfiguration.Kind == "Configuration" {
+				standaloneConfigurations = append(standaloneConfigurations, newConfiguration)
+			}
+			return nil
+		}
+		return nil
+	})
+	if err != nil {
+		log.Printf("error walking the path %q: %v\n", configurationsDirectory, err)
+		return []Configuration{}
+	}
+	return standaloneConfigurations
 }
 
 // tracingEnabled checks if tracing is enabled for a configuration

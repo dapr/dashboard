@@ -1,7 +1,6 @@
 package components
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -106,7 +105,9 @@ func (c *components) getStandaloneComponents() []Component {
 			log.Printf("Failure accessing path %s: %v\n", path, err)
 			return err
 		}
-		if !info.IsDir() {
+		if info.IsDir() && info.Name() != filepath.Base(componentsDirectory) {
+			return filepath.SkipDir
+		} else if !info.IsDir() && filepath.Ext(path) == ".yaml" {
 			content, err := ioutil.ReadFile(path)
 			if err != nil {
 				log.Printf("Failure reading file %s: %v\n", path, err)
@@ -116,7 +117,7 @@ func (c *components) getStandaloneComponents() []Component {
 			comp := v1alpha1.Component{}
 			err = yaml.Unmarshal(content, &comp)
 			if err != nil {
-				fmt.Println(err.Error())
+				log.Printf("Failure unmarshalling %s into Component: %s\n", path, err.Error())
 			}
 
 			newComponent := Component{
@@ -128,7 +129,10 @@ func (c *components) getStandaloneComponents() []Component {
 				Scopes:   comp.Scopes,
 				Manifest: string(content),
 			}
-			standaloneComponents = append(standaloneComponents, newComponent)
+
+			if newComponent.Kind == "Component" {
+				standaloneComponents = append(standaloneComponents, newComponent)
+			}
 			return nil
 		}
 		return nil
