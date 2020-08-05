@@ -62,7 +62,7 @@ func RunWebServer() {
 		platform = "standalone"
 	}
 
-	inst = instances.NewInstances(kubeClient)
+	inst = instances.NewInstances(platform, kubeClient)
 	comps = components.NewComponents(platform, daprClient)
 	configs = configurations.NewConfigurations(platform, daprClient)
 
@@ -78,7 +78,7 @@ func RunWebServer() {
 	api.HandleFunc("/deploymentconfiguration/{id}", getDeploymentConfigurationHandler).Methods("GET")
 	api.HandleFunc("/configurations", getConfigurationsHandler).Methods("GET")
 	api.HandleFunc("/configurations/{name}", getConfigurationHandler).Methods("GET")
-	api.HandleFunc("/environments", getEnvironmentsHandler).Methods("GET")
+	api.HandleFunc("/platform", getPlatformHandler).Methods("GET")
 	api.HandleFunc("/controlplanestatus", getControlPlaneHandler).Methods("GET")
 	api.HandleFunc("/metadata/{id}", getMetadataHandler).Methods("GET")
 
@@ -158,15 +158,15 @@ func getFeaturesHandler(w http.ResponseWriter, r *http.Request) {
 	if configs.Supported() {
 		features = append(features, "configurations")
 	}
-	if inst.Supported() {
+	if inst.CheckPlatform() == "kubernetes" {
 		features = append(features, "status")
 	}
 	respondWithJSON(w, 200, features)
 }
 
-func getEnvironmentsHandler(w http.ResponseWriter, r *http.Request) {
-	resp := inst.CheckSupportedEnvironments()
-	respondWithJSON(w, 200, resp)
+func getPlatformHandler(w http.ResponseWriter, r *http.Request) {
+	resp := inst.CheckPlatform()
+	respondWithPlainString(w, 200, resp)
 }
 
 func getLogsHandler(w http.ResponseWriter, r *http.Request) {
