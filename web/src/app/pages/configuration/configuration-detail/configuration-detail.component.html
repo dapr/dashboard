@@ -38,6 +38,18 @@
       </ng-monaco-editor>
     </mat-card>
   </mat-tab>
+  <mat-tab label="Apps" *ngIf="globals.kubernetesEnabled">
+    <mat-card class="card-large mat-elevation-z8" *ngIf="loadedConfiguration && loadedApps">
+      <mat-card-header>
+        <mat-card-title>Apps using {{ configuration.metadata.name }}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-nav-list>
+          <a mat-list-item routerLink="/overview/{{configApp.appID}}" *ngFor="let configApp of configurationApps">{{ configApp.appID }}</a>
+        </mat-nav-list>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
   <mat-tab label="Configuration" *ngIf="loadedConfiguration">
     <mat-card class="card-large mat-elevation-z8">
       <mat-card-header>
