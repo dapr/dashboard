@@ -12,9 +12,9 @@ import (
 // Components is an interface to interact with Dapr components
 type Components interface {
 	Supported() bool
-	GetComponents() []v1alpha1.Component
-	GetComponent(name string) v1alpha1.Component
-	GetStatus() []ComponentsOutput
+	GetComponents(scope string) []v1alpha1.Component
+	GetComponent(scope string, name string) v1alpha1.Component
+	GetStatus(scope string) []ComponentsOutput
 }
 
 type components struct {
@@ -42,8 +42,8 @@ func (c *components) Supported() bool {
 }
 
 // GetComponents returns the list of all Dapr components
-func (c *components) GetComponents() []v1alpha1.Component {
-	comps, err := c.daprClient.ComponentsV1alpha1().Components(meta_v1.NamespaceDefault).List(meta_v1.ListOptions{})
+func (c *components) GetComponents(scope string) []v1alpha1.Component {
+	comps, err := c.daprClient.ComponentsV1alpha1().Components(scope).List(meta_v1.ListOptions{})
 	if err != nil {
 		log.Println(err)
 		return []v1alpha1.Component{}
@@ -52,8 +52,8 @@ func (c *components) GetComponents() []v1alpha1.Component {
 }
 
 // GetComponent returns a specific component based on a supplied component name
-func (c *components) GetComponent(name string) v1alpha1.Component {
-	comps, err := c.daprClient.ComponentsV1alpha1().Components(meta_v1.NamespaceDefault).List(meta_v1.ListOptions{})
+func (c *components) GetComponent(scope string, name string) v1alpha1.Component {
+	comps, err := c.daprClient.ComponentsV1alpha1().Components(scope).List(meta_v1.ListOptions{})
 	if err != nil {
 		log.Println(err)
 		return v1alpha1.Component{}
@@ -67,8 +67,8 @@ func (c *components) GetComponent(name string) v1alpha1.Component {
 }
 
 // GetStatus returns returns a list of Dapr component statuses
-func (c *components) GetStatus() []ComponentsOutput {
-	comps, err := c.daprClient.ComponentsV1alpha1().Components(meta_v1.NamespaceDefault).List(meta_v1.ListOptions{})
+func (c *components) GetStatus(scope string) []ComponentsOutput {
+	comps, err := c.daprClient.ComponentsV1alpha1().Components(scope).List(meta_v1.ListOptions{})
 	if err != nil {
 		log.Println(err)
 		return []ComponentsOutput{}

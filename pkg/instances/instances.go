@@ -27,20 +27,22 @@ import (
 // Instances is an interface to interact with running Dapr instances in Kubernetes or Standalone modes
 type Instances interface {
 	Supported() bool
-	GetInstances() []Instance
-	GetInstance(id string) Instance
-	DeleteInstance(id string) error
-	GetLogs(id string) []Log
-	GetDeploymentConfiguration(id string) string
+	GetInstances(scope string) []Instance
+	GetInstance(scope string, id string) Instance
+	DeleteInstance(scope string, id string) error
+	GetLogs(scope string, id string) []Log
+	GetDeploymentConfiguration(scope string, id string) string
 	GetControlPlaneStatus() []StatusOutput
-	GetMetadata(id string) MetadataOutput
+	GetMetadata(scope string, id string) MetadataOutput
 	GetActiveActorsCount(metadata MetadataOutput) []MetadataActiveActorsCount
 	CheckSupportedEnvironments() []string
+	GetScopes() []string
 }
 
 type instances struct {
 	kubeClient     *kubernetes.Clientset
-	getInstancesFn func() []Instance
+	getInstancesFn func(string) []Instance
+	getScopesFn    func() []string
 }
 
 const (
@@ -59,9 +61,11 @@ func NewInstances(kubeClient *kubernetes.Clientset) Instances {
 
 	if kubeClient != nil {
 		i.getInstancesFn = i.getKubernetesInstances
+		i.getScopesFn = i.getKubernetesScopes
 		i.kubeClient = kubeClient
 	} else {
 		i.getInstancesFn = i.getStandaloneInstances
+		i.getScopesFn = i.getStandaloneScopes
 	}
 	return &i
 }
@@ -72,8 +76,13 @@ func (i *instances) Supported() bool {
 }
 
 // GetInstances returns the result of the appropriate environment's GetInstance function
-func (i *instances) GetInstances() []Instance {
-	return i.getInstancesFn()
+func (i *instances) GetInstances(scope string) []Instance {
+	return i.getInstancesFn(scope)
+}
+
+// GetScopes returns the result of the appropriate environment's GetScopes function
+func (i *instances) GetScopes() []string {
+	return i.getScopesFn()
 }
 
 // CheckSupportedEnvironments checks for valid environments for Dapr applications to run in
@@ -88,9 +97,9 @@ func (i *instances) CheckSupportedEnvironments() []string {
 }
 
 // GetLogs returns a string of all logs for the given Dapr app id
-func (i *instances) GetLogs(id string) []Log {
+func (i *instances) GetLogs(scope string, id string) []Log {
 	if i.kubeClient != nil {
-		resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
+		resp, err := i.kubeClient.AppsV1().Deployments(scope).List((meta_v1.ListOptions{}))
 		if err != nil || len(resp.Items) == 0 {
 			return []Log{}
 		}
@@ -169,9 +178,9 @@ func (i *instances) GetLogs(id string) []Log {
 }
 
 // GetDeploymentConfiguration returns the metadata of a Dapr application in YAML format
-func (i *instances) GetDeploymentConfiguration(id string) string {
+func (i *instances) GetDeploymentConfiguration(scope string, id string) string {
 	if i.kubeClient != nil {
-		resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
+		resp, err := i.kubeClient.AppsV1().Deployments(scope).List((meta_v1.ListOptions{}))
 		if err != nil || len(resp.Items) == 0 {
 			return ""
 		}
@@ -232,13 +241,13 @@ func (i *instances) GetDeploymentConfiguration(id string) string {
 }
 
 // DeleteInstance deletes the local Dapr sidecar instance
-func (i *instances) DeleteInstance(id string) error {
+func (i *instances) DeleteInstance(scope string, id string) error {
 	return standalone.Stop(id)
 }
 
 // GetInstance uses the appropriate getInstance function (kubernetes, standalone, etc.) and returns the given instance from its id
-func (i *instances) GetInstance(id string) Instance {
-	instanceList := i.getInstancesFn()
+func (i *instances) GetInstance(scope string, id string) Instance {
+	instanceList := i.getInstancesFn(scope)
 	for _, instance := range instanceList {
 		if instance.AppID == id {
 			return instance
@@ -313,10 +322,10 @@ func (i *instances) GetControlPlaneStatus() []StatusOutput {
 }
 
 // GetMetadata returns the result from the /v1.0/metadata endpoint
-func (i *instances) GetMetadata(id string) MetadataOutput {
+func (i *instances) GetMetadata(scope string, id string) MetadataOutput {
 	url := ""
 	if i.kubeClient != nil {
-		resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
+		resp, err := i.kubeClient.AppsV1().Deployments(scope).List((meta_v1.ListOptions{}))
 		if err != nil || len(resp.Items) == 0 {
 			return MetadataOutput{}
 		}
@@ -342,7 +351,7 @@ func (i *instances) GetMetadata(id string) MetadataOutput {
 		}
 
 	} else {
-		port := i.GetInstance(id).HTTPPort
+		port := i.GetInstance(id, scope).HTTPPort
 		url = fmt.Sprintf("http://localhost:%v/v1.0/metadata", port)
 	}
 	if url != "" {
@@ -375,9 +384,9 @@ func (i *instances) GetActiveActorsCount(metadata MetadataOutput) []MetadataActi
 }
 
 // getKubernetesInstances gets the list of Dapr applications running in the Kubernetes environment
-func (i *instances) getKubernetesInstances() []Instance {
+func (i *instances) getKubernetesInstances(scope string) []Instance {
 	list := []Instance{}
-	resp, err := i.kubeClient.AppsV1().Deployments(meta_v1.NamespaceAll).List((meta_v1.ListOptions{}))
+	resp, err := i.kubeClient.AppsV1().Deployments(scope).List((meta_v1.ListOptions{}))
 	if err != nil {
 		log.Println(err)
 		return list
@@ -427,7 +436,7 @@ func (i *instances) getKubernetesInstances() []Instance {
 }
 
 // getStandaloneInstances returns the Dapr instances running in the standalone environment
-func (i *instances) getStandaloneInstances() []Instance {
+func (i *instances) getStandaloneInstances(scope string) []Instance {
 	list := []Instance{}
 	output, err := standalone.List()
 	if err != nil {
@@ -451,4 +460,21 @@ func (i *instances) getStandaloneInstances() []Instance {
 		}
 	}
 	return list
+}
+
+func (i *instances) getKubernetesScopes() []string {
+	scopes := []string{"All"}
+	namespaces, err := i.kubeClient.CoreV1().Namespaces().List(meta_v1.ListOptions{})
+	if err != nil {
+		log.Println(err)
+		return scopes
+	}
+	for _, namespace := range namespaces.Items {
+		scopes = append(scopes, namespace.Name)
+	}
+	return scopes
+}
+
+func (i *instances) getStandaloneScopes() []string {
+	return []string{"All"}
 }

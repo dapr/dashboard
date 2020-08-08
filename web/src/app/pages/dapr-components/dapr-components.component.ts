@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ComponentsService } from 'src/app/components/components.service';
 import { DaprComponentStatus } from 'src/app/types/types';
+import { ScopesService } from 'src/app/scopes/scopes.service';
 
 @Component({
   selector: 'app-components',
@@ -12,11 +13,23 @@ export class DaprComponentsComponent implements OnInit {
   public componentsStatus: DaprComponentStatus[];
   public statusLoaded: boolean;
   public displayedColumns: string[] = ['img', 'name', 'status', 'age', 'created'];
+  private intervalHandler;
 
-  constructor(private componentsService: ComponentsService) { }
+  constructor(
+    private componentsService: ComponentsService,
+    private scopesService: ScopesService
+  ) { }
 
   ngOnInit(): void {
     this.getComponents();
+
+    this.intervalHandler = setInterval(() => {
+      this.getComponents();
+    }, 3000);
+
+    this.scopesService.scopeChanged.subscribe(() => {
+      this.getComponents();
+    });
   }
 
   getComponents(): void {

@@ -51,3 +51,9 @@ type Log struct {
 	Container string `json:"container"`
 	Content   string `json:"content"`
 }
+
+// Scope represents a Dapr scope
+type Scope struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}

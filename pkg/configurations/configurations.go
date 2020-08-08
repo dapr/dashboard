@@ -13,9 +13,9 @@ import (
 // Configurations is an interface to interact with a Dapr configuration
 type Configurations interface {
 	Supported() bool
-	GetConfigurations() []v1alpha1.Configuration
-	GetConfiguration(name string) v1alpha1.Configuration
-	GetStatus() []ConfigurationsOutput
+	GetConfigurations(scope string) []v1alpha1.Configuration
+	GetConfiguration(name string, scope string) v1alpha1.Configuration
+	GetStatus(scope string) []ConfigurationsOutput
 }
 
 type configurations struct {
@@ -46,8 +46,8 @@ func (c *configurations) Supported() bool {
 }
 
 // GetConfigurations returns the list of all Dapr Configurations
-func (c *configurations) GetConfigurations() []v1alpha1.Configuration {
-	confs, err := c.daprClient.ConfigurationV1alpha1().Configurations(meta_v1.NamespaceAll).List(meta_v1.ListOptions{})
+func (c *configurations) GetConfigurations(scope string) []v1alpha1.Configuration {
+	confs, err := c.daprClient.ConfigurationV1alpha1().Configurations(scope).List(meta_v1.ListOptions{})
 	if err != nil {
 		log.Println(err)
 		return []v1alpha1.Configuration{}
@@ -57,8 +57,8 @@ func (c *configurations) GetConfigurations() []v1alpha1.Configuration {
 }
 
 // GetConfiguration returns one Dapr configuration
-func (c *configurations) GetConfiguration(name string) v1alpha1.Configuration {
-	confs, err := c.daprClient.ConfigurationV1alpha1().Configurations(meta_v1.NamespaceAll).List(meta_v1.ListOptions{})
+func (c *configurations) GetConfiguration(scope string, name string) v1alpha1.Configuration {
+	confs, err := c.daprClient.ConfigurationV1alpha1().Configurations(scope).List(meta_v1.ListOptions{})
 	if err != nil {
 		log.Println(err)
 		return v1alpha1.Configuration{}
@@ -73,8 +73,8 @@ func (c *configurations) GetConfiguration(name string) v1alpha1.Configuration {
 }
 
 // GetStatus returns the list of Dapr Configurations Statuses
-func (c *configurations) GetStatus() []ConfigurationsOutput {
-	confs, err := c.daprClient.ConfigurationV1alpha1().Configurations(meta_v1.NamespaceAll).List(meta_v1.ListOptions{})
+func (c *configurations) GetStatus(scope string) []ConfigurationsOutput {
+	confs, err := c.daprClient.ConfigurationV1alpha1().Configurations(scope).List(meta_v1.ListOptions{})
 	if err != nil {
 		log.Println(err)
 		return []ConfigurationsOutput{}

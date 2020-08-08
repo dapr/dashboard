@@ -25,6 +25,7 @@ export class DetailComponent implements OnInit {
   public metadata: Metadata[];
   public metadataDisplayedColumns: string[] = ['type', 'count'];
   public options: YamlViewerOptions;
+  private intervalHandler;
 
   constructor(
     private route: ActivatedRoute,
@@ -34,13 +35,8 @@ export class DetailComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.loadedConfiguration = false;
-    this.loadedInstance = false;
-    this.loadedMetadata = false;
     this.id = this.route.snapshot.params.id;
-    this.getConfiguration(this.id);
-    this.getInstance(this.id);
-    this.getMetadata(this.id);
+    this.loadData();
     this.options = {
       folding: true,
       minimap: { enabled: true },
@@ -54,6 +50,10 @@ export class DetailComponent implements OnInit {
         theme: newTheme.includes('dark') ? 'vs-dark' : 'vs',
       };
     });
+
+    this.intervalHandler = setInterval(() => {
+      this.loadData();
+    }, 3000);
   }
 
   getConfiguration(id: string): void {
@@ -81,5 +81,11 @@ export class DetailComponent implements OnInit {
       this.metadata = data;
       this.loadedMetadata = true;
     });
+  }
+
+  loadData(): void {
+    this.getConfiguration(this.id);
+    this.getInstance(this.id);
+    this.getMetadata(this.id);
   }
 }

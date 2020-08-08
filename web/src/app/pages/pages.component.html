@@ -3,6 +3,15 @@
     <img [src]="imgPath" id="header-image">
   </div>
   <h1 class="app-header">Dashboard</h1>
+  <div id="scopeContainer" *ngIf="globals.changesEnabledRoutes.includes(router.url)">
+    <mat-form-field id="scopeFormField">
+      <mat-select (selectionChange)="onScopeChange()" [(ngModel)]="scopeValue" name="scope" placeholder="Scope">
+        <mat-option *ngFor="let scope of scopes" [value]="scope">
+          {{ scope }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
 </mat-toolbar>
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #drawer class="sidenav" mode="side" [class.menu-open]="isMenuOpen" [class.menu-close]="!isMenuOpen"
@@ -20,7 +29,8 @@
         </a>
       </ng-container>
       <mat-divider class="navigation-divider"></mat-divider>
-      <a *ngIf="router.url === '/overview'" id="theme-selector" class="navigation-item" mat-list-item (click)="onThemeChange()">
+      <a *ngIf="globals.changesEnabledRoutes.includes(router.url)" id="theme-selector" class="navigation-item"
+        mat-list-item (click)="onThemeChange()">
         <mat-icon class="material-icons">{{ isLightMode ? 'nights_stay' : 'wb_sunny' }}</mat-icon><span
           class="navigation-item-label">{{ isLightMode ? 'Dark Theme' : 'Light Theme' }}</span>
       </a>
