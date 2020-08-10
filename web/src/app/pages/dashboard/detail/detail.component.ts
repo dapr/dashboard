@@ -52,8 +52,8 @@ export class DetailComponent implements OnInit {
     });
 
     this.intervalHandler = setInterval(() => {
-      this.loadData();
-    }, 3000);
+      this.getMetadata(this.id);
+    }, 10000);
   }
 
   getConfiguration(id: string): void {

@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { InstanceService } from 'src/app/instances/instance.service';
 import { Status } from 'src/app/types/types';
-import { ScopesService } from 'src/app/scopes/scopes.service';
 
 @Component({
   selector: 'app-controlplane',
@@ -12,11 +11,11 @@ export class ControlPlaneComponent implements OnInit {
 
   public data: Status[];
   public displayedColumns: string[] = ['name', 'namespace', 'healthy', 'status', 'version', 'age', 'created'];
+  public controlPlaneLoaded: boolean;
   private intervalHandler;
 
   constructor(
     private statusService: InstanceService,
-    private scopesService: ScopesService
   ) { }
 
   ngOnInit(): void {
@@ -24,16 +23,14 @@ export class ControlPlaneComponent implements OnInit {
 
     this.intervalHandler = setInterval(() => {
       this.getControlPlaneStatus();
-    }, 3000);
-
-    this.scopesService.scopeChanged.subscribe(() => {
-      this.getControlPlaneStatus();
-    });
+    }, 10000);
   }
 
   getControlPlaneStatus(): void {
+    this.controlPlaneLoaded = false;
     this.statusService.getControlPlaneStatus().subscribe((data: Status[]) => {
       this.data = data.sort((a, b) => a.name.localeCompare(b.name));
+      this.controlPlaneLoaded = true;
     });
   }
 }

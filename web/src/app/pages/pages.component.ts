@@ -45,7 +45,7 @@ export class PagesComponent implements OnInit {
 
     this.intervalHandler = setInterval(() => {
       this.getScopes();
-    }, 3000);
+    }, 10000);
   }
 
   getFeatures(): void {

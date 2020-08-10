@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { DaprComponentStatus, DaprComponent } from '../types/types';
+import { DaprComponent } from '../types/types';
 import { ScopesService } from '../scopes/scopes.service';
 
 @Injectable({
@@ -22,10 +22,5 @@ export class ComponentsService {
   getComponent(name: string): Observable<DaprComponent> {
     const scope = this.scopesService.getScope();
     return this.http.get<DaprComponent>(`/api/components/${scope}/${name}`);
-  }
-
-  getComponentsStatus(): Observable<DaprComponentStatus[]> {
-    const scope = this.scopesService.getScope();
-    return this.http.get<DaprComponentStatus[]>(`/api/componentsstatus/${scope}`);
   }
 }

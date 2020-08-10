@@ -18,6 +18,7 @@ type Instance struct {
 	Status           string `json:"status"`
 	Labels           string `json:"labels"`
 	Selector         string `json:"selector"`
+	Config           string `json:"config"`
 }
 
 // StatusOutput represents the status of a named Dapr resource.
@@ -50,10 +51,4 @@ type Log struct {
 	Timestamp int64  `json:"timestamp"`
 	Container string `json:"container"`
 	Content   string `json:"content"`
-}
-
-// Scope represents a Dapr scope
-type Scope struct {
-	Name  string `json:"name"`
-	Value string `json:"value"`
 }

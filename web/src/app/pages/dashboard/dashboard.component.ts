@@ -29,23 +29,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    this.checkPlatform();
     this.loadData();
-    this.globals.getSupportedEnvironments().subscribe(data => {
-      const supportedEnvironments = data as Array<any>;
-      if (supportedEnvironments.includes('kubernetes')) {
-        this.globals.kubernetesEnabled = true;
-        this.displayedColumns = ['name', 'labels', 'status', 'age', 'selector'];
-      }
-      else if (supportedEnvironments.includes('standalone')) {
-        this.globals.standaloneEnabled = true;
-        this.displayedColumns = ['name', 'age', 'actions'];
-      }
-      this.tableLoaded = true;
-    });
 
     this.intervalHandler = setInterval(() => {
       this.loadData();
-    }, 3000);
+    }, 10000);
 
     this.scopesService.scopeChanged.subscribe(() => {
       this.loadData();
@@ -56,13 +45,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
     clearInterval(this.intervalHandler);
   }
 
-  checkEnvironment(): void {
-    this.globals.getSupportedEnvironments();
+  checkPlatform(): void {
+    this.globals.getPlatform().subscribe(platform => {
+      if (platform === 'kubernetes') {
+        this.globals.kubernetesEnabled = true;
+        this.displayedColumns = ['name', 'labels', 'status', 'age', 'selector'];
+      }
+      else if (platform === 'standalone') {
+        this.globals.standaloneEnabled = true;
+        this.displayedColumns = ['name', 'age', 'actions'];
+      }
+    });
   }
 
   getInstances(): void {
     this.instanceService.getInstances().subscribe((data: Instance[]) => {
       this.instances = data;
+      this.tableLoaded = true;
     });
   }
 

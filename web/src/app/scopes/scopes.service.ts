@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class ScopesService {
 
-  private scope = 'default';
+  private scope = 'All';
   public scopeChanged: EventEmitter<string> = new EventEmitter();
 
   constructor(private http: HttpClient) { }

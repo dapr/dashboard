@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { DaprConfiguration, DaprConfigurationStatus } from '../types/types';
+import { DaprConfiguration, Instance } from '../types/types';
 import { Observable } from 'rxjs';
 import { ScopesService } from '../scopes/scopes.service';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,7 @@ export class ConfigurationsService {
 
   getConfigurations(): Observable<DaprConfiguration[]> {
     const scope = this.scopesService.getScope();
-    return this.http.get<DaprConfiguration[]>(`/api/configurations${scope}`);
+    return this.http.get<DaprConfiguration[]>(`/api/configurations/${scope}`);
   }
 
   getConfiguration(name: string): Observable<DaprConfiguration> {
@@ -24,8 +25,12 @@ export class ConfigurationsService {
     return this.http.get<DaprConfiguration>(`/api/configurations/${scope}/${name}`);
   }
 
-  getConfigurationsStatus(): Observable<DaprConfigurationStatus[]> {
+  getConfigurationApps(name: string): Observable<Instance[]> {
     const scope = this.scopesService.getScope();
-    return this.http.get<DaprConfigurationStatus[]>(`/api/configurationsstatus/${scope}`);
+    return this.http.get<Instance[]>(`/api/instances/${scope}`).pipe(
+      map(instances => {
+        return instances.filter(instance => instance.config === name);
+      })
+    );
   }
 }
