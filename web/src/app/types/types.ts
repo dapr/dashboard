@@ -16,6 +16,7 @@ export interface Instance {
     status: string;
     labels: string;
     selector: string;
+    config: string;
 }
 
 // Status represents the status of a named Dapr resource
@@ -76,4 +77,4 @@ export interface YamlViewerOptions {
     readOnly: boolean;
     language: string;
     theme: string;
-  }
+}

@@ -4,7 +4,8 @@ import { ConfigurationsService } from 'src/app/configurations/configurations.ser
 import { ActivatedRoute } from '@angular/router';
 import * as yaml from 'js-yaml';
 import { ThemeService } from 'src/app/theme/theme.service';
-import { YamlViewerOptions } from 'src/app/types/types';
+import { YamlViewerOptions, Instance } from 'src/app/types/types';
+import { GlobalsService } from 'src/app/globals/globals.service';
 
 @Component({
   selector: 'app-configuration-detail',
@@ -18,16 +19,20 @@ export class ConfigurationDetailComponent implements OnInit {
   public configurationManifest: string | object;
   public options: YamlViewerOptions;
   public loadedConfiguration: boolean;
+  public loadedApps: boolean;
+  public configurationApps: Instance[];
 
   constructor(
     private route: ActivatedRoute,
     private configurationsService: ConfigurationsService,
     private themeService: ThemeService,
+    public globals: GlobalsService,
   ) { }
 
   ngOnInit(): void {
     this.name = this.route.snapshot.params.name;
     this.getConfiguration(this.name);
+    this.getConfigurationApps(this.name);
     this.options = {
       folding: true,
       minimap: { enabled: true },
@@ -48,6 +53,13 @@ export class ConfigurationDetailComponent implements OnInit {
       this.configuration = data;
       this.configurationManifest = yaml.safeDump(data.manifest);
       this.loadedConfiguration = true;
+    });
+  }
+
+  getConfigurationApps(name: string): void {
+    this.configurationsService.getConfigurationApps(name).subscribe((data: Instance[]) => {
+      this.configurationApps = data;
+      this.loadedApps = true;
     });
   }
 }
