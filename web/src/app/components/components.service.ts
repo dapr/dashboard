@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { DaprComponentStatus, DaprComponent } from '../types/types';
+import { DaprComponent } from '../types/types';
 
 @Injectable({
   providedIn: 'root',
@@ -16,9 +16,5 @@ export class ComponentsService {
 
   getComponent(name: string): Observable<DaprComponent> {
     return this.http.get<DaprComponent>('/api/components/' + name);
-  }
-
-  getComponentsStatus(): Observable<DaprComponentStatus[]> {
-    return this.http.get<DaprComponentStatus[]>('/api/componentsstatus');
   }
 }

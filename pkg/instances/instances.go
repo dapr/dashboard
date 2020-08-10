@@ -11,7 +11,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-
 	"time"
 
 	"github.com/dapr/cli/pkg/standalone"
@@ -22,6 +21,16 @@ import (
 	json_serializer "k8s.io/apimachinery/pkg/runtime/serializer/json"
 	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/yaml"
+)
+
+const (
+	daprEnabledAnnotation = "dapr.io/enabled"
+	daprIDAnnotation      = "dapr.io/id"
+	daprPortAnnotation    = "dapr.io/port"
+)
+
+var (
+	controlPlaneLabels = [...]string{"dapr-operator", "dapr-sentry", "dapr-placement", "dapr-sidecar-injector"}
 )
 
 // Instances is an interface to interact with running Dapr instances in Kubernetes or Standalone modes
@@ -35,56 +44,37 @@ type Instances interface {
 	GetControlPlaneStatus() []StatusOutput
 	GetMetadata(id string) MetadataOutput
 	GetActiveActorsCount(metadata MetadataOutput) []MetadataActiveActorsCount
-	CheckSupportedEnvironments() []string
+	CheckPlatform() string
 }
 
 type instances struct {
+	platform       string
 	kubeClient     *kubernetes.Clientset
 	getInstancesFn func() []Instance
 }
 
-const (
-	daprEnabledAnnotation = "dapr.io/enabled"
-	daprIDAnnotation      = "dapr.io/id"
-	daprPortAnnotation    = "dapr.io/port"
-)
-
-var (
-	controlPlaneLabels = [...]string{"dapr-operator", "dapr-sentry", "dapr-placement", "dapr-sidecar-injector"}
-)
-
-// NewInstances returns an Instances implementation
-func NewInstances(kubeClient *kubernetes.Clientset) Instances {
+// NewInstances returns an Instances instance
+func NewInstances(platform string, kubeClient *kubernetes.Clientset) Instances {
 	i := instances{}
+	i.platform = platform
 
-	if kubeClient != nil {
+	if i.platform == "kubernetes" {
 		i.getInstancesFn = i.getKubernetesInstances
 		i.kubeClient = kubeClient
-	} else {
+	} else if i.platform == "standalone" {
 		i.getInstancesFn = i.getStandaloneInstances
 	}
 	return &i
 }
 
-// Supported checks if the current kubernetes client is available
+// Supported checks if the current platform supports Dapr instances
 func (i *instances) Supported() bool {
-	return i.kubeClient != nil
+	return i.platform == "kubernetes" || i.platform == "standalone"
 }
 
-// GetInstances returns the result of the appropriate environment's GetInstance function
-func (i *instances) GetInstances() []Instance {
-	return i.getInstancesFn()
-}
-
-// CheckSupportedEnvironments checks for valid environments for Dapr applications to run in
-func (i *instances) CheckSupportedEnvironments() []string {
-	envs := make([]string, 2)
-	if i.kubeClient != nil {
-		envs = append(envs, "kubernetes")
-	} else {
-		envs = append(envs, "standalone")
-	}
-	return envs
+// CheckPlatform returns the current environment dashboard is running in
+func (i *instances) CheckPlatform() string {
+	return i.platform
 }
 
 // GetLogs returns a string of all logs for the given Dapr app id
@@ -374,6 +364,11 @@ func (i *instances) GetActiveActorsCount(metadata MetadataOutput) []MetadataActi
 	return metadata.Actors
 }
 
+// GetInstances returns the result of the appropriate environment's GetInstance function
+func (i *instances) GetInstances() []Instance {
+	return i.getInstancesFn()
+}
+
 // getKubernetesInstances gets the list of Dapr applications running in the Kubernetes environment
 func (i *instances) getKubernetesInstances() []Instance {
 	list := []Instance{}
@@ -435,6 +430,9 @@ func (i *instances) getStandaloneInstances() []Instance {
 		log.Println(err)
 	} else {
 		for _, o := range output {
+			if o.AppID == "" {
+				continue
+			}
 			list = append(list, Instance{
 				AppID:            o.AppID,
 				HTTPPort:         o.HTTPPort,

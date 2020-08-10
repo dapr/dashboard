@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { DaprConfiguration, DaprConfigurationStatus, Instance } from '../types/types';
+import { DaprConfiguration, Instance } from '../types/types';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -17,10 +17,6 @@ export class ConfigurationsService {
 
   getConfiguration(name: string): Observable<DaprConfiguration> {
     return this.http.get<DaprConfiguration>('/api/configurations/' + name);
-  }
-
-  getConfigurationsStatus(): Observable<DaprConfigurationStatus[]> {
-    return this.http.get<DaprConfigurationStatus[]>('/api/configurationsstatus');
   }
 
   getConfigurationApps(name: string): Observable<Instance[]> {

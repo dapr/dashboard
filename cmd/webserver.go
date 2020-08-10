@@ -54,13 +54,19 @@ var configs configurations.Configurations
 
 // RunWebServer starts the web server that serves the Dapr UI dashboard and the API
 func RunWebServer() {
+	platform := ""
 	kubeClient, daprClient, _ := kube.Clients()
-	inst = instances.NewInstances(kubeClient)
-	comps = components.NewComponents(daprClient)
-	configs = configurations.NewConfigurations(daprClient)
+	if kubeClient != nil {
+		platform = "kubernetes"
+	} else {
+		platform = "standalone"
+	}
+
+	inst = instances.NewInstances(platform, kubeClient)
+	comps = components.NewComponents(platform, daprClient)
+	configs = configurations.NewConfigurations(platform, daprClient)
 
 	r := mux.NewRouter()
-
 	api := r.PathPrefix("/api/").Subrouter()
 	api.HandleFunc("/features", getFeaturesHandler).Methods("GET")
 	api.HandleFunc("/instances", getInstancesHandler).Methods("GET")
@@ -68,18 +74,15 @@ func RunWebServer() {
 	api.HandleFunc("/instances/{id}", getInstanceHandler).Methods("GET")
 	api.HandleFunc("/instances/{id}/logs", getLogsHandler).Methods("GET")
 	api.HandleFunc("/components", getComponentsHandler).Methods("GET")
-	api.HandleFunc("/componentsstatus", getComponentsStatusHandler).Methods("GET")
 	api.HandleFunc("/components/{name}", getComponentHandler).Methods("GET")
 	api.HandleFunc("/deploymentconfiguration/{id}", getDeploymentConfigurationHandler).Methods("GET")
-	api.HandleFunc("/configurationsstatus", getConfigurationsStatusHandler).Methods("GET")
 	api.HandleFunc("/configurations", getConfigurationsHandler).Methods("GET")
 	api.HandleFunc("/configurations/{name}", getConfigurationHandler).Methods("GET")
-	api.HandleFunc("/environments", getEnvironmentsHandler).Methods("GET")
+	api.HandleFunc("/platform", getPlatformHandler).Methods("GET")
 	api.HandleFunc("/controlplanestatus", getControlPlaneHandler).Methods("GET")
 	api.HandleFunc("/metadata/{id}", getMetadataHandler).Methods("GET")
 
 	spa := spaHandler{staticPath: "web/dist", indexPath: "index.html"}
-
 	r.PathPrefix("/").Handler(spa)
 
 	srv := &http.Server{
@@ -88,7 +91,6 @@ func RunWebServer() {
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
-
 	fmt.Println(fmt.Sprintf("Dapr Dashboard running on http://localhost:%v", port))
 	log.Fatal(srv.ListenAndServe())
 }
@@ -148,11 +150,6 @@ func getComponentHandler(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, 200, resp)
 }
 
-func getComponentsStatusHandler(w http.ResponseWriter, r *http.Request) {
-	resp := comps.GetStatus()
-	respondWithJSON(w, 200, resp)
-}
-
 func getFeaturesHandler(w http.ResponseWriter, r *http.Request) {
 	features := []string{}
 	if comps.Supported() {
@@ -161,15 +158,15 @@ func getFeaturesHandler(w http.ResponseWriter, r *http.Request) {
 	if configs.Supported() {
 		features = append(features, "configurations")
 	}
-	if inst.Supported() {
+	if inst.CheckPlatform() == "kubernetes" {
 		features = append(features, "status")
 	}
 	respondWithJSON(w, 200, features)
 }
 
-func getEnvironmentsHandler(w http.ResponseWriter, r *http.Request) {
-	resp := inst.CheckSupportedEnvironments()
-	respondWithJSON(w, 200, resp)
+func getPlatformHandler(w http.ResponseWriter, r *http.Request) {
+	resp := inst.CheckPlatform()
+	respondWithPlainString(w, 200, resp)
 }
 
 func getLogsHandler(w http.ResponseWriter, r *http.Request) {
@@ -184,11 +181,6 @@ func getDeploymentConfigurationHandler(w http.ResponseWriter, r *http.Request) {
 	id := vars["id"]
 	details := inst.GetDeploymentConfiguration(id)
 	respondWithPlainString(w, 200, details)
-}
-
-func getConfigurationsStatusHandler(w http.ResponseWriter, r *http.Request) {
-	resp := configs.GetStatus()
-	respondWithJSON(w, 200, resp)
 }
 
 func getConfigurationsHandler(w http.ResponseWriter, r *http.Request) {
