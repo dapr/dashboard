@@ -15,8 +15,7 @@ export class ConfigurationDetailComponent implements OnInit {
 
   private name: string;
   public configuration: any;
-  public configurationMetadata: string | object;
-  public configurationDeployment: string | object;
+  public configurationManifest: string | object;
   public options: YamlViewerOptions;
   public loadedConfiguration: boolean;
 
@@ -47,8 +46,7 @@ export class ConfigurationDetailComponent implements OnInit {
   getConfiguration(name: string): void {
     this.configurationsService.getConfiguration(name).subscribe((data: DaprConfiguration) => {
       this.configuration = data;
-      this.configurationDeployment = yaml.safeDump(data);
-      this.configurationMetadata = yaml.safeDump(data.spec);
+      this.configurationManifest = yaml.safeDump(data.manifest);
       this.loadedConfiguration = true;
     });
   }

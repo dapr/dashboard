@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ export class GlobalsService {
 
   constructor(private http: HttpClient) { }
 
-  getSupportedEnvironments() {
-    return this.http.get('/api/environments');
+  getPlatform(): Observable<string> {
+    return this.http.get('/api/platform', { responseType: 'text' });
   }
 }

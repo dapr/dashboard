@@ -27,22 +27,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.tableLoaded = false;
-    this.controlPlaneLoaded = false;
     this.getInstances();
     this.getControlPlaneData();
-    this.globals.getSupportedEnvironments().subscribe(data => {
-      const supportedEnvironments = data as Array<any>;
-      if (supportedEnvironments.includes('kubernetes')) {
-        this.globals.kubernetesEnabled = true;
-        this.displayedColumns = ['name', 'labels', 'status', 'age', 'selector'];
-      }
-      else if (supportedEnvironments.includes('standalone')) {
-        this.globals.standaloneEnabled = true;
-        this.displayedColumns = ['name', 'age', 'actions'];
-      }
-      this.tableLoaded = true;
-    });
+    this.checkPlatform();
 
     this.intervalHandler = setInterval(() => {
       this.getInstances();
@@ -54,8 +41,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
     clearInterval(this.intervalHandler);
   }
 
-  checkEnvironment(): void {
-    this.globals.getSupportedEnvironments();
+  checkPlatform(): void {
+    this.globals.getPlatform().subscribe(platform => {
+      if (platform === 'kubernetes') {
+        this.globals.kubernetesEnabled = true;
+        this.displayedColumns = ['name', 'labels', 'status', 'age', 'selector'];
+      }
+      else if (platform === 'standalone') {
+        this.globals.standaloneEnabled = true;
+        this.displayedColumns = ['name', 'age', 'actions'];
+      }
+      this.tableLoaded = true;
+    });
   }
 
   getInstances(): void {
