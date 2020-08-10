@@ -52,19 +52,22 @@
   <mat-tab label="Apps" *ngIf="globals.kubernetesEnabled">
     <mat-card class="card-large mat-elevation-z8" *ngIf="loadedConfiguration && loadedApps">
       <mat-card-header>
-        <mat-card-title>Apps using {{ configuration.metadata.name }}</mat-card-title>
+        <mat-card-title>Apps using {{ configuration.name }}</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <mat-nav-list>
+        <mat-nav-list *ngIf="configurationApps.length > 0; else noApps">
           <a mat-list-item routerLink="/overview/{{configApp.appID}}" *ngFor="let configApp of configurationApps">{{ configApp.appID }}</a>
         </mat-nav-list>
+        <ng-template #noApps>
+          <p class="page-text">No Dapr apps using this configuration</p>
+        </ng-template>
       </mat-card-content>
     </mat-card>
   </mat-tab>
   <mat-tab label="Configuration" *ngIf="loadedConfiguration">
     <mat-card class="card-large mat-elevation-z8">
       <mat-card-header>
-        <mat-card-title>Deployment</mat-card-title>
+        <mat-card-title>Manifest</mat-card-title>
       </mat-card-header>
       <ng-monaco-editor style="height: 300px" modelUri="file:manifest.yaml" [options]="options" [(ngModel)]="configurationManifest">
       </ng-monaco-editor>
