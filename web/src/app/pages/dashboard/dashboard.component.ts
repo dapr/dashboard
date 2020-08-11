@@ -3,6 +3,7 @@ import { InstanceService } from 'src/app/instances/instance.service';
 import { GlobalsService } from 'src/app/globals/globals.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Instance, Status } from 'src/app/types/types';
+import { ScopesService } from 'src/app/scopes/scopes.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -24,17 +25,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private instanceService: InstanceService,
     public globals: GlobalsService,
     private snackbar: MatSnackBar,
+    private scopesService: ScopesService,
   ) { }
 
   ngOnInit(): void {
-    this.getInstances();
-    this.getControlPlaneData();
     this.checkPlatform();
+    this.loadData();
 
     this.intervalHandler = setInterval(() => {
-      this.getInstances();
-      this.getControlPlaneData();
-    }, 3000);
+      this.loadData();
+    }, 10000);
+
+    this.scopesService.scopeChanged.subscribe(() => {
+      this.loadData();
+    });
   }
 
   ngOnDestroy(): void {
@@ -51,13 +55,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.globals.standaloneEnabled = true;
         this.displayedColumns = ['name', 'age', 'actions'];
       }
-      this.tableLoaded = true;
     });
   }
 
   getInstances(): void {
     this.instanceService.getInstances().subscribe((data: Instance[]) => {
       this.instances = data;
+      this.tableLoaded = true;
     });
   }
 
@@ -66,6 +70,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.daprHealthiness = data.every((service) => {
         return service.healthy === 'True';
       }) ? 'Healthy' : 'Unhealthy';
+      if (data.length === 0) {
+        this.daprHealthiness = 'Unhealthy';
+      }
       data.forEach(service => {
         this.daprVersion = service.version;
       });
@@ -85,5 +92,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }, error => {
       this.showSnackbar('Failed to remove Dapr instance with ID ' + id);
     });
+  }
+
+  loadData(): void {
+    this.getInstances();
+    this.getControlPlaneData();
   }
 }

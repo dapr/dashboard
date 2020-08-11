@@ -18,14 +18,14 @@ import (
 // Configurations is an interface to interact with Dapr configurations
 type Configurations interface {
 	Supported() bool
-	GetConfigurations() []Configuration
-	GetConfiguration(name string) Configuration
+	GetConfiguration(scope string, name string) Configuration
+	GetConfigurations(scope string) []Configuration
 }
 
 type configurations struct {
 	platform            string
 	daprClient          scheme.Interface
-	getConfigurationsFn func() []Configuration
+	getConfigurationsFn func(scope string) []Configuration
 }
 
 // NewConfigurations returns a new Configurations instance
@@ -62,8 +62,8 @@ func (c *configurations) Supported() bool {
 }
 
 // GetConfiguration returns the Dapr configuration specified by name
-func (c *configurations) GetConfiguration(name string) Configuration {
-	confs := c.getConfigurationsFn()
+func (c *configurations) GetConfiguration(scope string, name string) Configuration {
+	confs := c.getConfigurationsFn(scope)
 	for _, conf := range confs {
 		if conf.Name == name {
 			return conf
@@ -73,13 +73,13 @@ func (c *configurations) GetConfiguration(name string) Configuration {
 }
 
 // GetConfigurations returns the result of the correct platform's getConfigurations function
-func (c *configurations) GetConfigurations() []Configuration {
-	return c.getConfigurationsFn()
+func (c *configurations) GetConfigurations(scope string) []Configuration {
+	return c.getConfigurationsFn(scope)
 }
 
 // getKubernetesConfigurations returns the list of all Dapr Configurations in a Kubernetes cluster
-func (c *configurations) getKubernetesConfigurations() []Configuration {
-	confs, err := c.daprClient.ConfigurationV1alpha1().Configurations(meta_v1.NamespaceAll).List(meta_v1.ListOptions{})
+func (c *configurations) getKubernetesConfigurations(scope string) []Configuration {
+	confs, err := c.daprClient.ConfigurationV1alpha1().Configurations(scope).List(meta_v1.ListOptions{})
 	if err != nil {
 		log.Println(err)
 		return []Configuration{}
@@ -105,7 +105,7 @@ func (c *configurations) getKubernetesConfigurations() []Configuration {
 }
 
 // getStandaloneConfigurations returns the list of Dapr Configurations Statuses
-func (c *configurations) getStandaloneConfigurations() []Configuration {
+func (c *configurations) getStandaloneConfigurations(scope string) []Configuration {
 	configurationsDirectory := filepath.Dir(standalone.DefaultConfigFilePath())
 	standaloneConfigurations := []Configuration{}
 	err := filepath.Walk(configurationsDirectory, func(path string, info os.FileInfo, err error) error {

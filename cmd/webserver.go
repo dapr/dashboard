@@ -69,18 +69,20 @@ func RunWebServer() {
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api/").Subrouter()
 	api.HandleFunc("/features", getFeaturesHandler).Methods("GET")
-	api.HandleFunc("/instances", getInstancesHandler).Methods("GET")
-	api.HandleFunc("/instances/{id}", deleteInstancesHandler).Methods("DELETE")
-	api.HandleFunc("/instances/{id}", getInstanceHandler).Methods("GET")
-	api.HandleFunc("/instances/{id}/logs", getLogsHandler).Methods("GET")
-	api.HandleFunc("/components", getComponentsHandler).Methods("GET")
-	api.HandleFunc("/components/{name}", getComponentHandler).Methods("GET")
-	api.HandleFunc("/deploymentconfiguration/{id}", getDeploymentConfigurationHandler).Methods("GET")
-	api.HandleFunc("/configurations", getConfigurationsHandler).Methods("GET")
-	api.HandleFunc("/configurations/{name}", getConfigurationHandler).Methods("GET")
-	api.HandleFunc("/platform", getPlatformHandler).Methods("GET")
+	api.HandleFunc("/instances/{scope}", getInstancesHandler).Methods("GET")
+	api.HandleFunc("/instances/{scope}/{id}", deleteInstancesHandler).Methods("DELETE")
+	api.HandleFunc("/instances/{scope}/{id}", getInstanceHandler).Methods("GET")
+	api.HandleFunc("/instances/{scope}/{id}/logs", getLogsHandler).Methods("GET")
+	api.HandleFunc("/components/{scope}", getComponentsHandler).Methods("GET")
+	api.HandleFunc("/components/{scope}/{name}", getComponentHandler).Methods("GET")
+	api.HandleFunc("/deploymentconfiguration/{scope}/{id}", getDeploymentConfigurationHandler).Methods("GET")
+	api.HandleFunc("/configurations/{scope}", getConfigurationsHandler).Methods("GET")
+	api.HandleFunc("/configurations/{scope}/{name}", getConfigurationHandler).Methods("GET")
 	api.HandleFunc("/controlplanestatus", getControlPlaneHandler).Methods("GET")
-	api.HandleFunc("/metadata/{id}", getMetadataHandler).Methods("GET")
+	api.HandleFunc("/metadata/{scope}/{id}", getMetadataHandler).Methods("GET")
+	api.HandleFunc("/platform", getPlatformHandler).Methods("GET")
+	api.HandleFunc("/scopes", getScopesHandler).Methods("GET")
+	api.HandleFunc("/features", getFeaturesHandler).Methods("GET")
 
 	spa := spaHandler{staticPath: "web/dist", indexPath: "index.html"}
 	r.PathPrefix("/").Handler(spa)
@@ -134,19 +136,33 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func getInstancesHandler(w http.ResponseWriter, r *http.Request) {
-	resp := inst.GetInstances()
+	vars := mux.Vars(r)
+	scope := vars["scope"]
+	if scope == "All" {
+		scope = ""
+	}
+	resp := inst.GetInstances(scope)
 	respondWithJSON(w, 200, resp)
 }
 
 func getComponentsHandler(w http.ResponseWriter, r *http.Request) {
-	resp := comps.GetComponents()
+	vars := mux.Vars(r)
+	scope := vars["scope"]
+	if scope == "All" {
+		scope = ""
+	}
+	resp := comps.GetComponents(scope)
 	respondWithJSON(w, 200, resp)
 }
 
 func getComponentHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	scope := vars["scope"]
+	if scope == "All" {
+		scope = ""
+	}
 	name := vars["name"]
-	resp := comps.GetComponent(name)
+	resp := comps.GetComponent(scope, name)
 	respondWithJSON(w, 200, resp)
 }
 
@@ -171,34 +187,55 @@ func getPlatformHandler(w http.ResponseWriter, r *http.Request) {
 
 func getLogsHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	scope := vars["scope"]
+	if scope == "All" {
+		scope = ""
+	}
 	id := vars["id"]
-	logs := inst.GetLogs(id)
+	logs := inst.GetLogs(scope, id)
 	respondWithJSON(w, 200, logs)
 }
 
 func getDeploymentConfigurationHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	scope := vars["scope"]
+	if scope == "All" {
+		scope = ""
+	}
 	id := vars["id"]
-	details := inst.GetDeploymentConfiguration(id)
+	details := inst.GetDeploymentConfiguration(scope, id)
 	respondWithPlainString(w, 200, details)
 }
 
 func getConfigurationsHandler(w http.ResponseWriter, r *http.Request) {
-	resp := configs.GetConfigurations()
+	vars := mux.Vars(r)
+	scope := vars["scope"]
+	if scope == "All" {
+		scope = ""
+	}
+	resp := configs.GetConfigurations(scope)
 	respondWithJSON(w, 200, resp)
 }
 
 func getConfigurationHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	scope := vars["scope"]
+	if scope == "All" {
+		scope = ""
+	}
 	name := vars["name"]
-	resp := configs.GetConfiguration(name)
+	resp := configs.GetConfiguration(scope, name)
 	respondWithJSON(w, 200, resp)
 }
 
 func getInstanceHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	scope := vars["scope"]
+	if scope == "All" {
+		scope = ""
+	}
 	id := vars["id"]
-	resp := inst.GetInstance(id)
+	resp := inst.GetInstance(scope, id)
 	respondWithJSON(w, 200, resp)
 }
 
@@ -209,21 +246,34 @@ func getControlPlaneHandler(w http.ResponseWriter, r *http.Request) {
 
 func getMetadataHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	scope := vars["scope"]
+	if scope == "All" {
+		scope = ""
+	}
 	id := vars["id"]
-	md := inst.GetMetadata(id)
+	md := inst.GetMetadata(scope, id)
 	resp := inst.GetActiveActorsCount(md)
 	respondWithJSON(w, 200, resp)
 }
 
 func deleteInstancesHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	scope := vars["scope"]
+	if scope == "All" {
+		scope = ""
+	}
 	id := vars["id"]
-	err := inst.DeleteInstance(id)
+	err := inst.DeleteInstance(scope, id)
 	if err != nil {
 		respondWithError(w, 500, err.Error())
 		return
 	}
 	respondWithJSON(w, 200, "")
+}
+
+func getScopesHandler(w http.ResponseWriter, r *http.Request) {
+	resp := inst.GetScopes()
+	respondWithJSON(w, 200, resp)
 }
 
 func respondWithError(w http.ResponseWriter, code int, message string) {

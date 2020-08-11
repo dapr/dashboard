@@ -17,14 +17,14 @@ import (
 // Components is an interface to interact with Dapr components
 type Components interface {
 	Supported() bool
-	GetComponents() []Component
-	GetComponent(name string) Component
+	GetComponent(scope string, name string) Component
+	GetComponents(scope string) []Component
 }
 
 type components struct {
 	platform        string
 	daprClient      scheme.Interface
-	getComponentsFn func() []Component
+	getComponentsFn func(scope string) []Component
 }
 
 // NewComponents returns a new Components instance
@@ -58,8 +58,8 @@ func (c *components) Supported() bool {
 }
 
 // GetComponent returns a specific component based on a supplied component name
-func (c *components) GetComponent(name string) Component {
-	comps := c.getComponentsFn()
+func (c *components) GetComponent(scope string, name string) Component {
+	comps := c.getComponentsFn(scope)
 	for _, comp := range comps {
 		if comp.Name == name {
 			return comp
@@ -69,13 +69,13 @@ func (c *components) GetComponent(name string) Component {
 }
 
 // GetComponent returns the result of the correct platform's getComponents function
-func (c *components) GetComponents() []Component {
-	return c.getComponentsFn()
+func (c *components) GetComponents(scope string) []Component {
+	return c.getComponentsFn(scope)
 }
 
 // getKubernetesComponents returns the list of all Dapr components in a Kubernetes cluster
-func (c *components) getKubernetesComponents() []Component {
-	comps, err := c.daprClient.ComponentsV1alpha1().Components(metav1.NamespaceDefault).List(metav1.ListOptions{})
+func (c *components) getKubernetesComponents(scope string) []Component {
+	comps, err := c.daprClient.ComponentsV1alpha1().Components(scope).List(metav1.ListOptions{})
 	if err != nil {
 		log.Println(err)
 		return []Component{}
@@ -97,7 +97,7 @@ func (c *components) getKubernetesComponents() []Component {
 }
 
 // getStandaloneComponents returns the list of all locally-hosted Dapr components
-func (c *components) getStandaloneComponents() []Component {
+func (c *components) getStandaloneComponents(scope string) []Component {
 	componentsDirectory := standalone.DefaultComponentsDirPath()
 	standaloneComponents := []Component{}
 	err := filepath.Walk(componentsDirectory, func(path string, info os.FileInfo, err error) error {

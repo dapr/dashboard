@@ -6,6 +6,7 @@ import { GlobalsService } from 'src/app/globals/globals.service';
 import { ThemeService } from 'src/app/theme/theme.service';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { Router } from '@angular/router';
+import { ScopesService } from '../scopes/scopes.service';
 
 @Component({
   selector: 'app-pages',
@@ -23,6 +24,9 @@ export class PagesComponent implements OnInit {
   public isLightMode = true;
   public imgPath: string;
   public themeSelectorEnabled: boolean;
+  public scopeValue = 'All';
+  public scopes: string[];
+  private intervalHandler;
 
   constructor(
     private featuresService: FeaturesService,
@@ -30,12 +34,18 @@ export class PagesComponent implements OnInit {
     private themeService: ThemeService,
     private overlayContainer: OverlayContainer,
     public router: Router,
+    private scopesService: ScopesService,
   ) { }
 
   ngOnInit(): void {
     this.getFeatures();
+    this.getScopes();
     this.componentCssClass = this.themeService.getTheme();
     this.imgPath = '../../assets/images/logo.svg';
+
+    this.intervalHandler = setInterval(() => {
+      this.getScopes();
+    }, 10000);
   }
 
   getFeatures(): void {
@@ -51,6 +61,12 @@ export class PagesComponent implements OnInit {
           this.menu.push(CONTROLPLANE_MENU_ITEM);
         }
       }
+    });
+  }
+
+  getScopes(): void {
+    this.scopesService.getScopes().subscribe((data: string[]) => {
+      this.scopes = data;
     });
   }
 
@@ -77,5 +93,10 @@ export class PagesComponent implements OnInit {
     } else {
       this.imgPath = '../../assets/images/logo-white.svg';
     }
+  }
+
+  onScopeChange(): void {
+    this.scopesService.changeScope(this.scopeValue);
+    this.getScopes();
   }
 }

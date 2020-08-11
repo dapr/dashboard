@@ -55,7 +55,7 @@
         <mat-card-title>Applications configured with <strong>{{ configuration.name }}</strong></mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <mat-nav-list *ngIf="configurationApps.length > 0; else noApps">
+        <mat-nav-list *ngIf="configurationApps && configurationApps.length > 0; else noApps">
           <a mat-list-item routerLink="/overview/{{configApp.appID}}" *ngFor="let configApp of configurationApps">{{ configApp.appID }}</a>
         </mat-nav-list>
         <ng-template #noApps>

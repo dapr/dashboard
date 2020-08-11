@@ -11,16 +11,26 @@ export class ControlPlaneComponent implements OnInit {
 
   public data: Status[];
   public displayedColumns: string[] = ['name', 'namespace', 'healthy', 'status', 'version', 'age', 'created'];
+  public controlPlaneLoaded: boolean;
+  private intervalHandler;
 
-  constructor(private statusService: InstanceService) { }
+  constructor(
+    private statusService: InstanceService,
+  ) { }
 
   ngOnInit(): void {
     this.getControlPlaneStatus();
+
+    this.intervalHandler = setInterval(() => {
+      this.getControlPlaneStatus();
+    }, 10000);
   }
 
   getControlPlaneStatus(): void {
+    this.controlPlaneLoaded = false;
     this.statusService.getControlPlaneStatus().subscribe((data: Status[]) => {
-      this.data = data;
+      this.data = data.sort((a, b) => a.name.localeCompare(b.name));
+      this.controlPlaneLoaded = true;
     });
   }
 }
