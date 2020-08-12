@@ -32,7 +32,7 @@ export class ConfigurationDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.name = this.route.snapshot.params.name;
-    this.checkPlatform()
+    this.checkPlatform();
     this.getConfiguration(this.name);
     this.getConfigurationApps(this.name);
     this.options = {
@@ -49,9 +49,9 @@ export class ConfigurationDetailComponent implements OnInit {
       };
     });
   }
-  
+
   checkPlatform(): void {
-    this.globals.getPlatform().subscribe(platform => { this.platform = platform } );
+    this.globals.getPlatform().subscribe(platform => { this.platform = platform; } );
   }
 
   getConfiguration(name: string): void {

@@ -76,7 +76,7 @@ export class DetailComponent implements OnInit, OnDestroy {
   }
 
   checkPlatform(): void {
-    this.globals.getPlatform().subscribe(platform => { this.platform = platform });
+    this.globals.getPlatform().subscribe(platform => { this.platform = platform; });
   }
 
   getInstance(id: string): void {
