@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ComponentsService } from 'src/app/components/components.service';
 import { ScopesService } from 'src/app/scopes/scopes.service';
 import { DaprComponent } from 'src/app/types/types';
@@ -8,7 +8,7 @@ import { DaprComponent } from 'src/app/types/types';
   templateUrl: 'dapr-components.component.html',
   styleUrls: ['dapr-components.component.scss'],
 })
-export class DaprComponentsComponent implements OnInit {
+export class DaprComponentsComponent implements OnInit, OnDestroy {
 
   public components: DaprComponent[];
   public componentsLoaded: boolean;
@@ -30,6 +30,10 @@ export class DaprComponentsComponent implements OnInit {
     this.scopesService.scopeChanged.subscribe(() => {
       this.getComponents();
     });
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.intervalHandler);
   }
 
   getComponents(): void {

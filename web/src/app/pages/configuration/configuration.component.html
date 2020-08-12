@@ -1,5 +1,5 @@
 <h2 class="page-header">Dapr Configurations</h2>
-<table mat-table [dataSource]="config" class="table-large mat-elevation-z8">
+<table mat-table [dataSource]="config" class="table-large mat-elevation-z8" *ngIf="configurationsLoaded">
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef>Name</th>
     <td mat-cell *matCellDef="let item"><a routerLink="/configurations/{{item.name}}">{{ item.name }}</a></td>

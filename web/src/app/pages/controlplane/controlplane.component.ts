@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { InstanceService } from 'src/app/instances/instance.service';
 import { Status } from 'src/app/types/types';
 
@@ -7,7 +7,7 @@ import { Status } from 'src/app/types/types';
   templateUrl: './controlplane.component.html',
   styleUrls: ['./controlplane.component.scss']
 })
-export class ControlPlaneComponent implements OnInit {
+export class ControlPlaneComponent implements OnInit, OnDestroy {
 
   public data: Status[];
   public displayedColumns: string[] = ['name', 'namespace', 'healthy', 'status', 'version', 'age', 'created'];
@@ -24,6 +24,10 @@ export class ControlPlaneComponent implements OnInit {
     this.intervalHandler = setInterval(() => {
       this.getControlPlaneStatus();
     }, 10000);
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.intervalHandler);
   }
 
   getControlPlaneStatus(): void {

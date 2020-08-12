@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ConfigurationsService } from 'src/app/configurations/configurations.service';
 import { ScopesService } from 'src/app/scopes/scopes.service';
 import { DaprConfiguration } from 'src/app/types/types';
@@ -9,25 +9,27 @@ import { GlobalsService } from 'src/app/globals/globals.service';
   templateUrl: './configuration.component.html',
   styleUrls: ['./configuration.component.scss']
 })
-export class ConfigurationComponent implements OnInit {
+export class ConfigurationComponent implements OnInit, OnDestroy {
 
   public config: DaprConfiguration[];
-  public displayedColumns: string[];
+  public displayedColumns: string[] = [];
   public configurationsLoaded: boolean;
   private intervalHandler;
 
   constructor(
     private configurationService: ConfigurationsService,
-    public globalsService: GlobalsService,
+    public globals: GlobalsService,
     private scopesService: ScopesService,
   ) { }
 
   ngOnInit(): void {
-    if (this.globalsService.kubernetesEnabled) {
-      this.displayedColumns = ['name', 'tracing-enabled', 'mtls-enabled', 'mtls-workload-ttl', 'mtls-clock-skew', 'age', 'created'];
-    } else {
-      this.displayedColumns = ['name', 'tracing-enabled', 'mtls-enabled', 'age', 'created'];
-    }
+    this.globals.getPlatform().subscribe(platform => {
+      if (platform === 'kubernetes') {
+        this.displayedColumns = ['name', 'tracing-enabled', 'mtls-enabled', 'mtls-workload-ttl', 'mtls-clock-skew', 'age', 'created'];
+      } else if (platform === 'standalone') {
+        this.displayedColumns = ['name', 'tracing-enabled', 'mtls-enabled', 'age', 'created'];
+      }
+    });
 
     this.getConfiguration();
 
@@ -38,6 +40,10 @@ export class ConfigurationComponent implements OnInit {
     this.scopesService.scopeChanged.subscribe(() => {
       this.getConfiguration();
     });
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.intervalHandler);
   }
 
   getConfiguration(): void {

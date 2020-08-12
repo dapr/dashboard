@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, HostBinding } from '@angular/core';
+import { Component, ViewChild, OnInit, HostBinding, OnDestroy } from '@angular/core';
 import { MenuItem, MENU_ITEMS, COMPONENTS_MENU_ITEM, CONFIGURATIONS_MENU_ITEM, CONTROLPLANE_MENU_ITEM } from './pages-menu';
 import { FeaturesService } from 'src/app/features/features.service';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -13,7 +13,7 @@ import { ScopesService } from '../scopes/scopes.service';
   styleUrls: ['pages.component.scss'],
   templateUrl: 'pages.component.html',
 })
-export class PagesComponent implements OnInit {
+export class PagesComponent implements OnInit, OnDestroy {
 
   @HostBinding('class') public componentCssClass: string;
   @ViewChild('drawer', { static: false })
@@ -46,6 +46,10 @@ export class PagesComponent implements OnInit {
     this.intervalHandler = setInterval(() => {
       this.getScopes();
     }, 10000);
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.intervalHandler);
   }
 
   getFeatures(): void {

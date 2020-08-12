@@ -19,6 +19,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   public daprVersion: string;
   public tableLoaded: boolean;
   public controlPlaneLoaded: boolean;
+  public platform: string;
   private intervalHandler;
 
   constructor(
@@ -47,12 +48,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   checkPlatform(): void {
     this.globals.getPlatform().subscribe(platform => {
+      this.platform = platform;
       if (platform === 'kubernetes') {
-        this.globals.kubernetesEnabled = true;
         this.displayedColumns = ['name', 'labels', 'status', 'age', 'selector'];
       }
       else if (platform === 'standalone') {
-        this.globals.standaloneEnabled = true;
         this.displayedColumns = ['name', 'age', 'actions'];
       }
     });
