@@ -31,7 +31,7 @@ echo "# Generate artifacts: $GENERATE_ARTIFACTS"
 
 cd web
 npm i
-ng build --base-href ./
+ng build
 cd ..
 rm -r -f ${RELEASE_DIR}
 mkdir -p ${RELEASE_DIR}

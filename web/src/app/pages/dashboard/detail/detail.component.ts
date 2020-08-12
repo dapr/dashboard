@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { InstanceService } from 'src/app/instances/instance.service';
 import { ActivatedRoute } from '@angular/router';
 import * as yaml from 'js-yaml';
@@ -12,7 +12,7 @@ import { YamlViewerOptions } from 'src/app/types/types';
   templateUrl: 'detail.component.html',
   styleUrls: ['detail.component.scss'],
 })
-export class DetailComponent implements OnInit {
+export class DetailComponent implements OnInit, OnDestroy {
 
   private id: string;
   public model: string;
@@ -25,6 +25,7 @@ export class DetailComponent implements OnInit {
   public metadata: Metadata[];
   public metadataDisplayedColumns: string[] = ['type', 'count'];
   public options: YamlViewerOptions;
+  public platform: string;
   private intervalHandler;
 
   constructor(
@@ -36,6 +37,7 @@ export class DetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.id = this.route.snapshot.params.id;
+    this.checkPlatform();
     this.loadData();
     this.options = {
       folding: true,
@@ -56,6 +58,10 @@ export class DetailComponent implements OnInit {
     }, 10000);
   }
 
+  ngOnDestroy(): void {
+    clearInterval(this.intervalHandler);
+  }
+
   getConfiguration(id: string): void {
     this.instanceService.getDeploymentConfiguration(id).subscribe((data: string) => {
       this.model = data;
@@ -67,6 +73,10 @@ export class DetailComponent implements OnInit {
         this.modelYAML = {};
       }
     });
+  }
+
+  checkPlatform(): void {
+    this.globals.getPlatform().subscribe(platform => { this.platform = platform; });
   }
 
   getInstance(id: string): void {

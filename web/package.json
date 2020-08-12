@@ -12,7 +12,7 @@
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "e2e": "ng e2e",
     "watch": "tsc -w",
-    "start:electron": "tsc main.ts && ng build --base-href ./ && electron .",
+    "start:electron": "tsc main.ts && ng build && electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "electron-postinstall": "electron-builder install-app-deps && ngcc"

@@ -1,5 +1,5 @@
 <h2 class="page-header">Overview</h2>
-<ng-container *ngIf="this.globals.kubernetesEnabled">
+<ng-container *ngIf="platform === 'kubernetes'">
   <h3 class="card-header">Dapr Control Plane</h3>
   <mat-card class="card-tiny mat-elevation-z8">
     <mat-card-content>

@@ -21,6 +21,7 @@ export class ConfigurationDetailComponent implements OnInit {
   public loadedConfiguration: boolean;
   public loadedApps: boolean;
   public configurationApps: Instance[];
+  public platform: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -31,6 +32,7 @@ export class ConfigurationDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.name = this.route.snapshot.params.name;
+    this.checkPlatform();
     this.getConfiguration(this.name);
     this.getConfigurationApps(this.name);
     this.options = {
@@ -46,6 +48,10 @@ export class ConfigurationDetailComponent implements OnInit {
         theme: newTheme.includes('dark') ? 'vs-dark' : 'vs',
       };
     });
+  }
+
+  checkPlatform(): void {
+    this.globals.getPlatform().subscribe(platform => { this.platform = platform; } );
   }
 
   getConfiguration(name: string): void {

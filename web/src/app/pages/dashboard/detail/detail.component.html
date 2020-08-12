@@ -1,4 +1,4 @@
-<h2 class="page-header-left" *ngIf="loadedInstance">App: {{ instance.appID }}</h2>
+<h2 class="page-header-left" *ngIf="loadedInstance">Application: {{ instance.appID }}</h2>
 <mat-tab-group>
   <mat-tab label="Summary">
     <mat-card class="card-large mat-elevation-z8" *ngIf="loadedInstance">
@@ -36,7 +36,7 @@
               <td class="table-label">Address</td>
               <td class="table-data">{{ instance.address }}</td>
             </tr>
-            <tr *ngIf="this.globals.standaloneEnabled">
+            <tr *ngIf="platform === 'standalone'">
               <td class="table-label">PID</td>
               <td class="table-data">{{ instance.pid }}</td>
             </tr>
@@ -53,7 +53,7 @@
       </mat-card-content>
     </mat-card>
   </mat-tab>
-  <mat-tab *ngIf="this.globals.kubernetesEnabled" label="Metadata">
+  <mat-tab *ngIf="platform === 'kubernetes'" label="Metadata">
     <mat-card class="card-large mat-elevation-z8" *ngIf="loadedConfiguration">
       <mat-card-header>
         <mat-card-title>Metadata</mat-card-title>
@@ -87,7 +87,7 @@
       </mat-card-content>
     </mat-card>
   </mat-tab>
-  <mat-tab *ngIf="this.globals.kubernetesEnabled" label="Configuration">
+  <mat-tab *ngIf="platform === 'kubernetes'" label="Configuration">
     <mat-card class="card-large mat-elevation-z8">
       <mat-card-header>
         <mat-card-title>Deployment</mat-card-title>
@@ -121,7 +121,7 @@
       </mat-card-content>
     </mat-card>
   </mat-tab>
-  <mat-tab *ngIf="this.globals.kubernetesEnabled" label="Logs">
+  <mat-tab *ngIf="platform === 'kubernetes'" label="Logs">
     <app-logs></app-logs>
   </mat-tab>
 </mat-tab-group>
