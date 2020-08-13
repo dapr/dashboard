@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -14,5 +13,9 @@ export class GlobalsService {
 
   getPlatform(): Observable<string> {
     return this.http.get('/api/platform', { responseType: 'text' });
+  }
+
+  getVersion(): Observable<string> {
+    return this.http.get('/api/version', { responseType: 'text' });
   }
 }

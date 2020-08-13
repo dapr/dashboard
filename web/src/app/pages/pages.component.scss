@@ -68,11 +68,17 @@ mat-icon {
   left: 0;
 }
 
+#info-dialog {
+  position: absolute;
+  bottom: 48px;
+  left: 0;
+}
+
 #scopeContainer {
   position: absolute;
   top: 0;
   right: 0;
-  width: 15%;
+  width: 200px;
   height: 100%;
 }
 

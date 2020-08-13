@@ -28,8 +28,12 @@
             class="navigation-item-label">{{ component.title }}</span>
         </a>
       </ng-container>
+      <a id="info-dialog" class="navigation-item" mat-list-item (click)="openDialog()">
+        <mat-icon>info</mat-icon>
+        <mat-divider class="navigation-divider"></mat-divider>
+      </a>
       <mat-divider class="navigation-divider"></mat-divider>
-      <a *ngIf="globals.changesEnabledRoutes.includes(router.url)" id="theme-selector" class="navigation-item"
+      <a fxLayout="row" fxLayoutAlign="space-around end" id="theme-selector" *ngIf="globals.changesEnabledRoutes.includes(router.url)" class="navigation-item"
         mat-list-item (click)="onThemeChange()">
         <mat-icon class="material-icons">{{ isLightMode ? 'nights_stay' : 'wb_sunny' }}</mat-icon><span
           class="navigation-item-label">{{ isLightMode ? 'Dark Theme' : 'Light Theme' }}</span>
