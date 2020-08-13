@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, HostBinding, OnDestroy } from '@angular/core';
+import { Component, ViewChild, OnInit, HostBinding, OnDestroy, Inject } from '@angular/core';
 import { MenuItem, MENU_ITEMS, COMPONENTS_MENU_ITEM, CONFIGURATIONS_MENU_ITEM, CONTROLPLANE_MENU_ITEM } from './pages-menu';
 import { FeaturesService } from 'src/app/features/features.service';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -7,6 +7,11 @@ import { ThemeService } from 'src/app/theme/theme.service';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { Router } from '@angular/router';
 import { ScopesService } from '../scopes/scopes.service';
+import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
+
+export interface DialogData {
+  version: string;
+}
 
 @Component({
   selector: 'app-pages',
@@ -26,6 +31,8 @@ export class PagesComponent implements OnInit, OnDestroy {
   public themeSelectorEnabled: boolean;
   public scopeValue = 'All';
   public scopes: string[];
+  public version: string;
+  public versionLoaded: boolean;
   private intervalHandler;
 
   constructor(
@@ -35,9 +42,11 @@ export class PagesComponent implements OnInit, OnDestroy {
     private overlayContainer: OverlayContainer,
     public router: Router,
     private scopesService: ScopesService,
+    public dialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
+    this.getVersion();
     this.getFeatures();
     this.getScopes();
     this.componentCssClass = this.themeService.getTheme();
@@ -50,6 +59,13 @@ export class PagesComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     clearInterval(this.intervalHandler);
+  }
+
+  getVersion(): void {
+    this.globals.getVersion().subscribe(version => {
+      this.version = version;
+      this.versionLoaded = true;
+    });
   }
 
   getFeatures(): void {
@@ -103,4 +119,20 @@ export class PagesComponent implements OnInit, OnDestroy {
     this.scopesService.changeScope(this.scopeValue);
     this.getScopes();
   }
+
+  openDialog() {
+    this.dialog.open(AboutDialogComponent, {
+      data: {
+        version: this.version
+      }
+    });
+  }
+}
+
+@Component({
+  selector: 'app-about-dialog',
+  templateUrl: 'dialog-template.html',
+})
+export class AboutDialogComponent {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) {}
 }

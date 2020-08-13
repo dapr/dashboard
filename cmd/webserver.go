@@ -14,6 +14,7 @@ import (
 	configurations "github.com/dapr/dashboard/pkg/configurations"
 	instances "github.com/dapr/dashboard/pkg/instances"
 	kube "github.com/dapr/dashboard/pkg/kube"
+	"github.com/dapr/dashboard/pkg/version"
 	"github.com/gorilla/mux"
 )
 
@@ -83,6 +84,7 @@ func RunWebServer() {
 	api.HandleFunc("/platform", getPlatformHandler).Methods("GET")
 	api.HandleFunc("/scopes", getScopesHandler).Methods("GET")
 	api.HandleFunc("/features", getFeaturesHandler).Methods("GET")
+	api.HandleFunc("/version", getVersionHandler).Methods("GET")
 
 	spa := spaHandler{staticPath: "web/dist", indexPath: "index.html"}
 	r.PathPrefix("/").Handler(spa)
@@ -274,6 +276,11 @@ func deleteInstancesHandler(w http.ResponseWriter, r *http.Request) {
 func getScopesHandler(w http.ResponseWriter, r *http.Request) {
 	resp := inst.GetScopes()
 	respondWithJSON(w, 200, resp)
+}
+
+func getVersionHandler(w http.ResponseWriter, r *http.Request) {
+	resp := version.GetVersion()
+	respondWithPlainString(w, 200, resp)
 }
 
 func respondWithError(w http.ResponseWriter, code int, message string) {

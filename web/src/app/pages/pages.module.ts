@@ -16,6 +16,7 @@ import { ConfigurationDetailModule } from './configuration/configuration-detail/
 import { OverlayModule } from '@angular/cdk/overlay';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   imports: [
@@ -35,6 +36,7 @@ import { FormsModule } from '@angular/forms';
     OverlayModule,
     MatSelectModule,
     FormsModule,
+    MatDialogModule
   ],
   declarations: [
     PagesComponent,

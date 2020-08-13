@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	cmd.RunWebServer()
+	cmd.RunDashboard()
 }

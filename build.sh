@@ -4,6 +4,7 @@
 # --generate-artifacts flag is passed in github actions workflow to generate artifacts.
 GENERATE_ARTIFACTS=false
 RELEASE_DIR=./release
+DASHBOARD_VERSION=edge
 OTHER_ARGUMENTS=()
 
 for arg in "$@"
@@ -13,8 +14,13 @@ do
         GENERATE_ARTIFACTS=true
         shift # Remove ----generate-artifacts from processing
         ;;
+        -v|--release-version)
+        DASHBOARD_VERSION="$2"
+        shift # Remove argument name from processing
+        shift # Remove argument value from processing
+        ;;
         -r|--release-dir)
-        RELEASE_DIR="$2"
+        RELEASE_DIR="$3"
         shift # Remove argument name from processing
         shift # Remove argument value from processing
         ;;
@@ -27,6 +33,7 @@ done
 
 echo "# Release directory: $RELEASE_DIR"
 echo "# Generate artifacts: $GENERATE_ARTIFACTS"
+echo "# Version: $DASHBOARD_VERSION"
 #echo "# Other arguments: ${OTHER_ARGUMENTS[*]}"
 
 cd web
@@ -52,7 +59,7 @@ do
   fi
 
   echo building go executable for $GOOS $GOARCH, output will be $go_executable_output_file
-  env CGO_ENABLED=0 GOOS=$GOOS GOARCH=$GOARCH go build -a -o $go_executable_output_file
+  env CGO_ENABLED=0 GOOS=$GOOS GOARCH=$GOARCH go build -a -o $go_executable_output_file -ldflags="-X 'github.com/dapr/dashboard/pkg/version.Version=$DASHBOARD_VERSION'"
 
   platform_release_dir=${RELEASE_DIR}/${platform}  
 

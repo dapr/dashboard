@@ -89,6 +89,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   delete(id: string): void {
     this.instanceService.deleteInstance(id).subscribe(() => {
       this.showSnackbar('Deleted Dapr instance with ID ' + id);
+      this.getInstances();
     }, error => {
       this.showSnackbar('Failed to remove Dapr instance with ID ' + id);
     });
