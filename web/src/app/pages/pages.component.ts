@@ -121,7 +121,7 @@ export class PagesComponent implements OnInit, OnDestroy {
   }
 
   openDialog() {
-    this.dialog.open(AboutDialog, {
+    this.dialog.open(AboutDialogComponent, {
       data: {
         version: this.version
       }
@@ -130,9 +130,9 @@ export class PagesComponent implements OnInit, OnDestroy {
 }
 
 @Component({
-  selector: 'about-dialog',
+  selector: 'app-about-dialog',
   templateUrl: 'dialog-template.html',
 })
-export class AboutDialog {
+export class AboutDialogComponent {
   constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) {}
 }
