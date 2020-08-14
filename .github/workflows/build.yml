@@ -56,7 +56,7 @@ jobs:
       run: |
         # zip is already installed in latest ubuntu in github actions, if it changes in future, uncomment following line to install explicitly.
         # sudo apt install zip
-        ./build.sh --generate-artifacts
+        ./build.sh --generate-artifacts --release-version ${{ env.REL_VERSION }}
     - name: upload artifacts
       uses: actions/upload-artifact@master
       with:
