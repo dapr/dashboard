@@ -20,7 +20,7 @@ do
         shift # Remove argument value from processing
         ;;
         -r|--release-dir)
-        RELEASE_DIR="$3"
+        RELEASE_DIR="$2"
         shift # Remove argument name from processing
         shift # Remove argument value from processing
         ;;
