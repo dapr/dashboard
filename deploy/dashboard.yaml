@@ -22,7 +22,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: dashboard-reader
-    namespace: { { .Release.Namespace } }
+    namespace: dapr-system
 roleRef:
   kind: ClusterRole
   name: dashboard-reader
@@ -52,7 +52,6 @@ metadata:
   labels:
     app: dapr-dashboard
 spec:
-  serviceAccountName: dashboard-reader
   replicas: 1
   selector:
     matchLabels:
@@ -62,6 +61,7 @@ spec:
       labels:
         app: dapr-dashboard
     spec:
+      serviceAccountName: dashboard-reader
       containers:
         - name: dapr-dashboard
           image: docker.io/daprio/dashboard:0.2.0
