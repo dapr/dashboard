@@ -1,27 +1,33 @@
-apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
-metadata:
-  name: deployment-reader
-rules:
-- apiGroups: ["", "dapr.io", "apps", "extensions"]
-  resources: ["deployments", "pods", "pods/log", "components", "configurations", "namespaces"]
-  verbs: ["get", "list"]
-
----
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
 metadata:
-  name: deployment-reader-global
+  name: dashboard-reader
+rules:
+  - apiGroups: ["", "dapr.io", "apps", "extensions"]
+    resources:
+      [
+        "deployments",
+        "pods",
+        "pods/log",
+        "components",
+        "configurations",
+        "namespaces",
+      ]
+    verbs: ["get", "list"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: dashboard-reader-global
 subjects:
-- kind: ServiceAccount
-  name: default
-  namespace: default
+  - kind: ServiceAccount
+    name: dashboard-reader
+    namespace: { { .Release.Namespace } }
 roleRef:
   kind: ClusterRole
-  name: deployment-reader
+  name: dashboard-reader
   apiGroup: rbac.authorization.k8s.io
 ---
-
 kind: Service
 apiVersion: v1
 metadata:
@@ -30,9 +36,14 @@ spec:
   selector:
     app: dapr-dashboard
   ports:
-  - protocol: TCP
-    port: 8080
-    targetPort: 8080
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dashboard-reader
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -41,6 +52,7 @@ metadata:
   labels:
     app: dapr-dashboard
 spec:
+  serviceAccountName: dashboard-reader
   replicas: 1
   selector:
     matchLabels:
@@ -51,8 +63,8 @@ spec:
         app: dapr-dashboard
     spec:
       containers:
-      - name: dapr-dashboard
-        image: docker.io/daprio/dashboard:0.2.0
-        ports:
-        - containerPort: 8080
-        imagePullPolicy: Always
+        - name: dapr-dashboard
+          image: docker.io/daprio/dashboard:0.2.0
+          ports:
+            - containerPort: 8080
+          imagePullPolicy: Always
