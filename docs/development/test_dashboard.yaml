@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dapr-dashboard
+  labels:
+    app: dapr-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dapr-dashboard
+  template:
+    metadata:
+      labels:
+        app: dapr-dashboard
+    spec:
+      containers:
+      - name: dapr-dashboard
+        image: <username>/dashboard:<tag>
+        ports:
+        - containerPort: 8080
+        imagePullPolicy: Always
