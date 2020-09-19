@@ -63,7 +63,10 @@ jobs:
         name: artifacts
         path: ${{ env.ARTIFACTS_DIR }}
     - name: Build docker image
-      run: docker build -t ${{ secrets.DOCKER_DAPRIO_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.REL_VERSION }} .
+      run: docker build -t ${{ env.IMAGE_NAME }}:${{ env.REL_VERSION }} .
+    - name: Tag docker image
+      if: github.event_name != 'pull_request'
+      run: docker tag ${{ env.IMAGE_NAME }}:${{ env.REL_VERSION }} ${{ secrets.DOCKER_DAPRIO_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.REL_VERSION }}
     - name: Push dashboard docker images
       if: github.event_name != 'pull_request'
       run: |

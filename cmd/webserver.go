@@ -18,10 +18,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const (
-	port = 8080
-)
-
 var epoch = time.Unix(0, 0).Format(time.RFC1123)
 
 var noCacheHeaders = map[string]string{
@@ -54,7 +50,7 @@ var comps components.Components
 var configs configurations.Configurations
 
 // RunWebServer starts the web server that serves the Dapr UI dashboard and the API
-func RunWebServer() {
+func RunWebServer(port int) {
 	platform := ""
 	kubeClient, daprClient, _ := kube.Clients()
 	if kubeClient != nil {
