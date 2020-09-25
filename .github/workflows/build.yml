@@ -78,6 +78,7 @@ jobs:
     - name: Publish binaries to github for tags
       if: startswith(github.ref, 'refs/tags/v')
       run: |
+        sudo npm install --silent --no-progreess -g @babel/runtime-corejs2
         sudo npm install --silent --no-progress -g github-release-cli
         
         # Parse repository to get owner and repo names
