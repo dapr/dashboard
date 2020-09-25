@@ -1,3 +1,8 @@
+# ------------------------------------------------------------
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+# ------------------------------------------------------------
+
 name: Build
 
 on:
@@ -15,86 +20,161 @@ on:
       - release-*
     paths-ignore: 
       - '**.md'
-
 jobs:
   build:
-    runs-on: ubuntu-latest
+    name: Build ${{ matrix.target_os }}_${{ matrix.target_arch }} binaries
+    runs-on: ${{ matrix.os }}
     env:
-      GOVER: 1.14.3
+      GOVER: 1.15
+      GOLANGCILINT_VER: 1.26.0
+      GOOS: ${{ matrix.target_os }}
+      GOARCH: ${{ matrix.target_arch }}
       GOPROXY: https://proxy.golang.org
       NODE_VERSION: 12.x
-      IMAGE_NAME: dashboard
       ARTIFACTS_DIR: release/artifacts
-    steps:  
-    - name: Setup node ${{ env.NODE_VERSION }} and npm
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-    - name: Set up Go ${{ env.GOVER }}
-      uses: actions/setup-go@v2-beta
-      with:
-        go-version: ${{ env.GOVER }}
-    - name: Check out code
-      uses: actions/checkout@v2
-    - name: golangci-lint
-      uses: golangci/golangci-lint-action@v1
-      with:
-        version: v1.26
-        args: --timeout=20m
-    - name: Parse release version and set REL_VERSION env var.
-      run: python ./.github/scripts/get_release_version.py    
-    - name: Setup node_module caching # this allows for re-using node_modules caching, making builds a bit faster.
-      uses: actions/cache@v1 
-      with:
-        path: ~/.npm
-        key: ${{ runner.os }}-node-${{ hashFiles('web/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
-    - name: Install angular cli
-      run: npm install -g @angular/cli > /dev/null    
-    - name: Build and prepare release
-      run: |
-        # zip is already installed in latest ubuntu in github actions, if it changes in future, uncomment following line to install explicitly.
-        # sudo apt install zip
-        ./build.sh --generate-artifacts --release-version ${{ env.REL_VERSION }}
-    - name: upload artifacts
-      uses: actions/upload-artifact@master
-      with:
-        name: artifacts
-        path: ${{ env.ARTIFACTS_DIR }}
-    - name: Build docker image
-      run: docker build -t ${{ env.IMAGE_NAME }}:${{ env.REL_VERSION }} .
-    - name: Tag docker image
-      if: github.event_name != 'pull_request'
-      run: docker tag ${{ env.IMAGE_NAME }}:${{ env.REL_VERSION }} ${{ secrets.DOCKER_DAPRIO_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.REL_VERSION }}
-    - name: Push dashboard docker images
-      if: github.event_name != 'pull_request'
-      run: |
-        echo performing docker login 
-        docker login -u ${{ secrets.DOCKER_REGISTRY_ID }} -p ${{ secrets.DOCKER_REGISTRY_PASS }}
-        echo pushing docker image for ${{ env.DOTNET_SAMPLE_APP_IMAGE_NAME }}
-        echo image with tag ${{ secrets.DOCKER_DAPRIO_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.REL_VERSION }} will be pushed
-        docker push ${{ secrets.DOCKER_DAPRIO_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.REL_VERSION }}
-    - name: Publish binaries to github for tags
-      if: startswith(github.ref, 'refs/tags/v')
-      run: |
-        sudo npm install --silent --no-progress -g github-release-cli@1.3.1
-        
-        # Parse repository to get owner and repo names
-        OWNER_NAME="${GITHUB_REPOSITORY%%/*}"
-        REPO_NAME="${GITHUB_REPOSITORY#*/}"
-        
-        # Get the list of files
-        RELEASE_ARTIFACT=(${{ env.ARTIFACTS_DIR }}/*)
-        
-        export GITHUB_TOKEN=${{ secrets.DAPR_BOT_TOKEN }}
-        echo "Uploading release packages to GitHub Release"
-        github-release upload \
-          --owner $OWNER_NAME \
-          --repo $REPO_NAME \
-          --body "Release dapr dashboard v${REL_VERSION}" \
-          --tag "v${REL_VERSION}" \
-          --name "Dapr dashboard v${REL_VERSION}" \
-          --prerelease true \
-          ${RELEASE_ARTIFACT[*]}
-
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        target_arch: [arm, arm64, amd64]
+        include:
+          - os: ubuntu-latest
+            target_os: linux
+          - os: windows-latest
+            target_os: windows
+          - os: macOS-latest
+            target_os: darwin
+        exclude:
+          - os: windows-latest
+            target_arch: arm
+          - os: macOS-latest
+            target_arch: arm
+          - os: windows-latest
+            target_arch: arm64
+          - os: macOS-latest
+            target_arch: arm64
+    steps:
+      - name: Setup node ${{ env.NODE_VERSION }} and npm
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install angular cli
+        run: npm install -g @angular/cli
+      - name: Set up Go ${{ env.GOVER }}
+        uses: actions/setup-go@v2-beta
+        with:
+          go-version: ${{ env.GOVER }}
+      - name: Install golangci-lint
+        if: matrix.target_arch != 'arm' && matrix.target_os != 'windows'
+        run: |
+          curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "${{ env.GOROOT }}/bin" v${{ env.GOLANGCILINT_VER }}
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+      - name: Parse release version and set REL_VERSION
+        run: python ./.github/scripts/get_release_version.py
+      - name: Run make lint
+        if: matrix.target_arch != 'arm' && matrix.target_os != 'windows'
+        run: make lint
+      - name: Run make test
+        env:
+          COVERAGE_OPTS: "-coverprofile=coverage.txt -covermode=atomic"
+        if: matrix.target_arch != 'arm'
+        run: make test
+      - name: Codecov
+        if: matrix.target_arch == 'amd64' && matrix.target_os == 'linux'
+        uses: codecov/codecov-action@v1
+      - name: Run make release to build and archive binaries
+        run: |
+          mkdir -p ${{ env.ARTIFACTS_DIR }}
+          make release GOOS=${{ matrix.target_os }} GOARCH=${{ matrix.target_arch }} ARCHIVE_OUT_DIR=${{ env.ARTIFACTS_DIR }}
+      - name: upload artifacts
+        uses: actions/upload-artifact@master
+        with:
+          name: dashboard_${{ matrix.target_os }}_${{ matrix.target_arch }}
+          path: ${{ env.ARTIFACTS_DIR }}
+      - name: docker login
+        if: matrix.target_os != 'darwin' && github.event_name != 'pull_request'
+        run: |
+          docker login -u ${{ secrets.DOCKER_REGISTRY_ID }} -p ${{ secrets.DOCKER_REGISTRY_PASS }}
+      - name: Build and push docker images
+        if: matrix.target_os != 'darwin' && github.event_name != 'pull_request'
+        run: |
+          echo "Build docker image and push image..."
+          make docker-push TARGET_OS=${{ matrix.target_os }} TARGET_ARCH=${{ matrix.target_arch }} DAPR_REGISTRY=${{ secrets.DOCKER_REGISTRY }} DAPR_TAG=${{ env.REL_VERSION }}
+  publish:
+    name: Publish docker image and binaries
+    needs: build
+    if: github.event_name != 'pull_request'
+    env:
+      ARTIFACTS_DIR: ./release
+      DAPR_VERSION_ARTIFACT: dapr_version
+      DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+      - name: Install Docker CE for buildx
+        run: |
+          sudo apt update
+          sudo apt install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+          sudo apt update
+          sudo apt install docker-ce
+          docker -v
+      - name: Parse release version and set REL_VERSION
+        run: python ./.github/scripts/get_release_version.py
+      - name: download artifacts - dapr_linux_amd64
+        uses: actions/download-artifact@master
+        with:
+          name: dashboard_linux_amd64
+          path: ${{ env.ARTIFACTS_DIR }}
+      - name: download artifacts - dapr_linux_arm
+        uses: actions/download-artifact@master
+        with:
+          name: dashboard_linux_arm
+          path: ${{ env.ARTIFACTS_DIR }}
+      - name: download artifacts - dapr_linux_arm64
+        uses: actions/download-artifact@master
+        with:
+          name: dashboard_linux_arm64
+          path: ${{ env.ARTIFACTS_DIR }}
+      - name: download artifacts - dapr_windows_amd64
+        uses: actions/download-artifact@master
+        with:
+          name: dashboard_windows_amd64
+          path: ${{ env.ARTIFACTS_DIR }}
+      - name: download artifacts - dapr_darwin_amd64
+        uses: actions/download-artifact@master
+        with:
+          name: dashboard_darwin_amd64
+          path: ${{ env.ARTIFACTS_DIR }}
+      - name: prepare artifacts
+        run: |
+          ls -l ${{ env.ARTIFACTS_DIR }}
+      - name: publish binaries to github
+        if: startswith(github.ref, 'refs/tags/v')
+        run: |
+          sudo npm install --silent --no-progress -g github-release-cli@1.3.1
+          # Parse repository to get owner and repo names
+          OWNER_NAME="${GITHUB_REPOSITORY%%/*}"
+          REPO_NAME="${GITHUB_REPOSITORY#*/}"
+          # Get the list of files
+          RELEASE_ARTIFACT=(${{ env.ARTIFACTS_DIR }}/*)
+          export GITHUB_TOKEN=${{ secrets.DAPR_BOT_TOKEN }}
+          echo "Uploading release packages to GitHub Release"
+          github-release upload \
+            --owner $OWNER_NAME \
+            --repo $REPO_NAME \
+            --body "Release dapr dashboard v${REL_VERSION}" \
+            --tag "v${REL_VERSION}" \
+            --name "Dapr dashboard v${REL_VERSION}" \
+            --prerelease true \
+            ${RELEASE_ARTIFACT[*]}
+      - name: docker login
+        run: |
+          docker login -u ${{ secrets.DOCKER_REGISTRY_ID }} -p ${{ secrets.DOCKER_REGISTRY_PASS }}
+      - name: Build and push docker multiarch manifest
+        if: matrix.target_os != 'darwin'
+        run: |
+          echo "Build docker multiarch image manifest and push it"
+          make docker-publish DAPR_REGISTRY=${{ secrets.DOCKER_REGISTRY }} DAPR_TAG=${{ env.REL_VERSION }}
