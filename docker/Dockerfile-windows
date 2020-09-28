@@ -9,6 +9,8 @@ FROM mcr.microsoft.com/windows/nanoserver:$WINDOWS_VERSION
 COPY --from=servercore /windows/system32/netapi32.dll /windows/system32/netapi32.dll
 
 ARG BIN_PATH
+EXPOSE 8080/tcp
+WORKDIR /app
 ADD $BIN_PATH/dashboard.exe .
-ADD $BIN_PATH/web .
+ADD $BIN_PATH/web ./web
 CMD ["dashboard.exe"]
