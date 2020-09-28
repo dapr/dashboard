@@ -99,7 +99,7 @@ jobs:
         if: matrix.target_os != 'darwin' && github.event_name != 'pull_request'
         run: |
           echo "Build docker image and push image..."
-          make docker-push TARGET_OS=${{ matrix.target_os }} TARGET_ARCH=${{ matrix.target_arch }} DAPR_REGISTRY=${{ secrets.DOCKER_REGISTRY }} DAPR_TAG=${{ env.REL_VERSION }}
+          make docker-push TARGET_OS=${{ matrix.target_os }} TARGET_ARCH=${{ matrix.target_arch }} DAPR_REGISTRY=${{ secrets.DOCKER_DAPRIO_REGISTRY }} DAPR_TAG=${{ env.REL_VERSION }}
   publish:
     name: Publish docker image and binaries
     needs: build
@@ -107,7 +107,7 @@ jobs:
     env:
       ARTIFACTS_DIR: ./release
       DAPR_VERSION_ARTIFACT: dapr_version
-      DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+      DOCKER_REGISTRY: ${{ secrets.DOCKER_DAPRIO_REGISTRY }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out code into the Go module directory
@@ -177,4 +177,4 @@ jobs:
         if: matrix.target_os != 'darwin'
         run: |
           echo "Build docker multiarch image manifest and push it"
-          make docker-publish DAPR_REGISTRY=${{ secrets.DOCKER_REGISTRY }} DAPR_TAG=${{ env.REL_VERSION }}
+          make docker-publish DAPR_REGISTRY=${{ secrets.DOCKER_DAPRIO_REGISTRY }} DAPR_TAG=${{ env.REL_VERSION }}
