@@ -25,7 +25,7 @@ import (
 
 const (
 	daprEnabledAnnotation = "dapr.io/enabled"
-	daprIDAnnotation      = "dapr.io/id"
+	daprIDAnnotation      = "dapr.io/app-id"
 	daprPortAnnotation    = "dapr.io/port"
 )
 
