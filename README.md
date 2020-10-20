@@ -1,5 +1,7 @@
 # Dapr Dashboard
 
+[![codecov](https://codecov.io/gh/dapr/dashboard/branch/master/graph/badge.svg)](https://codecov.io/gh/dapr/dashboard)
+
 Dapr Dashboard is a web-based UI for Dapr, allowing users to see information, view logs and more for the Dapr applications, components, and configurations running either locally or in a Kubernetes cluster.
 
 <p style="text-align:center">

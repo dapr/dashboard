@@ -8,6 +8,7 @@ require (
 	github.com/dapr/go-sdk v0.0.0-20200312165010-7bb7a2205f3b // indirect
 	github.com/gorilla/mux v1.7.3
 	github.com/joomcode/errorx v1.0.1 // indirect
+	github.com/stretchr/testify v1.5.1
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	k8s.io/api v0.17.0
 	k8s.io/apimachinery v0.17.0
