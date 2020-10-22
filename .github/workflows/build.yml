@@ -60,7 +60,7 @@ jobs:
       - name: Install angular cli
         run: npm install -g @angular/cli
       - name: Set up Go ${{ env.GOVER }}
-        uses: actions/setup-go@v2-beta
+        uses: actions/setup-go@v2
         with:
           go-version: ${{ env.GOVER }}
       - name: Install golangci-lint
@@ -77,7 +77,7 @@ jobs:
       - name: Run make test
         env:
           COVERAGE_OPTS: "-coverprofile=coverage.txt -covermode=atomic"
-        if: matrix.target_arch != 'arm'
+        if: matrix.target_arch == 'amd64'
         run: make test
       - name: Codecov
         if: matrix.target_arch == 'amd64' && matrix.target_os == 'linux'
