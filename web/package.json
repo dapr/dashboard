@@ -34,7 +34,7 @@
     "moment": "^2.27.0",
     "moment-timezone": "^0.5.31",
     "monaco-editor": "^0.20.0",
-    "ng-monaco-editor": "^2.2.2",
+    "ng-monaco-editor": "^2.3.0",
     "rxjs": "~6.5.4",
     "tslib": "^1.10.0",
     "web-animations-js": "github:angular/web-animations-js#release_pr208",

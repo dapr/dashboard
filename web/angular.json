@@ -131,5 +131,8 @@
       }
     }
   },
-  "defaultProject": "dapr-dashboard"
+  "defaultProject": "dapr-dashboard",
+  "cli": {
+    "analytics": "6b2f9b2e-03d4-4ecd-b71d-041b4a826e96"
+  }
 }
