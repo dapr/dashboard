@@ -30,7 +30,8 @@ const (
 )
 
 var (
-	controlPlaneLabels = [...]string{"dapr-operator", "dapr-sentry", "dapr-placement", "dapr-sidecar-injector"}
+	//TODO: dapr-placement left for backward compatability, can be removed after v1.0 release
+	controlPlaneLabels = [...]string{"dapr-operator", "dapr-sentry", "dapr-placement", "dapr-placement-server", "dapr-sidecar-injector"}
 )
 
 // Instances is an interface to interact with running Dapr instances in Kubernetes or Standalone modes
@@ -50,7 +51,7 @@ type Instances interface {
 
 type instances struct {
 	platform       string
-	kubeClient     *kubernetes.Clientset
+	kubeClient     kubernetes.Interface
 	getInstancesFn func(string) []Instance
 	getScopesFn    func() []string
 }
@@ -264,9 +265,8 @@ func (i *instances) GetControlPlaneStatus() []StatusOutput {
 				options.LabelSelector = labels.FormatLabels(labelSelector)
 
 				p, err := i.kubeClient.CoreV1().Pods(v1.NamespaceAll).List(options)
-				if err == nil && len(p.Items) == 1 {
+				if err == nil && len(p.Items) != 0 {
 					pod := p.Items[0]
-
 					image := pod.Spec.Containers[0].Image
 					namespace := pod.GetNamespace()
 					age := age.GetAge(pod.CreationTimestamp.Time)
