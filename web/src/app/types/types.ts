@@ -21,6 +21,7 @@ export interface Instance {
 
 // Status represents the status of a named Dapr resource
 export interface Status {
+    service: string;
     name: string;
     namespace: string;
     healthy: string;

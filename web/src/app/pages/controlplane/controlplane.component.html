@@ -1,5 +1,9 @@
 <h2 class="page-header">Dapr Control Plane</h2>
 <table mat-table [dataSource]="data" class="table-large mat-elevation-z8">
+  <ng-container matColumnDef="service">
+    <th mat-header-cell *matHeaderCellDef>Service</th>
+    <td mat-cell *matCellDef="let item">{{ item.service }}</td>
+  </ng-container>
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef>Name</th>
     <td mat-cell *matCellDef="let item">{{ item.name }}</td>

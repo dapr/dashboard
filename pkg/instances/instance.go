@@ -23,6 +23,7 @@ type Instance struct {
 
 // StatusOutput represents the status of a named Dapr resource.
 type StatusOutput struct {
+	Service   string `json:"service"`
 	Name      string `json:"name"`
 	Namespace string `json:"namespace"`
 	Healthy   string `json:"healthy"`
