@@ -30,7 +30,13 @@ const (
 )
 
 var (
-	controlPlaneLabels = [...]string{"dapr-operator", "dapr-sentry", "dapr-placement-server", "dapr-sidecar-injector", "dapr-dashboard"}
+	controlPlaneLabels = [...]string{
+		"dapr-operator",
+		"dapr-sentry",
+		"dapr-placement",
+		"dapr-placement-server",
+		"dapr-sidecar-injector",
+		"dapr-dashboard"}
 )
 
 // Instances is an interface to interact with running Dapr instances in Kubernetes or Standalone modes
