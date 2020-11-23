@@ -10,7 +10,7 @@ import { Status } from 'src/app/types/types';
 export class ControlPlaneComponent implements OnInit, OnDestroy {
 
   public data: Status[];
-  public displayedColumns: string[] = ['name', 'namespace', 'healthy', 'status', 'version', 'age', 'created'];
+  public displayedColumns: string[] = ['service', 'name', 'namespace', 'healthy', 'status', 'version', 'age', 'created'];
   public controlPlaneLoaded: boolean;
   private intervalHandler;
 

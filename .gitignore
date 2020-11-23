@@ -5,3 +5,4 @@ dist/
 release/
 *.exe
 .vscode/**/*
+__debug_bin
