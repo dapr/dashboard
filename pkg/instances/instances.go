@@ -50,7 +50,7 @@ type Instances interface {
 
 type instances struct {
 	platform       string
-	kubeClient     *kubernetes.Clientset
+	kubeClient     kubernetes.Interface
 	getInstancesFn func(string) []Instance
 	getScopesFn    func() []string
 }
