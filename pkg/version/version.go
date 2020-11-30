@@ -1,9 +1,9 @@
 package version
 
-// Version is the current Dapr dashboard version
-var Version = "edge"
+// version is the current Dapr dashboard version
+var version = "edge"
 
 // GetVersion returns the current dashboard version
 func GetVersion() string {
-	return Version
+	return version
 }
