@@ -86,13 +86,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  delete(id: string): void {
-    this.instanceService.deleteInstance(id).subscribe(() => {
-      this.showSnackbar('Deleted Dapr instance with ID ' + id);
-      this.getInstances();
-    }, error => {
-      this.showSnackbar('Failed to remove Dapr instance with ID ' + id);
-    });
+  stop(id: string): void {
+    if (confirm('You are about to stop Dapr instance with ID "' + id + '". Confirm?')) {
+      this.instanceService.stopInstance(id).subscribe(() => {
+        this.showSnackbar('Stopped Dapr instance with ID ' + id);
+        this.getInstances();
+      }, error => {
+        this.showSnackbar('Failed to stop Dapr instance with ID ' + id);
+      });
+    }
   }
 
   loadData(): void {

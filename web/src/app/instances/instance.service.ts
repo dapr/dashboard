@@ -24,7 +24,7 @@ export class InstanceService {
     return this.http.get<Instance>(`/api/instances/${scope}/${id}`);
   }
 
-  deleteInstance(id: string): Observable<Instance[]> {
+  stopInstance(id: string): Observable<Instance[]> {
     const scope = this.scopesService.getScope();
     return this.http.delete<Instance[]>(`/api/instances/${scope}/${id}`);
   }
