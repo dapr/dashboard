@@ -19,6 +19,7 @@ type Instance struct {
 	Labels           string `json:"labels"`
 	Selector         string `json:"selector"`
 	Config           string `json:"config"`
+	MetricsEnabled   bool   `json:"metricsEnabled"`
 }
 
 // StatusOutput represents the status of a named Dapr resource.

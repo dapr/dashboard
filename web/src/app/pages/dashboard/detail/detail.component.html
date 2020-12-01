@@ -36,6 +36,10 @@
               <td class="table-label">Address</td>
               <td class="table-data">{{ instance.address }}</td>
             </tr>
+            <tr>
+              <td class="table-label">Metrics Enabled</td>
+              <td class="table-data">{{ instance.metricsEnabled }}</td>
+            </tr>
             <tr *ngIf="platform === 'standalone'">
               <td class="table-label">PID</td>
               <td class="table-data">{{ instance.pid }}</td>

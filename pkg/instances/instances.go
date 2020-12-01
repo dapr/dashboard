@@ -24,9 +24,10 @@ import (
 )
 
 const (
-	daprEnabledAnnotation = "dapr.io/enabled"
-	daprIDAnnotation      = "dapr.io/app-id"
-	daprPortAnnotation    = "dapr.io/port"
+	daprEnabledAnnotation       = "dapr.io/enabled"
+	daprIDAnnotation            = "dapr.io/app-id"
+	daprPortAnnotation          = "dapr.io/port"
+	prometheusEnabledAnnotation = "prometheus.io/scrape"
 )
 
 var (
@@ -398,6 +399,10 @@ func (i *instances) getKubernetesInstances(scope string) []Instance {
 	for _, d := range resp.Items {
 		if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
 			id := d.Spec.Template.Annotations[daprIDAnnotation]
+			prometheusEnabled, err := strconv.ParseBool(d.Spec.Template.Annotations[prometheusEnabledAnnotation])
+			if err != nil {
+				prometheusEnabled = false
+			}
 			i := Instance{
 				AppID:            id,
 				HTTPPort:         3500,
@@ -414,6 +419,7 @@ func (i *instances) getKubernetesInstances(scope string) []Instance {
 				Labels:           "app:" + d.Labels["app"],
 				Selector:         "app:" + d.Labels["app"],
 				Config:           d.Spec.Template.Annotations["dapr.io/config"],
+				MetricsEnabled:   prometheusEnabled,
 			}
 
 			if val, ok := d.Spec.Template.Annotations[daprPortAnnotation]; ok {
@@ -425,7 +431,7 @@ func (i *instances) getKubernetesInstances(scope string) []Instance {
 
 			s := json_serializer.NewYAMLSerializer(json_serializer.DefaultMetaFactory, nil, nil)
 			buf := new(bytes.Buffer)
-			err := s.Encode(&d, buf)
+			err = s.Encode(&d, buf)
 			if err != nil {
 				log.Println(err)
 				return list
@@ -463,6 +469,7 @@ func (i *instances) getStandaloneInstances(scope string) []Instance {
 				SupportsDeletion: true,
 				SupportsLogs:     false,
 				Address:          fmt.Sprintf("localhost:%v", o.HTTPPort),
+				MetricsEnabled:   o.MetricsEnabled,
 			})
 		}
 	}

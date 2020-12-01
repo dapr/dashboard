@@ -17,6 +17,7 @@ export interface Instance {
     labels: string;
     selector: string;
     config: string;
+    metricsEnabled: boolean;
 }
 
 // Status represents the status of a named Dapr resource
