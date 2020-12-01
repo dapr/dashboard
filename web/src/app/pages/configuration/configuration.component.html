@@ -8,6 +8,10 @@
     <th mat-header-cell *matHeaderCellDef>Tracing Enabled</th>
     <td mat-cell *matCellDef="let item">{{ item.tracingEnabled}}</td>
   </ng-container>
+  <ng-container matColumnDef="metrics-enabled">
+    <th mat-header-cell *matHeaderCellDef>Metrics Enabled</th>
+    <td mat-cell *matCellDef="let item">{{ item.metricsEnabled }}</td>
+  </ng-container>
   <ng-container matColumnDef="mtls-enabled">
     <th mat-header-cell *matHeaderCellDef>MTLS Enabled</th>
     <td mat-cell *matCellDef="let item">{{ item.mtlsEnabled }}</td>

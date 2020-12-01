@@ -65,6 +65,7 @@ export interface DaprConfiguration {
     age: string;
     tracingEnabled: boolean;
     samplingRate: string;
+    metricsEnabled: boolean;
     mtlsEnabled: boolean;
     mtlsWorkloadTTL: string;
     mtlsClockSkew: string;
