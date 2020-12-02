@@ -91,7 +91,7 @@ func RunWebServer(port int) {
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
-	fmt.Println(fmt.Sprintf("Dapr Dashboard running on http://localhost:%v", port))
+	fmt.Printf("Dapr Dashboard running on http://localhost:%v\n", port)
 	log.Fatal(srv.ListenAndServe())
 }
 

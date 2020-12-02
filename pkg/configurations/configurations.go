@@ -1,18 +1,16 @@
 package configurations
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strconv"
 
 	"github.com/dapr/cli/pkg/standalone"
-	v1alpha1 "github.com/dapr/dapr/pkg/apis/configuration/v1alpha1"
 	scheme "github.com/dapr/dapr/pkg/client/clientset/versioned"
+	"github.com/dapr/dapr/pkg/config"
 	"github.com/dapr/dashboard/pkg/age"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/yaml"
 )
 
 // Configurations is an interface to interact with Dapr configurations
@@ -50,6 +48,7 @@ type Configuration struct {
 	Age             string      `json:"age"`
 	TracingEnabled  bool        `json:"tracingEnabled"`
 	SamplingRate    string      `json:"samplingRate"`
+	MetricsEnabled  bool        `json:"metricsEnabled"`
 	MTLSEnabled     bool        `json:"mtlsEnabled"`
 	WorkloadCertTTL string      `json:"mtlsWorkloadTTL"`
 	ClockSkew       string      `json:"mtlsClockSkew"`
@@ -92,8 +91,9 @@ func (c *configurations) getKubernetesConfigurations(scope string) []Configurati
 			Kind:            comp.Kind,
 			Created:         comp.CreationTimestamp.Format("2006-01-02 15:04.05"),
 			Age:             age.GetAge(comp.CreationTimestamp.Time),
-			TracingEnabled:  tracingEnabled(comp.Spec.TracingSpec),
+			TracingEnabled:  tracingEnabled(comp.Spec.TracingSpec.SamplingRate),
 			SamplingRate:    comp.Spec.TracingSpec.SamplingRate,
+			MetricsEnabled:  comp.Spec.MetricSpec.Enabled,
 			MTLSEnabled:     comp.Spec.MTLSSpec.Enabled,
 			WorkloadCertTTL: comp.Spec.MTLSSpec.WorkloadCertTTL,
 			ClockSkew:       comp.Spec.MTLSSpec.AllowedClockSkew,
@@ -116,16 +116,10 @@ func (c *configurations) getStandaloneConfigurations(scope string) []Configurati
 		if info.IsDir() && info.Name() != filepath.Base(configurationsDirectory) {
 			return filepath.SkipDir
 		} else if !info.IsDir() && filepath.Ext(path) == ".yaml" {
-			content, err := ioutil.ReadFile(path)
+			comp, content, err := config.LoadStandaloneConfiguration(path)
 			if err != nil {
-				log.Printf("Failure reading file %s: %v\n", path, err)
+				log.Printf("Failure reading configuration file %s: %v\n", path, err)
 				return err
-			}
-
-			comp := v1alpha1.Configuration{}
-			err = yaml.Unmarshal(content, &comp)
-			if err != nil {
-				log.Printf("Failure unmarshalling %s into Configuration: %s\n", path, err.Error())
 			}
 
 			newConfiguration := Configuration{
@@ -133,12 +127,13 @@ func (c *configurations) getStandaloneConfigurations(scope string) []Configurati
 				Kind:            comp.Kind,
 				Created:         info.ModTime().Format("2006-01-02 15:04.05"),
 				Age:             age.GetAge(info.ModTime()),
-				TracingEnabled:  tracingEnabled(comp.Spec.TracingSpec),
+				TracingEnabled:  tracingEnabled(comp.Spec.TracingSpec.SamplingRate),
 				SamplingRate:    comp.Spec.TracingSpec.SamplingRate,
+				MetricsEnabled:  comp.Spec.MetricSpec.Enabled,
 				MTLSEnabled:     comp.Spec.MTLSSpec.Enabled,
 				WorkloadCertTTL: comp.Spec.MTLSSpec.WorkloadCertTTL,
 				ClockSkew:       comp.Spec.MTLSSpec.AllowedClockSkew,
-				Manifest:        string(content),
+				Manifest:        content,
 			}
 
 			if newConfiguration.Kind == "Configuration" {
@@ -156,8 +151,8 @@ func (c *configurations) getStandaloneConfigurations(scope string) []Configurati
 }
 
 // tracingEnabled checks if tracing is enabled for a configuration
-func tracingEnabled(spec v1alpha1.TracingSpec) bool {
-	sr, err := strconv.ParseFloat(spec.SamplingRate, 32)
+func tracingEnabled(samplingRate string) bool {
+	sr, err := strconv.ParseFloat(samplingRate, 32)
 	if err != nil {
 		return false
 	}
