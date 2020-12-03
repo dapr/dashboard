@@ -39,11 +39,7 @@
   </mat-tab>
   <mat-tab label="Configuration" *ngIf="loadedComponent">
     <mat-card class="card-large mat-elevation-z8">
-      <mat-card-header>
-        <mat-card-title>Manifest</mat-card-title>
-      </mat-card-header>
-      <ng-monaco-editor style="height: 300px" modelUri="file:manifest.yaml" [options]="options" [(ngModel)]="componentManifest">
-      </ng-monaco-editor>
+      <pre style="font-family: Consolas, 'Courier New', monospace;"><code ngCodeColorize="yaml">{{ componentManifest }}</code></pre>
     </mat-card>
   </mat-tab>
 </mat-tab-group>

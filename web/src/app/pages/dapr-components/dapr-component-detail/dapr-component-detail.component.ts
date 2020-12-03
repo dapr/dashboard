@@ -15,7 +15,7 @@ export class DaprComponentDetailComponent implements OnInit {
 
   private name: string;
   public component: any;
-  public componentManifest: string | object;
+  public componentManifest: string;
   public options: YamlViewerOptions;
   public loadedComponent: boolean;
 
@@ -46,7 +46,7 @@ export class DaprComponentDetailComponent implements OnInit {
   getComponent(name: string): void {
     this.componentsService.getComponent(name).subscribe((data: DaprComponent) => {
       this.component = data;
-      this.componentManifest = yaml.safeDump(data.manifest);
+      this.componentManifest = (typeof data.manifest === 'string') ? data.manifest : yaml.safeDump(data.manifest);
       this.loadedComponent = true;
     });
   }
