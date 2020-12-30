@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { PagesComponent } from './pages.component';
+import { AboutDialogComponent } from './pages.component';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { PagesRoutingModule } from './pages-routing.module';
 import { CommonModule } from '@angular/common';
@@ -40,6 +41,7 @@ import { MatDialogModule } from '@angular/material/dialog';
   ],
   declarations: [
     PagesComponent,
+    AboutDialogComponent
   ],
 })
 export class PagesModule { }
