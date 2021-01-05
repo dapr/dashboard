@@ -67,6 +67,7 @@ button {
     border-color: #888888;
     border-width: thin;
     border-radius: 5px;
+    background-color: black;
 }
 
 li {
@@ -74,4 +75,18 @@ li {
     white-space: break-spaces;
     font-weight: 300;
     font-size: 12px;
+    font-family: Lucida Console, Courier, monospace;
+    color: #FFFFFF;
+}
+
+.logTimestamp {
+    color: #8a8a8a
+}
+
+.logWarn {
+    color: #fffd6f
+}
+
+.logError {
+    color: #fa3232
 }

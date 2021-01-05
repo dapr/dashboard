@@ -17,10 +17,10 @@ import { HighlightPipe } from './logs/pipes/highlight.pipe';
 import { MatSelectModule } from '@angular/material/select';
 import { ContainerPipe } from './logs/pipes/container.pipe';
 import { SortPipe } from './logs/pipes/sort.pipe';
-import { TimestampPipe } from './logs/pipes/timestamp.pipe';
 import { TimeSincePipe } from './logs/pipes/timeSince.pipe';
 import { MatNativeDateModule } from '@angular/material/core';
 import { TimePipe } from './logs/pipes/time.pipe';
+import { ISODatePipe } from './logs/pipes/isoDate.pipe';
 
 @NgModule({
   imports: [
@@ -45,9 +45,9 @@ import { TimePipe } from './logs/pipes/time.pipe';
     HighlightPipe,
     ContainerPipe,
     SortPipe,
-    TimestampPipe,
     TimeSincePipe,
-    TimePipe
+    TimePipe,
+    ISODatePipe
   ],
 })
 export class DetailModule { }

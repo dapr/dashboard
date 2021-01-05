@@ -4,14 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"regexp"
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/dapr/cli/pkg/standalone"
 	"github.com/dapr/dashboard/pkg/age"
@@ -45,7 +44,8 @@ type Instances interface {
 	GetInstances(scope string) []Instance
 	GetInstance(scope string, id string) Instance
 	DeleteInstance(scope string, id string) error
-	GetLogs(scope string, id string) []Log
+	GetContainers(scope string, id string) []string
+	GetLogStream(scope, id, containerName string) (io.ReadCloser, error)
 	GetDeploymentConfiguration(scope string, id string) string
 	GetControlPlaneStatus() []StatusOutput
 	GetMetadata(scope string, id string) MetadataOutput
@@ -92,12 +92,12 @@ func (i *instances) CheckPlatform() string {
 	return i.platform
 }
 
-// GetLogs returns a string of all logs for the given Dapr app id
-func (i *instances) GetLogs(scope string, id string) []Log {
+// GetContainers returns a list of containers for an app.
+func (i *instances) GetContainers(scope string, id string) []string {
 	if i.kubeClient != nil {
 		resp, err := i.kubeClient.AppsV1().Deployments(scope).List((meta_v1.ListOptions{}))
 		if err != nil || len(resp.Items) == 0 {
-			return []Log{}
+			return nil
 		}
 
 		for _, d := range resp.Items {
@@ -109,60 +109,14 @@ func (i *instances) GetLogs(scope string, id string) []Log {
 					})
 					if err != nil {
 						log.Println(err)
-						return []Log{}
+						return nil
 					}
 
 					if len(pods.Items) > 0 {
 						p := pods.Items[0]
-						name := p.ObjectMeta.Name
-
-						out := []Log{}
+						out := []string{}
 						for _, container := range p.Spec.Containers {
-							options := v1.PodLogOptions{}
-							options.Container = container.Name
-							options.Timestamps = true
-
-							res := i.kubeClient.CoreV1().Pods(p.ObjectMeta.Namespace).GetLogs(name, &options)
-							stream, err := res.Stream()
-							if err != nil {
-								log.Println(err)
-								return out
-							}
-
-							buf := new(bytes.Buffer)
-							_, err = buf.ReadFrom(stream)
-							if err != nil {
-								log.Println(err)
-								return out
-							}
-							bufString := buf.String()
-
-							levelExp, _ := regexp.Compile("(level=)[^ ]*")
-							timeExp, _ := regexp.Compile("^[^ ]+")
-
-							for _, content := range strings.Split(bufString, "\n") {
-								currentLog := Log{
-									Level:     "info",
-									Timestamp: 0,
-									Container: container.Name,
-									Content:   content,
-								}
-
-								currentLog.Level = strings.Replace(levelExp.FindString(content), "level=", "", 1)
-								if err != nil {
-									log.Println(err)
-									continue
-								}
-
-								timestamp, err := time.Parse(time.RFC3339Nano, timeExp.FindString(content))
-								if err != nil {
-									log.Println(err)
-									continue
-								}
-
-								currentLog.Timestamp = timestamp.UnixNano()
-								out = append(out, currentLog)
-							}
+							out = append(out, container.Name)
 						}
 						return out
 					}
@@ -170,7 +124,51 @@ func (i *instances) GetLogs(scope string, id string) []Log {
 			}
 		}
 	}
-	return []Log{}
+	return nil
+}
+
+// GetLogStream returns a stream of bytes from K8s logs
+func (i *instances) GetLogStream(scope, id, containerName string) (io.ReadCloser, error) {
+	if i.kubeClient != nil {
+		resp, err := i.kubeClient.AppsV1().Deployments(scope).List((meta_v1.ListOptions{}))
+		if err != nil {
+			return nil, err
+		}
+
+		for _, d := range resp.Items {
+			if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
+				daprID := d.Spec.Template.Annotations[daprIDAnnotation]
+				if daprID == id {
+					pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(meta_v1.ListOptions{
+						LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
+					})
+					if err != nil {
+						return nil, err
+					}
+
+					if len(pods.Items) > 0 {
+						p := pods.Items[0]
+						name := p.ObjectMeta.Name
+
+						for _, container := range p.Spec.Containers {
+							if container.Name == containerName {
+								var tailLines int64 = 100
+								options := v1.PodLogOptions{}
+								options.Container = container.Name
+								options.Timestamps = true
+								options.TailLines = &tailLines
+								options.Follow = true
+
+								res := i.kubeClient.CoreV1().Pods(p.ObjectMeta.Namespace).GetLogs(name, &options)
+								return res.Stream()
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return nil, fmt.Errorf("could not find logstream for %v, %v, %v", scope, id, containerName)
 }
 
 // GetDeploymentConfiguration returns the metadata of a Dapr application in YAML format
