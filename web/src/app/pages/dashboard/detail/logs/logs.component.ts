@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { InstanceService } from 'src/app/instances/instance.service';
 import { LogStreamService } from 'src/app/logstream/logstream.service';
@@ -10,7 +10,7 @@ import { Log } from 'src/app/types/types';
   styleUrls: ['logs.component.scss'],
 })
 
-export class LogsComponent implements OnInit {
+export class LogsComponent implements OnInit, OnDestroy {
 
   public id: string;
   public containers: string[];
@@ -29,7 +29,7 @@ export class LogsComponent implements OnInit {
 
   ngOnInit(): void {
     this.id = this.route.snapshot.params.id;
-    this.containers = ['daprd']
+    this.containers = ['daprd'];
     this.instances.getContainers(this.id).subscribe(containers => {
       this.containers = containers;
       containers.forEach(container => {
@@ -38,7 +38,7 @@ export class LogsComponent implements OnInit {
         this.logStream.startStream(this.id, container).subscribe(logRecord => {
            containerLogs.push(logRecord);
         });
-      })
+      });
     });
   }
 

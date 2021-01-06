@@ -1,7 +1,7 @@
-import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { ScopesService } from '../scopes/scopes.service';
-import { WebsocketService } from "../websocket/websocket.service";
+import { WebsocketService } from '../websocket/websocket.service';
 import { Log } from 'src/app/types/types';
 import { map } from 'rxjs/operators';
 
