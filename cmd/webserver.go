@@ -250,8 +250,7 @@ func getMetadataHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	id := vars["id"]
 	md := inst.GetMetadata(scope, id)
-	resp := inst.GetActiveActorsCount(md)
-	respondWithJSON(w, 200, resp)
+	respondWithJSON(w, 200, md)
 }
 
 func deleteInstancesHandler(w http.ResponseWriter, r *http.Request) {

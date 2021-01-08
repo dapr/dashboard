@@ -49,7 +49,6 @@ type Instances interface {
 	GetDeploymentConfiguration(scope string, id string) string
 	GetControlPlaneStatus() []StatusOutput
 	GetMetadata(scope string, id string) MetadataOutput
-	GetActiveActorsCount(metadata MetadataOutput) []MetadataActiveActorsCount
 	GetScopes() []string
 	CheckPlatform() string
 }
@@ -376,11 +375,6 @@ func (i *instances) GetMetadata(scope string, id string) MetadataOutput {
 	return MetadataOutput{}
 }
 
-// GetActiveActorsCount returns the Actors slice of a MetadataOutput
-func (i *instances) GetActiveActorsCount(metadata MetadataOutput) []MetadataActiveActorsCount {
-	return metadata.Actors
-}
-
 // GetInstances returns the result of the appropriate environment's GetInstance function
 func (i *instances) GetInstances(scope string) []Instance {
 	return i.getInstancesFn(scope)
@@ -402,7 +396,7 @@ func (i *instances) getKubernetesInstances(scope string) []Instance {
 				AppID:            id,
 				HTTPPort:         3500,
 				GRPCPort:         50001,
-				Command:          "./daprd",
+				Command:          "",
 				Age:              age.GetAge(d.CreationTimestamp.Time),
 				Created:          d.GetCreationTimestamp().String(),
 				PID:              -1,
