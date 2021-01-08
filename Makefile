@@ -184,3 +184,21 @@ lint:
 # Target: docker                                                               #
 ################################################################################
 include docker/docker.mk
+
+################################################################################
+# Target: dev shortcuts                                                        #
+################################################################################
+run-nginx:
+	echo "Open http://localhost:8000/" && \
+	nginx -p "" -c nginx.conf
+
+run-frontend:
+	cd web && \
+	ng serve  --host 0.0.0.0 --disable-host-check && \
+	cd -
+
+run-backend-standalone:
+	$(DAPR_OUT_DIR)/dashboard$(BINARY_EXT)
+
+run-backend-kubernetes:
+	DAPR_DASHBOARD_KUBECONFIG=~/.kube/config $(DAPR_OUT_DIR)/dashboard$(BINARY_EXT)

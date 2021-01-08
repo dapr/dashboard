@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { InstanceService } from 'src/app/instances/instance.service';
+import { LogStreamService } from 'src/app/logstream/logstream.service';
 import { Log } from 'src/app/types/types';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-logs',
@@ -10,67 +10,42 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrls: ['logs.component.scss'],
 })
 
-export class LogsComponent implements OnInit {
+export class LogsComponent implements OnInit, OnDestroy {
 
-  public logs: Log[];
   public id: string;
   public containers: string[];
-  public showFiltered = false;
+  public showFiltered = true;
   public filterValue = '';
-  public containerValue = '\[all containers\]';
-  public dateOrder = 'desc';
-  public showTimestamps = false;
+  public containerValue = 'daprd';
   public since: number;
   public sinceUnit = '';
-  public dateFrom: Date;
-  public dateTo: Date;
-  public timeFrom: string;
-  public timeTo: string;
+  public logs: Map<string, Log[]> = new Map();
 
   constructor(
     private route: ActivatedRoute,
     private instances: InstanceService,
-    private snackbar: MatSnackBar,
+    private logStream: LogStreamService,
   ) { }
 
   ngOnInit(): void {
     this.id = this.route.snapshot.params.id;
-    this.getLogs(false);
-  }
-
-  getLogs(refresh: boolean): void {
-    this.instances.getLogs(this.id).subscribe((data: Log[]) => {
-      const comparator = (a: Log, b: Log) => {
-        return a.timestamp - b.timestamp;
-      };
-      this.logs = data.sort(comparator);
-      this.containers = data.map(log => log.container).filter((value, index, self) => self.indexOf(value) === index);
-      this.containers.unshift('\[all containers\]');
-      if (refresh) {
-        this.showSnackbar('Logs successfully refreshed');
-      }
+    this.containers = ['daprd'];
+    this.instances.getContainers(this.id).subscribe(containers => {
+      this.containers = containers;
+      containers.forEach(container => {
+        const containerLogs = new Array<Log>();
+        this.logs.set(container, containerLogs);
+        this.logStream.startStream(this.id, container).subscribe(logRecord => {
+           containerLogs.push(logRecord);
+        });
+      });
     });
   }
 
-  resetFilters(): void {
-    this.showFiltered = false;
-    this.filterValue = '';
-    this.containerValue = '\[all containers\]';
-    this.dateOrder = 'desc';
-    this.showTimestamps = false;
-    this.since = undefined;
-    this.sinceUnit = '';
-    this.dateFrom = undefined;
-    this.dateTo = undefined;
-    this.timeFrom = undefined;
-    this.timeTo = undefined;
-
-    this.showSnackbar('Filters Reset');
-  }
-
-  showSnackbar(message: string): void {
-    this.snackbar.open(message, '', {
-      duration: 2000,
+  ngOnDestroy(): void {
+    this.containers.forEach(container => {
+      this.logStream.endStream(this.id, container);
     });
   }
+
 }

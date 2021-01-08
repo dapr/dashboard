@@ -6,6 +6,7 @@ require (
 	github.com/dapr/cli v0.9.0
 	github.com/dapr/dapr v1.0.0-rc.1.0.20201202053523-152c218d89da
 	github.com/gorilla/mux v1.7.3
+	github.com/gorilla/websocket v1.4.2
 	github.com/stretchr/testify v1.6.1
 	k8s.io/api v0.17.8
 	k8s.io/apimachinery v0.17.8

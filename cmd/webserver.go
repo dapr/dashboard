@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -14,8 +15,10 @@ import (
 	configurations "github.com/dapr/dashboard/pkg/configurations"
 	instances "github.com/dapr/dashboard/pkg/instances"
 	kube "github.com/dapr/dashboard/pkg/kube"
+	dashboard_log "github.com/dapr/dashboard/pkg/log"
 	"github.com/dapr/dashboard/pkg/version"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 )
 
 var epoch = time.Unix(0, 0).Format(time.RFC1123)
@@ -35,6 +38,8 @@ var etagHeaders = []string{
 	"If-Range",
 	"If-Unmodified-Since",
 }
+
+var upgrader = websocket.Upgrader{} // use default options
 
 // spaHandler implements the http.Handler interface, so we can use it
 // to respond to HTTP requests. The path to the static directory and
@@ -69,7 +74,8 @@ func RunWebServer(port int) {
 	api.HandleFunc("/instances/{scope}", getInstancesHandler).Methods("GET")
 	api.HandleFunc("/instances/{scope}/{id}", deleteInstancesHandler).Methods("DELETE")
 	api.HandleFunc("/instances/{scope}/{id}", getInstanceHandler).Methods("GET")
-	api.HandleFunc("/instances/{scope}/{id}/logs", getLogsHandler).Methods("GET")
+	api.HandleFunc("/instances/{scope}/{id}/containers", getContainersHandler).Methods("GET")
+	api.HandleFunc("/instances/{scope}/{id}/logstreams/{container}", getLogStreamsHandler)
 	api.HandleFunc("/components/{scope}", getComponentsHandler).Methods("GET")
 	api.HandleFunc("/components/{scope}/{name}", getComponentHandler).Methods("GET")
 	api.HandleFunc("/deploymentconfiguration/{scope}/{id}", getDeploymentConfigurationHandler).Methods("GET")
@@ -183,15 +189,66 @@ func getPlatformHandler(w http.ResponseWriter, r *http.Request) {
 	respondWithPlainString(w, 200, resp)
 }
 
-func getLogsHandler(w http.ResponseWriter, r *http.Request) {
+func getContainersHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	scope := vars["scope"]
 	if scope == "All" {
 		scope = ""
 	}
 	id := vars["id"]
-	logs := inst.GetLogs(scope, id)
-	respondWithJSON(w, 200, logs)
+	containers := inst.GetContainers(scope, id)
+	respondWithJSON(w, 200, containers)
+}
+
+func getLogStreamsHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	scope := vars["scope"]
+	if scope == "All" {
+		scope = ""
+	}
+	id := vars["id"]
+	container := vars["container"]
+	c, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer c.Close()
+	reader, err := inst.GetLogStream(scope, id, container)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer reader.Close()
+
+	lineReader := bufio.NewReader(reader)
+	logReader := dashboard_log.NewReader(container, lineReader)
+	for {
+		logRecord, err := logReader.ReadLog()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if logRecord == nil {
+			// Now wait some time before reading more.
+			time.Sleep(time.Second)
+			continue
+		}
+
+		bytes, err := json.Marshal(logRecord)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		err = c.WriteMessage(websocket.TextMessage, bytes)
+		if err != nil {
+			log.Println("fail to write log stream, aborting:", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
 }
 
 func getDeploymentConfigurationHandler(w http.ResponseWriter, r *http.Request) {

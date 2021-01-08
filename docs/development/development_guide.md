@@ -16,6 +16,45 @@
 
 [Dapr CLI](https://github.com/dapr/cli)
 
+## Expedite UI development
+
+### Build binaries
+```sh
+make
+```
+
+### Run backend
+
+On one terminal, run:
+
+For standalone mode:
+```sh
+make run-backend-standalone
+```
+
+For kubernetes mode:
+```sh
+make run-backend-kubernetes
+```
+
+### Run frontend
+
+On another terminal, run:
+```sh
+make run-frontend
+```
+
+### Run proxy
+
+On a third terminal, run:
+```sh
+make run-nginx
+```
+
+### Open website
+
+Now, open http://localhost:8000. Then, you can change the Angular code and see live changes without rebuilding the website to test every delta.
+
 ## Kubernetes
 
 ### Build using script
@@ -30,7 +69,7 @@ e.g. `./build_kubernetes.sh docker-username/dashboard:test dapr-system`
 
 #### Build distribution folder and binary
 ```bash
-./build.sh
+make
 ```
 
 #### Build docker image
@@ -85,10 +124,7 @@ e.g. `./build_standalone.sh windows_amd64`
 
 #### Build distribution folder and binary
 ```bash
-cd web
-ng build --base-href ./
-cd ..
-go build
+make
 
 # Windows
 ./dashboard.exe

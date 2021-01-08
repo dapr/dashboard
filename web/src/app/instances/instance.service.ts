@@ -43,6 +43,11 @@ export class InstanceService {
     return this.http.get<Status[]>(`/api/controlplanestatus`);
   }
 
+  getContainers(id: string): Observable<string[]> {
+    const scope = this.scopesService.getScope();
+    return this.http.get<string[]>(`/api/instances/${scope}/${id}/containers`);
+  }
+
   getLogs(id: string): Observable<Log[]> {
     const scope = this.scopesService.getScope();
     return this.http.get<Log[]>(`/api/instances/${scope}/${id}/logs`);
