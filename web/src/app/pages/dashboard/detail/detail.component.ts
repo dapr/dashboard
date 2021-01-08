@@ -22,8 +22,7 @@ export class DetailComponent implements OnInit, OnDestroy {
   public loadedConfiguration: boolean;
   public loadedInstance: boolean;
   public loadedMetadata: boolean;
-  public metadata: Metadata[];
-  public metadataDisplayedColumns: string[] = ['type', 'count'];
+  public metadata: Metadata;
   public options: YamlViewerOptions;
   public platform: string;
   private intervalHandler;
@@ -87,7 +86,7 @@ export class DetailComponent implements OnInit, OnDestroy {
   }
 
   getMetadata(id: string): void {
-    this.instanceService.getMetadata(id).subscribe((data: Metadata[]) => {
+    this.instanceService.getMetadata(id).subscribe((data: Metadata) => {
       this.metadata = data;
       this.loadedMetadata = true;
     });

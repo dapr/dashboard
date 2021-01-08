@@ -24,10 +24,16 @@
               <td class="table-label">Dapr gRPC Port</td>
               <td class="table-data">{{ instance.grpcPort }}</td>
             </tr>
-            <tr>
+            <tr *ngIf="metadata && metadata.extended && metadata.extended['appCommand']; else noMetadataCommand">
               <td class="table-label">Command</td>
-              <td class="table-data">{{ instance.command }}</td>
+              <td class="table-data">{{ metadata.extended['appCommand'] }}</td>
             </tr>
+            <ng-template #noMetadataCommand>
+              <tr *ngIf="instance.command">
+                <td class="table-label">Command</td>
+                <td class="table-data">{{ instance.command }}</td>
+              </tr>
+            </ng-template>
             <tr>
               <td class="table-label">Replicas</td>
               <td class="table-data">{{ instance.replicas }}</td>
@@ -98,18 +104,13 @@
         <mat-card-title>Actors</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <table *ngIf="metadata && metadata.length > 0; else noActors" mat-table [dataSource]="metadata"
-          class="table-large actor-table mat-elevation-z1">
-          <ng-container matColumnDef="type">
-            <th mat-header-cell *matHeaderCellDef>Type</th>
-            <td mat-cell *matCellDef="let item">{{ item.type }}</td>
-          </ng-container>
-          <ng-container matColumnDef="count">
-            <th mat-header-cell *matHeaderCellDef>Count</th>
-            <td mat-cell *matCellDef="let item">{{ item.count }}</td>
-          </ng-container>
-          <tr mat-header-row *matHeaderRowDef="metadataDisplayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: metadataDisplayedColumns;"></tr>
+        <table *ngIf="metadata && metadata.actors.length > 0; else noActors">
+          <tbody>
+            <tr *ngFor="let item of metadata.actors">
+              <td class="table-label">{{ item.type }}</td>
+              <td class="table-data">{{ item.count }}</td>
+            </tr>
+          </tbody>
         </table>
         <ng-template #noActors>
           <p class="page-text">No registered Dapr Actors</p>
