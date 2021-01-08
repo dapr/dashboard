@@ -34,9 +34,9 @@ export class InstanceService {
     return this.http.get(`/api/deploymentconfiguration/${scope}/${id}`, { responseType: 'text' });
   }
 
-  getMetadata(id: string): Observable<Metadata[]> {
+  getMetadata(id: string): Observable<Metadata> {
     const scope = this.scopesService.getScope();
-    return this.http.get<Metadata[]>(`/api/metadata/${scope}/${id}`);
+    return this.http.get<Metadata>(`/api/metadata/${scope}/${id}`);
   }
 
   getControlPlaneStatus(): Observable<Status[]> {

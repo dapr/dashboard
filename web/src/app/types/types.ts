@@ -31,8 +31,15 @@ export interface Status {
     created: string;
 }
 
-// Metadata represents actor metadata: type and count
+// Metadata represents metadata from dapr sidecar.
 export interface Metadata {
+    id: string;
+    actors: MetadataActors[];
+    extended: Map<string, any>;
+}
+
+// MetadataActors represents actor metadata: type and count
+export interface MetadataActors {
     type: string;
     count: number;
 }
