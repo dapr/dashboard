@@ -6,6 +6,10 @@
   height: 5%;
 }
 
+.mat-toolbar {
+  min-height: 4rem;
+}
+
 #imgWrapper {
   height: 100%;
   width: 4rem;
@@ -84,5 +88,5 @@ mat-icon {
 
 #scopeFormField {
   position: absolute;
-  bottom: 0px;
+  bottom: 0rem;
 }
