@@ -6,3 +6,4 @@ release/
 *.exe
 .vscode/**/*
 __debug_bin
+.venv/**
