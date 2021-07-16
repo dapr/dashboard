@@ -25,7 +25,6 @@ export class PagesComponent implements OnInit, OnDestroy {
   public drawer: MatSidenav;
   public menu: MenuItem[] = MENU_ITEMS;
   public isMenuOpen = false;
-  public contentMargin = 60;
   public themeSelectorEnabled: boolean;
   public scopeValue = 'All';
   public scopes: string[];
@@ -89,12 +88,6 @@ export class PagesComponent implements OnInit, OnDestroy {
 
   onDrawerToggle(): void {
     this.isMenuOpen = !this.isMenuOpen;
-    if (!this.isMenuOpen) {
-      this.contentMargin = 60;
-    }
-    else {
-      this.contentMargin = 240;
-    }
   }
 
   onThemeChange(): void {

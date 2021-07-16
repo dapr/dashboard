@@ -15,37 +15,40 @@
   </div>
 </mat-toolbar>
 
-<mat-sidenav-container class="sidenav-container">
-  <mat-sidenav #drawer class="sidenav" mode="side" [ngClass]="isMenuOpen ? 'menu-open' : 'menu-close'" opened>
+<mat-sidenav-container>
+  <mat-sidenav #drawer mode="side" [ngClass]="isMenuOpen ? 'menu-open' : 'menu-close'" opened>
     <mat-nav-list>
-      <mat-list-item (click)="onDrawerToggle()">
-        <mat-icon>{{ isMenuOpen? 'chevron_left' : 'chevron_right' }}</mat-icon>
-        <span class="navigation-item-label"></span>
-      </mat-list-item>
+      <a mat-list-item (click)="onDrawerToggle()">
+        <mat-icon matListIcon>{{ isMenuOpen? 'chevron_left' : 'chevron_right' }}</mat-icon>
+        <span mat-line></span>
+      </a>
       <ng-container *ngFor="let component of menu">
         <mat-divider></mat-divider>
-        <mat-list-item [routerLink]="component.link" routerLinkActive="active">
-          <mat-icon>{{ component.icon }}</mat-icon>
-          <span class="navigation-item-label">{{ component.title }}</span>
-        </mat-list-item>
+        <a mat-list-item [routerLink]="component.link" routerLinkActive="active">
+          <mat-icon matListIcon>{{ component.icon }}</mat-icon>
+          <span mat-line>{{ component.title }}</span>
+        </a>
       </ng-container>
 
       <span class="spacer"></span>
 
-      <mat-list-item (click)="openDialog()">
-        <mat-icon>info</mat-icon>
-        <span class="navigation-item-label">Info</span>
+      <a mat-list-item (click)="openDialog()">
+        <mat-icon matListIcon>info</mat-icon>
+        <span mat-line>Info</span>
+      </a>
 
-        <mat-divider *ngIf="globals.changesEnabledRoutes.includes(router.url)"></mat-divider>
-      </mat-list-item>
-      <mat-list-item *ngIf="globals.changesEnabledRoutes.includes(router.url)" (click)="onThemeChange()">
-        <mat-icon>{{ isLightMode() ? 'nights_stay' : 'wb_sunny' }}</mat-icon>
-        <span class="navigation-item-label">{{ isLightMode() ? 'Dark Theme' : 'Light Theme' }}</span>
-      </mat-list-item>
+      <ng-container *ngIf="globals.changesEnabledRoutes.includes(router.url)" >
+        <mat-divider></mat-divider>
+        <a mat-list-item (click)="onThemeChange()">
+          <mat-icon matListIcon>{{ isLightMode() ? 'nights_stay' : 'wb_sunny' }}</mat-icon>
+          <span mat-line>{{ isLightMode() ? 'Dark Theme' : 'Light Theme' }}</span>
+        </a>
+      </ng-container>
+      
     </mat-nav-list>
   </mat-sidenav>
 
-  <mat-sidenav-content [ngStyle]="{ 'margin-left.px': contentMargin }">
+  <mat-sidenav-content>
     <router-outlet></router-outlet>
   </mat-sidenav-content>
 

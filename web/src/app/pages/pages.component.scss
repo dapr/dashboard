@@ -2,22 +2,15 @@
 @use '../theme/tables.scss';
 @use '../theme/cards.scss';
 
-.navigation-item:hover {
-  cursor: pointer;
-}
-
-.mat-elevation-z5 {
-  position: relative;
-  z-index: 2;
-}
-
-.sidenav-container {
-  height: calc(100% - 4rem);
+mat-icon {
+  color: #888888;
 }
 
 mat-toolbar {
   display: flex;
   height: 4rem;
+  position: relative;
+  z-index: 2;
   
   #logo {
     width: 4rem;
@@ -33,10 +26,19 @@ mat-toolbar {
 
 mat-sidenav {
   overflow: hidden;
+  position: initial;
 }
 
-.spacer {
-  flex: 1 1 auto;
+mat-sidenav-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  height: calc(100% - 4rem);
+}
+
+mat-sidenav-content {
+  width: 100%;
+  margin-left: 0 !important;
 }
 
 mat-nav-list {
@@ -47,18 +49,16 @@ mat-nav-list {
   overflow: hidden;
 }
 
-.sidenav.menu-close {
-  width: 60px;
+.menu-close {
+  min-width: 64px;
+  max-width: 64px;
 }
 
-.sidenav.menu-open {
-  width: 200px;
+.menu-open {
+  min-width: 224px;
+  max-width: 224px;
 }
 
-mat-icon {
-  color: #888888;
-}
-
-.navigation-item-label {
-  padding-left: 20px;
+.spacer {
+  flex: 1 1 auto;
 }
