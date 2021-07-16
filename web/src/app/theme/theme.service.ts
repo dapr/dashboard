@@ -1,6 +1,6 @@
 import { Injectable, EventEmitter } from '@angular/core';
 
-const STORAGE_THEME_KEY = "preferred_dashboard_theme";
+const STORAGE_THEME_KEY = 'preferred_dashboard_theme';
 
 @Injectable({
     providedIn: 'root'

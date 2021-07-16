@@ -120,7 +120,7 @@ export class PagesComponent implements OnInit, OnDestroy {
   }
 
   isLightMode(): boolean {
-    return this.componentCssClass === "dashboard-light-theme";
+    return this.componentCssClass === 'dashboard-light-theme';
   }
 }
 
