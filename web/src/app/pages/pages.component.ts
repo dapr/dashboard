@@ -46,7 +46,7 @@ export class PagesComponent implements OnInit, OnDestroy {
     this.getVersion();
     this.getFeatures();
     this.getScopes();
-    this.componentCssClass = this.themeService.getTheme();
+    this.applyTheme();
 
     this.intervalHandler = setInterval(() => {
       this.getScopes();
@@ -92,6 +92,10 @@ export class PagesComponent implements OnInit, OnDestroy {
 
   onThemeChange(): void {
     this.themeService.changeTheme();
+    this.applyTheme();
+  }
+
+  private applyTheme(): void {
     this.componentCssClass = this.themeService.getTheme();
     this.themeService.getThemes().forEach(theme => {
       this.overlayContainer.getContainerElement().classList.remove(theme);
