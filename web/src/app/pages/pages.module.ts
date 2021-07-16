@@ -43,5 +43,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     PagesComponent,
     AboutDialogComponent
   ],
+  entryComponents: [
+    AboutDialogComponent
+  ]
 })
 export class PagesModule { }

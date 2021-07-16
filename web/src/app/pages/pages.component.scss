@@ -2,14 +2,6 @@
 @use '../theme/tables.scss';
 @use '../theme/cards.scss';
 
-.pages-header {
-  height: 5%;
-}
-
-.mat-toolbar {
-  min-height: 4rem;
-}
-
 #imgWrapper {
   height: 100%;
   width: 4rem;
@@ -38,14 +30,32 @@
 }
 
 .sidenav-container {
-  height: 85%;
+  height: calc(100% - 4rem);
+}
+
+mat-toolbar {
+  display: flex;
+  height: 4rem;
+
+  #scopeFormField {
+    padding: 0px 0 9px 0;
+    height: 16px;
+    font-size: 1rem;
+  }
 }
 
 mat-sidenav {
   overflow: hidden;
 }
 
+.spacer {
+  flex: 1 1 auto;
+}
+
 mat-nav-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   padding: 0;
   overflow: hidden;
 }
@@ -64,29 +74,4 @@ mat-icon {
 
 .navigation-item-label {
   padding-left: 20px;
-}
-
-#theme-selector {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-}
-
-#info-dialog {
-  position: absolute;
-  bottom: 48px;
-  left: 0;
-}
-
-#scopeContainer {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 200px;
-  height: 100%;
-}
-
-#scopeFormField {
-  position: absolute;
-  bottom: 0rem;
 }

@@ -1,8 +1,11 @@
-<mat-toolbar class="pages-header mat-elevation-z5">
+<mat-toolbar class="mat-elevation-z5">
   <div id="imgWrapper">
     <img [src]="imgPath" id="header-image">
   </div>
   <h1 class="app-header">Dashboard</h1>
+
+  <span class="spacer"></span>
+
   <div id="scopeContainer" *ngIf="globals.changesEnabledRoutes.includes(router.url)">
     <mat-form-field id="scopeFormField">
       <mat-select (selectionChange)="onScopeChange()" [(ngModel)]="scopeValue" name="scope" placeholder="Scope">
@@ -13,6 +16,7 @@
     </mat-form-field>
   </div>
 </mat-toolbar>
+
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #drawer class="sidenav" mode="side" [class.menu-open]="isMenuOpen" [class.menu-close]="!isMenuOpen"
     opened>
@@ -28,15 +32,19 @@
             class="navigation-item-label">{{ component.title }}</span>
         </a>
       </ng-container>
+
+      <span class="spacer"></span>
+
       <a id="info-dialog" class="navigation-item" mat-list-item (click)="openDialog()">
-        <mat-icon>info</mat-icon>
+        <mat-icon class="material-icons">info</mat-icon>
+        <span class="navigation-item-label">Info</span>
         <mat-divider class="navigation-divider"></mat-divider>
       </a>
       <mat-divider class="navigation-divider"></mat-divider>
       <a fxLayout="row" fxLayoutAlign="space-around end" id="theme-selector" *ngIf="globals.changesEnabledRoutes.includes(router.url)" class="navigation-item"
         mat-list-item (click)="onThemeChange()">
-        <mat-icon class="material-icons">{{ isLightMode ? 'nights_stay' : 'wb_sunny' }}</mat-icon><span
-          class="navigation-item-label">{{ isLightMode ? 'Dark Theme' : 'Light Theme' }}</span>
+        <mat-icon class="material-icons">{{ isLightMode ? 'nights_stay' : 'wb_sunny' }}</mat-icon>
+        <span class="navigation-item-label">{{ isLightMode ? 'Dark Theme' : 'Light Theme' }}</span>
       </a>
     </mat-nav-list>
   </mat-sidenav>
