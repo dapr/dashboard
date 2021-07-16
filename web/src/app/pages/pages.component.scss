@@ -2,24 +2,6 @@
 @use '../theme/tables.scss';
 @use '../theme/cards.scss';
 
-#imgWrapper {
-  height: 100%;
-  width: 4rem;
-  text-align: center;
-  position: relative;
-  display: inline-block;
-  overflow: hidden;
-}
-
-#header-image {
-  height: 100%;
-  padding-left: 2rem;
-  position: absolute;
-  top: 50%;
-  left: 20%;
-  transform: translate(-50%, -50%);
-}
-
 .navigation-item:hover {
   cursor: pointer;
 }
@@ -36,6 +18,11 @@
 mat-toolbar {
   display: flex;
   height: 4rem;
+  
+  #logo {
+    width: 4rem;
+    padding-right: 0.5rem;
+  }
 
   #scopeFormField {
     padding: 0px 0 9px 0;
