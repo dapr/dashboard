@@ -26,8 +26,6 @@ export class PagesComponent implements OnInit, OnDestroy {
   public menu: MenuItem[] = MENU_ITEMS;
   public isMenuOpen = false;
   public contentMargin = 60;
-  public isLightMode = true;
-  public imgPath: string;
   public themeSelectorEnabled: boolean;
   public scopeValue = 'All';
   public scopes: string[];
@@ -50,7 +48,6 @@ export class PagesComponent implements OnInit, OnDestroy {
     this.getFeatures();
     this.getScopes();
     this.componentCssClass = this.themeService.getTheme();
-    this.imgPath = '../../assets/images/logo.svg';
 
     this.intervalHandler = setInterval(() => {
       this.getScopes();
@@ -103,16 +100,10 @@ export class PagesComponent implements OnInit, OnDestroy {
   onThemeChange(): void {
     this.themeService.changeTheme();
     this.componentCssClass = this.themeService.getTheme();
-    this.isLightMode = !this.isLightMode;
     this.themeService.getThemes().forEach(theme => {
       this.overlayContainer.getContainerElement().classList.remove(theme);
     });
     this.overlayContainer.getContainerElement().classList.add(this.themeService.getTheme());
-    if (this.isLightMode) {
-      this.imgPath = '../../assets/images/logo.svg';
-    } else {
-      this.imgPath = '../../assets/images/logo-white.svg';
-    }
   }
 
   onScopeChange(): void {
@@ -127,6 +118,10 @@ export class PagesComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+  isLightMode(): boolean {
+    return this.componentCssClass === "dashboard-light-theme";
+  }
 }
 
 @Component({
@@ -134,5 +129,5 @@ export class PagesComponent implements OnInit, OnDestroy {
   templateUrl: 'dialog-template.html',
 })
 export class AboutDialogComponent {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) {}
+  constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) { }
 }
