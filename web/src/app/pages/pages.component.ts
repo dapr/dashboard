@@ -1,13 +1,14 @@
-import { Component, ViewChild, OnInit, HostBinding, OnDestroy, Inject } from '@angular/core';
-import { MenuItem, MENU_ITEMS, COMPONENTS_MENU_ITEM, CONFIGURATIONS_MENU_ITEM, CONTROLPLANE_MENU_ITEM } from './pages-menu';
-import { FeaturesService } from 'src/app/features/features.service';
+import { OverlayContainer } from '@angular/cdk/overlay';
+import { Component, ElementRef, HostBinding, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
+import { Router } from '@angular/router';
+import { FeaturesService } from 'src/app/features/features.service';
 import { GlobalsService } from 'src/app/globals/globals.service';
 import { ThemeService } from 'src/app/theme/theme.service';
-import { OverlayContainer } from '@angular/cdk/overlay';
-import { Router } from '@angular/router';
+import { VERSION } from '../../environments/version';
 import { ScopesService } from '../scopes/scopes.service';
-import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { COMPONENTS_MENU_ITEM, CONFIGURATIONS_MENU_ITEM, CONTROLPLANE_MENU_ITEM, MenuItem, MENU_ITEMS } from './pages-menu';
 
 export interface DialogData {
   version: string;
@@ -112,7 +113,7 @@ export class PagesComponent implements OnInit, OnDestroy {
     this.dialog.open(AboutDialogComponent, {
       data: {
         version: this.version
-      }
+      } as DialogData
     });
   }
 
@@ -126,5 +127,13 @@ export class PagesComponent implements OnInit, OnDestroy {
   templateUrl: 'dialog-template.html',
 })
 export class AboutDialogComponent {
+  @ViewChild('info', { static: true }) public info: ElementRef;
+  public version = VERSION;
+
   constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) { }
+
+  copyInfo() {
+    const data = this.info.nativeElement?.innerText || '';
+    navigator.clipboard.writeText(data.replace('\n\n', '\n'));
+  }
 }

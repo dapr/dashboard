@@ -1,4 +1,16 @@
 <h1 mat-dialog-title>About</h1>
-<div mat-dialog-content>
-  Version: <strong>{{ data.version }}</strong>
-</div>
+<mat-dialog-content #info>
+  <p>
+    Dapr version: <strong>{{ data.version }}</strong>
+  </p>
+
+  <p>
+    Dapr Dashboard: <strong>{{ version.version }}</strong> (<i>{{ version.hash }}</i>)
+  </p>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Close</button>
+  <button mat-button mat-dialog-close cdkFocusInitial (click)="copyInfo()">Copy info</button>
+</mat-dialog-actions>
