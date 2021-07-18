@@ -35,5 +35,9 @@ export class ThemeService {
 
         localStorage.setItem(STORAGE_THEME_KEY, `${this.themeIndex}`);
     }
+
+    isDarkTheme() {
+        return this.getTheme().includes('dark');
+    }
 }
 
