@@ -94,8 +94,8 @@
     </mat-card>
   </mat-tab>
   <mat-tab *ngIf="platform === 'kubernetes'" label="Configuration">
-    <mat-card class="card-large mat-elevation-z8">
-      <pre style="font-family: Consolas, 'Courier New', monospace;"><code ngCodeColorize="yaml">{{ model }}</code></pre>
+    <mat-card class="card-large mat-elevation-z8" [ngStyle]="{ 'background-color': isDarkTheme() ? '#1e1e1e' : '' }">
+      <app-editor [(model)]="model"></app-editor>
     </mat-card>
   </mat-tab>
   <mat-tab label="Actors">

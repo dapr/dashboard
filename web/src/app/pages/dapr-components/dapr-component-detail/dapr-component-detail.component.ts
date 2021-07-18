@@ -4,7 +4,6 @@ import { ComponentsService } from 'src/app/components/components.service';
 import { ActivatedRoute } from '@angular/router';
 import * as yaml from 'js-yaml';
 import { ThemeService } from 'src/app/theme/theme.service';
-import { YamlViewerOptions } from 'src/app/types/types';
 
 @Component({
   selector: 'app-dapr-component-detail',
@@ -16,7 +15,6 @@ export class DaprComponentDetailComponent implements OnInit {
   private name: string;
   public component: any;
   public componentManifest: string;
-  public options: YamlViewerOptions;
   public loadedComponent: boolean;
 
   constructor(
@@ -28,19 +26,6 @@ export class DaprComponentDetailComponent implements OnInit {
   ngOnInit(): void {
     this.name = this.route.snapshot.params.name;
     this.getComponent(this.name);
-    this.options = {
-      folding: true,
-      minimap: { enabled: true },
-      readOnly: false,
-      language: 'yaml',
-      theme: this.themeService.getTheme().includes('dark') ? 'vs-dark' : 'vs',
-    };
-    this.themeService.themeChanged.subscribe((newTheme: string) => {
-      this.options = {
-        ...this.options,
-        theme: newTheme.includes('dark') ? 'vs-dark' : 'vs',
-      };
-    });
   }
 
   getComponent(name: string): void {
@@ -49,5 +34,9 @@ export class DaprComponentDetailComponent implements OnInit {
       this.componentManifest = (typeof data.manifest === 'string') ? data.manifest : yaml.safeDump(data.manifest);
       this.loadedComponent = true;
     });
+  }
+
+  isDarkTheme(){
+    return this.themeService.isDarkTheme();
   }
 }

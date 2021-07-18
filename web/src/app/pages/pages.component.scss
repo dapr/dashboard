@@ -2,91 +2,63 @@
 @use '../theme/tables.scss';
 @use '../theme/cards.scss';
 
-.pages-header {
-  height: 5%;
-}
-
-.mat-toolbar {
-  min-height: 4rem;
-}
-
-#imgWrapper {
-  height: 100%;
-  width: 4rem;
-  text-align: center;
-  position: relative;
-  display: inline-block;
-  overflow: hidden;
-}
-
-#header-image {
-  height: 100%;
-  padding-left: 2rem;
-  position: absolute;
-  top: 50%;
-  left: 20%;
-  transform: translate(-50%, -50%);
-}
-
-.navigation-item:hover {
-  cursor: pointer;
-}
-
-.mat-elevation-z5 {
-  position: relative;
-  z-index: 2;
-}
-
-.sidenav-container {
-  height: 85%;
-}
-
-mat-sidenav {
-  overflow: hidden;
-}
-
-mat-nav-list {
-  padding: 0;
-  overflow: hidden;
-}
-
-.sidenav.menu-close {
-  width: 60px;
-}
-
-.sidenav.menu-open {
-  width: 200px;
-}
-
 mat-icon {
   color: #888888;
 }
 
-.navigation-item-label {
-  padding-left: 20px;
+mat-toolbar {
+  display: flex;
+  height: 4rem;
+  position: relative;
+  z-index: 2;
+  
+  #logo {
+    width: 4rem;
+    padding-right: 0.5rem;
+  }
+
+  #scopeFormField {
+    padding: 0px 0 9px 0;
+    height: 16px;
+    font-size: 1rem;
+  }
 }
 
-#theme-selector {
-  position: absolute;
-  bottom: 0;
-  left: 0;
+mat-sidenav {
+  overflow: hidden;
+  position: initial;
 }
 
-#info-dialog {
-  position: absolute;
-  bottom: 48px;
-  left: 0;
+mat-sidenav-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  height: calc(100% - 4rem);
 }
 
-#scopeContainer {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 200px;
+mat-sidenav-content {
+  width: 100%;
+  margin-left: 0 !important;
+}
+
+mat-nav-list {
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  padding: 0;
+  overflow: hidden;
 }
 
-#scopeFormField {
-  position: absolute;
-  bottom: 0rem;
+.menu-close {
+  min-width: 64px;
+  max-width: 64px;
+}
+
+.menu-open {
+  min-width: 224px;
+  max-width: 224px;
+}
+
+.spacer {
+  flex: 1 1 auto;
 }
