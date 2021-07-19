@@ -3,12 +3,16 @@
 @use '../theme/cards.scss';
 
 .pages-header {
-  height: 15%;
+  height: 5%;
+}
+
+.mat-toolbar {
+  min-height: 4rem;
 }
 
 #imgWrapper {
   height: 100%;
-  width: 15%;
+  width: 4rem;
   text-align: center;
   position: relative;
   display: inline-block;
@@ -16,11 +20,11 @@
 }
 
 #header-image {
-  height: 150%;
-  width: auto;
+  height: 100%;
+  padding-left: 2rem;
   position: absolute;
   top: 50%;
-  left: 50%;
+  left: 20%;
   transform: translate(-50%, -50%);
 }
 
@@ -84,5 +88,5 @@ mat-icon {
 
 #scopeFormField {
   position: absolute;
-  bottom: 0px;
+  bottom: 0rem;
 }
