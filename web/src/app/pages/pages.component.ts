@@ -125,6 +125,15 @@ export class PagesComponent implements OnInit, OnDestroy {
 @Component({
   selector: 'app-about-dialog',
   templateUrl: 'dialog-template.html',
+  styles: [`
+    td button {
+      visibility: hidden;
+    }
+
+    td:hover button {
+      visibility: initial;
+    }
+  `]
 })
 export class AboutDialogComponent {
   @ViewChild('info', { static: true }) public info: ElementRef;
@@ -132,8 +141,8 @@ export class AboutDialogComponent {
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) { }
 
-  copyInfo() {
-    const data = this.info.nativeElement?.innerText || '';
-    navigator.clipboard.writeText(data.replace('\n\n', '\n'));
+  copyInfo(data?: string) {
+    const result = data || this.info.nativeElement?.innerText?.replace(/( )*content_copy( )*/g, '') || '';
+    navigator.clipboard.writeText(result.replace(/\n\n/g, '\n'));
   }
 }
