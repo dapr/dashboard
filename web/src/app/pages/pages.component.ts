@@ -1,13 +1,14 @@
-import { Component, ViewChild, OnInit, HostBinding, OnDestroy, Inject } from '@angular/core';
-import { MenuItem, MENU_ITEMS, COMPONENTS_MENU_ITEM, CONFIGURATIONS_MENU_ITEM, CONTROLPLANE_MENU_ITEM } from './pages-menu';
-import { FeaturesService } from 'src/app/features/features.service';
+import { OverlayContainer } from '@angular/cdk/overlay';
+import { Component, ElementRef, HostBinding, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
+import { Router } from '@angular/router';
+import { FeaturesService } from 'src/app/features/features.service';
 import { GlobalsService } from 'src/app/globals/globals.service';
 import { ThemeService } from 'src/app/theme/theme.service';
-import { OverlayContainer } from '@angular/cdk/overlay';
-import { Router } from '@angular/router';
+import { VERSION } from '../../environments/version';
 import { ScopesService } from '../scopes/scopes.service';
-import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { COMPONENTS_MENU_ITEM, CONFIGURATIONS_MENU_ITEM, CONTROLPLANE_MENU_ITEM, MenuItem, MENU_ITEMS } from './pages-menu';
 
 export interface DialogData {
   version: string;
@@ -25,9 +26,6 @@ export class PagesComponent implements OnInit, OnDestroy {
   public drawer: MatSidenav;
   public menu: MenuItem[] = MENU_ITEMS;
   public isMenuOpen = false;
-  public contentMargin = 60;
-  public isLightMode = true;
-  public imgPath: string;
   public themeSelectorEnabled: boolean;
   public scopeValue = 'All';
   public scopes: string[];
@@ -49,8 +47,7 @@ export class PagesComponent implements OnInit, OnDestroy {
     this.getVersion();
     this.getFeatures();
     this.getScopes();
-    this.componentCssClass = this.themeService.getTheme();
-    this.imgPath = '../../assets/images/logo.svg';
+    this.applyTheme();
 
     this.intervalHandler = setInterval(() => {
       this.getScopes();
@@ -92,27 +89,19 @@ export class PagesComponent implements OnInit, OnDestroy {
 
   onDrawerToggle(): void {
     this.isMenuOpen = !this.isMenuOpen;
-    if (!this.isMenuOpen) {
-      this.contentMargin = 60;
-    }
-    else {
-      this.contentMargin = 240;
-    }
   }
 
   onThemeChange(): void {
     this.themeService.changeTheme();
+    this.applyTheme();
+  }
+
+  private applyTheme(): void {
     this.componentCssClass = this.themeService.getTheme();
-    this.isLightMode = !this.isLightMode;
     this.themeService.getThemes().forEach(theme => {
       this.overlayContainer.getContainerElement().classList.remove(theme);
     });
     this.overlayContainer.getContainerElement().classList.add(this.themeService.getTheme());
-    if (this.isLightMode) {
-      this.imgPath = '../../assets/images/logo.svg';
-    } else {
-      this.imgPath = '../../assets/images/logo-white.svg';
-    }
   }
 
   onScopeChange(): void {
@@ -124,15 +113,36 @@ export class PagesComponent implements OnInit, OnDestroy {
     this.dialog.open(AboutDialogComponent, {
       data: {
         version: this.version
-      }
+      } as DialogData
     });
+  }
+
+  isLightMode(): boolean {
+    return this.componentCssClass === 'dashboard-light-theme';
   }
 }
 
 @Component({
   selector: 'app-about-dialog',
   templateUrl: 'dialog-template.html',
+  styles: [`
+    td button {
+      visibility: hidden;
+    }
+
+    td:hover button {
+      visibility: initial;
+    }
+  `]
 })
 export class AboutDialogComponent {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) {}
+  @ViewChild('info', { static: true }) public info: ElementRef;
+  public version = VERSION;
+
+  constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) { }
+
+  copyInfo(data?: string) {
+    const result = data || this.info.nativeElement?.innerText?.replace(/( )*content_copy( )*/g, '') || '';
+    navigator.clipboard.writeText(result.replace(/\n\n/g, '\n'));
+  }
 }
