@@ -1,3 +1,6 @@
+# Auto generated after a successful npm install
+web/src/environments/version.ts
+
 release/
 node_modules/
 web/npm-debug.log

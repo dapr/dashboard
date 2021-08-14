@@ -1,4 +1,35 @@
 <h1 mat-dialog-title>About</h1>
-<div mat-dialog-content>
-  Version: <strong>{{ data.version }}</strong>
-</div>
+<mat-dialog-content #info>
+
+  <table>
+    <tr>
+      <td>
+        Dapr version
+      </td>
+      <td>
+        : <strong>{{ data.version }}</strong>
+        <button mat-icon-button aria-label="Copy" (click)="copyInfo(data.version)">
+          <mat-icon>content_copy</mat-icon>
+        </button>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        Dapr Dashboard
+      </td>
+      <td>
+        : <strong>{{ version.version }}</strong> (<i>{{ version.hash }}</i>)
+        <button mat-icon-button aria-label="Copy" (click)="copyInfo(version.version + ' (' + version.hash + ')')">
+          <mat-icon>content_copy</mat-icon>
+        </button>
+      </td>
+    </tr>
+  </table>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Close</button>
+  <button mat-button mat-dialog-close cdkFocusInitial (click)="copyInfo()">Copy all</button>
+</mat-dialog-actions>

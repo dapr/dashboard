@@ -1,9 +1,10 @@
-<mat-toolbar class="pages-header mat-elevation-z5">
-  <div id="imgWrapper">
-    <img [src]="imgPath" id="header-image">
-  </div>
+<mat-toolbar class="mat-elevation-z5">
+  <img [src]="isLightMode() ? '/assets/images/logo.svg' : '/assets/images/logo-white.svg'" id="logo">
   <h1 class="app-header">Dashboard</h1>
-  <div id="scopeContainer" *ngIf="globals.changesEnabledRoutes.includes(router.url)">
+
+  <span class="spacer"></span>
+
+  <div *ngIf="globals.changesEnabledRoutes.includes(router.url)">
     <mat-form-field id="scopeFormField">
       <mat-select (selectionChange)="onScopeChange()" [(ngModel)]="scopeValue" name="scope" placeholder="Scope">
         <mat-option *ngFor="let scope of scopes" [value]="scope">
@@ -13,34 +14,42 @@
     </mat-form-field>
   </div>
 </mat-toolbar>
-<mat-sidenav-container class="sidenav-container">
-  <mat-sidenav #drawer class="sidenav" mode="side" [class.menu-open]="isMenuOpen" [class.menu-close]="!isMenuOpen"
-    opened>
-    <mat-nav-list class="navigation-list">
-      <a class="navigation-item" mat-list-item (click)="onDrawerToggle()">
-        <mat-icon class="material-icons">{{ isMenuOpen? 'chevron_left' : 'chevron_right' }}</mat-icon><span
-          class="navigation-item-label"></span>
+
+<mat-sidenav-container>
+  <mat-sidenav #drawer mode="side" [ngClass]="isMenuOpen ? 'menu-open' : 'menu-close'" opened>
+    <mat-nav-list>
+      <a mat-list-item (click)="onDrawerToggle()">
+        <mat-icon matListIcon>{{ isMenuOpen? 'chevron_left' : 'chevron_right' }}</mat-icon>
+        <span mat-line></span>
       </a>
       <ng-container *ngFor="let component of menu">
-        <mat-divider class="navigation-divider"></mat-divider>
-        <a class="navigation-item" mat-list-item [routerLink]="component.link" routerLinkActive="active">
-          <mat-icon class="material-icons">{{ component.icon }}</mat-icon><span
-            class="navigation-item-label">{{ component.title }}</span>
+        <mat-divider></mat-divider>
+        <a mat-list-item [routerLink]="component.link" routerLinkActive="active">
+          <mat-icon matListIcon>{{ component.icon }}</mat-icon>
+          <span mat-line>{{ component.title }}</span>
         </a>
       </ng-container>
-      <a id="info-dialog" class="navigation-item" mat-list-item (click)="openDialog()">
-        <mat-icon>info</mat-icon>
-        <mat-divider class="navigation-divider"></mat-divider>
+
+      <span class="spacer"></span>
+
+      <a mat-list-item (click)="openDialog()">
+        <mat-icon matListIcon>info</mat-icon>
+        <span mat-line>About</span>
       </a>
-      <mat-divider class="navigation-divider"></mat-divider>
-      <a fxLayout="row" fxLayoutAlign="space-around end" id="theme-selector" *ngIf="globals.changesEnabledRoutes.includes(router.url)" class="navigation-item"
-        mat-list-item (click)="onThemeChange()">
-        <mat-icon class="material-icons">{{ isLightMode ? 'nights_stay' : 'wb_sunny' }}</mat-icon><span
-          class="navigation-item-label">{{ isLightMode ? 'Dark Theme' : 'Light Theme' }}</span>
-      </a>
+
+      <ng-container *ngIf="globals.changesEnabledRoutes.includes(router.url)" >
+        <mat-divider></mat-divider>
+        <a mat-list-item (click)="onThemeChange()">
+          <mat-icon matListIcon>{{ isLightMode() ? 'nights_stay' : 'wb_sunny' }}</mat-icon>
+          <span mat-line>{{ isLightMode() ? 'Dark Theme' : 'Light Theme' }}</span>
+        </a>
+      </ng-container>
+      
     </mat-nav-list>
   </mat-sidenav>
-  <mat-sidenav-content [ngStyle]="{ 'margin-left.px': contentMargin }">
+
+  <mat-sidenav-content>
     <router-outlet></router-outlet>
   </mat-sidenav-content>
+
 </mat-sidenav-container>

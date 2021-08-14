@@ -5,7 +5,6 @@ import * as yaml from 'js-yaml';
 import { GlobalsService } from 'src/app/globals/globals.service';
 import { Metadata, Instance } from 'src/app/types/types';
 import { ThemeService } from 'src/app/theme/theme.service';
-import { YamlViewerOptions } from 'src/app/types/types';
 
 @Component({
   selector: 'app-detail',
@@ -23,7 +22,6 @@ export class DetailComponent implements OnInit, OnDestroy {
   public loadedInstance: boolean;
   public loadedMetadata: boolean;
   public metadata: Metadata;
-  public options: YamlViewerOptions;
   public platform: string;
   private intervalHandler;
 
@@ -38,19 +36,6 @@ export class DetailComponent implements OnInit, OnDestroy {
     this.id = this.route.snapshot.params.id;
     this.checkPlatform();
     this.loadData();
-    this.options = {
-      folding: true,
-      minimap: { enabled: true },
-      readOnly: false,
-      language: 'yaml',
-      theme: this.themeService.getTheme().includes('dark') ? 'vs-dark' : 'vs',
-    };
-    this.themeService.themeChanged.subscribe((newTheme: string) => {
-      this.options = {
-        ...this.options,
-        theme: newTheme.includes('dark') ? 'vs-dark' : 'vs',
-      };
-    });
 
     this.intervalHandler = setInterval(() => {
       this.getMetadata(this.id);
@@ -96,5 +81,9 @@ export class DetailComponent implements OnInit, OnDestroy {
     this.getConfiguration(this.id);
     this.getInstance(this.id);
     this.getMetadata(this.id);
+  }
+
+  isDarkTheme() {
+    return this.themeService.isDarkTheme();
   }
 }
