@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DetailComponent } from '../detail/detail.component';
-import { MonacoEditorModule } from 'ng-monaco-editor';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -21,11 +20,11 @@ import { TimeSincePipe } from './logs/pipes/timeSince.pipe';
 import { MatNativeDateModule } from '@angular/material/core';
 import { TimePipe } from './logs/pipes/time.pipe';
 import { ISODatePipe } from './logs/pipes/isoDate.pipe';
+import { SharedModule } from '../../../shared/shared.module';
 
 @NgModule({
   imports: [
     CommonModule,
-    MonacoEditorModule,
     FormsModule,
     MatTabsModule,
     MatCardModule,
@@ -37,6 +36,7 @@ import { ISODatePipe } from './logs/pipes/isoDate.pipe';
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    SharedModule
   ],
   declarations: [
     DetailComponent,

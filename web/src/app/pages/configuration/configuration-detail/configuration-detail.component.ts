@@ -4,7 +4,7 @@ import { ConfigurationsService } from 'src/app/configurations/configurations.ser
 import { ActivatedRoute } from '@angular/router';
 import * as yaml from 'js-yaml';
 import { ThemeService } from 'src/app/theme/theme.service';
-import { YamlViewerOptions, Instance } from 'src/app/types/types';
+import { Instance } from 'src/app/types/types';
 import { GlobalsService } from 'src/app/globals/globals.service';
 
 @Component({
@@ -17,7 +17,6 @@ export class ConfigurationDetailComponent implements OnInit {
   private name: string;
   public configuration: any;
   public configurationManifest: string;
-  public options: YamlViewerOptions;
   public loadedConfiguration: boolean;
   public loadedApps: boolean;
   public configurationApps: Instance[];
@@ -35,23 +34,10 @@ export class ConfigurationDetailComponent implements OnInit {
     this.checkPlatform();
     this.getConfiguration(this.name);
     this.getConfigurationApps(this.name);
-    this.options = {
-      folding: true,
-      minimap: { enabled: true },
-      readOnly: false,
-      language: 'yaml',
-      theme: this.themeService.getTheme().includes('dark') ? 'vs-dark' : 'vs',
-    };
-    this.themeService.themeChanged.subscribe((newTheme: string) => {
-      this.options = {
-        ...this.options,
-        theme: newTheme.includes('dark') ? 'vs-dark' : 'vs',
-      };
-    });
   }
 
   checkPlatform(): void {
-    this.globals.getPlatform().subscribe(platform => { this.platform = platform; } );
+    this.globals.getPlatform().subscribe(platform => { this.platform = platform; });
   }
 
   getConfiguration(name: string): void {
@@ -67,5 +53,9 @@ export class ConfigurationDetailComponent implements OnInit {
       this.configurationApps = data;
       this.loadedApps = true;
     });
+  }
+
+  isDarkTheme(): boolean {
+    return this.themeService.isDarkTheme();
   }
 }
