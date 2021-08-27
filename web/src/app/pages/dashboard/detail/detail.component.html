@@ -24,9 +24,9 @@
               <td class="table-label">Dapr gRPC Port</td>
               <td class="table-data">{{ instance.grpcPort }}</td>
             </tr>
-            <tr *ngIf="metadata && metadata.extended && metadata.extended.get('appCommand'); else noMetadataCommand">
+            <tr *ngIf="metadata && metadata.extended && metadata.extended['appCommand']; else noMetadataCommand">
               <td class="table-label">Command</td>
-              <td class="table-data">{{ metadata.extended.get('appCommand') }}</td>
+              <td class="table-data">{{ metadata.extended['appCommand'] }}</td>
             </tr>
             <ng-template #noMetadataCommand>
               <tr *ngIf="instance.command">
