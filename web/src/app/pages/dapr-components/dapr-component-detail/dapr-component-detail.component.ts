@@ -12,10 +12,10 @@ import { ThemeService } from 'src/app/theme/theme.service';
 })
 export class DaprComponentDetailComponent implements OnInit {
 
-  private name: string;
+  private name: string | undefined;
   public component: any;
-  public componentManifest: string;
-  public loadedComponent: boolean;
+  public componentManifest!: string;
+  public loadedComponent = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -25,7 +25,9 @@ export class DaprComponentDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.name = this.route.snapshot.params.name;
-    this.getComponent(this.name);
+    if (typeof this.name !== 'undefined') {
+      this.getComponent(this.name);
+    }
   }
 
   getComponent(name: string): void {

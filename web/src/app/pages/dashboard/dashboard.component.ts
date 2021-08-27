@@ -13,14 +13,14 @@ import { ScopesService } from 'src/app/scopes/scopes.service';
 
 export class DashboardComponent implements OnInit, OnDestroy {
 
-  public instances: Instance[];
+  public instances: Instance[] = [];
   public displayedColumns: string[] = [];
-  public daprHealthiness: string;
-  public daprVersion: string;
-  public tableLoaded: boolean;
-  public controlPlaneLoaded: boolean;
-  public platform: string;
-  private intervalHandler;
+  public daprHealthiness: 'Healthy' | 'Unhealthy' = 'Unhealthy';
+  public daprVersion = '';
+  public tableLoaded = false;
+  public controlPlaneLoaded = false;
+  public platform = '';
+  private intervalHandler: any;
 
   constructor(
     private instanceService: InstanceService,
@@ -67,9 +67,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   getControlPlaneData(): void {
     this.instanceService.getControlPlaneStatus().subscribe((data: Status[]) => {
-      this.daprHealthiness = data.every((service) => {
-        return service.healthy === 'True';
-      }) ? 'Healthy' : 'Unhealthy';
+      this.daprHealthiness = data.every((service) => service.healthy === 'True') ? 'Healthy' : 'Unhealthy';
       if (data.length === 0) {
         this.daprHealthiness = 'Unhealthy';
       }

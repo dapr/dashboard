@@ -8,10 +8,10 @@ import { YamlViewerOptions } from '../../types/types';
 })
 export class EditorComponent implements OnInit {
 
-  @Input() model: string;
+  @Input() model = '';
   @Output() modelChange = new EventEmitter<string>();
 
-  options: YamlViewerOptions;
+  options!: YamlViewerOptions;
 
   constructor(
     private themeService: ThemeService,

@@ -88,5 +88,5 @@ export interface YamlViewerOptions {
     theme: string;
     contextmenu?: boolean;
     scrollBeyondLastLine?: boolean;
-    lineNumbers?: boolean;
+    lineNumbers?: boolean | any;
 }

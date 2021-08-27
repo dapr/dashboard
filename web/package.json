@@ -71,6 +71,7 @@
   "build": {
     "appId": "com.daprio.dapr-dashboard"
   },
+  "sideEffects": false,
   "husky": {
     "hooks": {
       "pre-push": "ng lint"
