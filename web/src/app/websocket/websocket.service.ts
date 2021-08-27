@@ -45,8 +45,8 @@ export class WebsocketService {
           ws.send(JSON.stringify(data));
         }
       },
-      error: (err: any) => {},
-      complete: () => {}
+      error: (err: any) => { },
+      complete: () => { }
     };
     return new AnonymousSubject<MessageEvent>(observer, observable);
   }

@@ -16,6 +16,9 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "js-yaml"
+            ],
             "outputPath": "dist",
             "index": "src/index.html",
             "main": "src/main.ts",
