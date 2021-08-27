@@ -48,7 +48,7 @@
     "@angular/compiler-cli": "~12.2.3",
     "@types/jasmine": "^3.8.2",
     "@types/jasminewd2": "^2.0.10",
-    "@types/js-yaml": "^3.12.5",
+    "@types/js-yaml": "^4.0.3",
     "@types/node": "^12.11.1",
     "codelyzer": "^6.0.0",
     "electron": "^9.4.4",

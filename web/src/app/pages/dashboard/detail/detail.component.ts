@@ -52,7 +52,7 @@ export class DetailComponent implements OnInit, OnDestroy {
     this.instanceService.getDeploymentConfiguration(id).subscribe((data: string) => {
       this.model = data;
       try {
-        this.modelYAML = yaml.safeLoad(data);
+        this.modelYAML = yaml.load(data, { schema: yaml.FAILSAFE_SCHEMA });
         this.annotations = Object.keys(this.modelYAML.metadata.annotations);
         this.loadedConfiguration = true;
       } catch (e) {

@@ -45,7 +45,8 @@ export class ConfigurationDetailComponent implements OnInit {
   getConfiguration(name: string): void {
     this.configurationsService.getConfiguration(name).subscribe((data: DaprConfiguration) => {
       this.configuration = data;
-      this.configurationManifest = (typeof data.manifest === 'string') ? data.manifest : yaml.safeDump(data.manifest);
+      this.configurationManifest = (typeof data.manifest === 'string') ?
+        data.manifest : yaml.dump(data.manifest, { schema: yaml.FAILSAFE_SCHEMA });
       this.loadedConfiguration = true;
     });
   }

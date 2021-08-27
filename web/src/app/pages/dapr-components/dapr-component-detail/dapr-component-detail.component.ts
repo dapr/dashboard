@@ -33,12 +33,13 @@ export class DaprComponentDetailComponent implements OnInit {
   getComponent(name: string): void {
     this.componentsService.getComponent(name).subscribe((data: DaprComponent) => {
       this.component = data;
-      this.componentManifest = (typeof data.manifest === 'string') ? data.manifest : yaml.safeDump(data.manifest);
+      this.componentManifest = (typeof data.manifest === 'string') ?
+        data.manifest : yaml.dump(data.manifest, { schema: yaml.FAILSAFE_SCHEMA });
       this.loadedComponent = true;
     });
   }
 
-  isDarkTheme(){
+  isDarkTheme() {
     return this.themeService.isDarkTheme();
   }
 }
