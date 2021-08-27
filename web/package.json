@@ -17,7 +17,7 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "electron-postinstall": "electron-builder install-app-deps && ngcc",
-    "postinstall": "node scripts/version.js"
+    "postinstall": "node scripts/version.js && ngcc"
   },
   "dependencies": {
     "@angular/animations": "~12.2.3",
