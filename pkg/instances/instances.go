@@ -319,6 +319,7 @@ func (i *instances) GetControlPlaneStatus() []StatusOutput {
 // GetMetadata returns the result from the /v1.0/metadata endpoint
 func (i *instances) GetMetadata(scope string, id string) MetadataOutput {
 	url := ""
+	secondaryUrl := ""
 	if i.kubeClient != nil {
 		resp, err := i.kubeClient.AppsV1().Deployments(scope).List((meta_v1.ListOptions{}))
 		if err != nil || len(resp.Items) == 0 {
@@ -339,7 +340,8 @@ func (i *instances) GetMetadata(scope string, id string) MetadataOutput {
 
 					if len(pods.Items) > 0 {
 						p := pods.Items[0]
-						url = fmt.Sprintf("http://%v:%v/v1.0/metadata", p.Status.PodIP, 3500)
+						url = fmt.Sprintf("http://%v:%v/v1.0/metadata", p.Status.PodIP, 3501)
+						secondaryUrl = fmt.Sprintf("http://%v:%v/v1.0/metadata", p.Status.PodIP, 3500)
 					}
 				}
 			}
@@ -351,9 +353,13 @@ func (i *instances) GetMetadata(scope string, id string) MetadataOutput {
 	}
 	if url != "" {
 		resp, err := http.Get(url)
-		if err != nil {
+		if err != nil && secondaryUrl != "" {
 			log.Println(err)
-			return MetadataOutput{}
+			resp, err = http.Get(secondaryUrl)
+			if err != nil {
+				log.Println(err)
+				return MetadataOutput{}
+			}
 		}
 
 		defer resp.Body.Close()
