@@ -55,7 +55,6 @@
     "electron-builder": "^22.11.7",
     "fs-extra": "^10.0.0",
     "git-describe": "^4.1.0",
-    "husky": "^7.0.2",
     "jasmine-core": "^3.9.0",
     "jasmine-spec-reporter": "^7.0.0",
     "karma": "~6.3.4",
@@ -71,11 +70,5 @@
   },
   "build": {
     "appId": "com.daprio.dapr-dashboard"
-  },
-  "sideEffects": false,
-  "husky": {
-    "hooks": {
-      "pre-push": "ng lint"
-    }
   }
 }
