@@ -1,7 +1,7 @@
 # External Packages
 
 ## Angular Material
-[Angular Material v9](https://v9.material.angular.io/)
+[Angular Material v12](https://material.angular.io/)
 
 ## Kubernetes API
 [API Reference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/)

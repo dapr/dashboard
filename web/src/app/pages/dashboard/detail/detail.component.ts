@@ -13,17 +13,17 @@ import { ThemeService } from 'src/app/theme/theme.service';
 })
 export class DetailComponent implements OnInit, OnDestroy {
 
-  private id: string;
-  public model: string;
+  private id: string | undefined;
+  public model!: string;
   public modelYAML: any;
-  public annotations: string[];
-  public instance: Instance;
-  public loadedConfiguration: boolean;
-  public loadedInstance: boolean;
-  public loadedMetadata: boolean;
-  public metadata: Metadata;
-  public platform: string;
-  private intervalHandler;
+  public annotations: string[] = [];
+  public instance!: Instance;
+  public loadedConfiguration = false;
+  public loadedInstance = false;
+  public loadedMetadata = false;
+  public metadata!: Metadata;
+  public platform!: string;
+  private intervalHandler: any;
 
   constructor(
     private route: ActivatedRoute,
@@ -38,7 +38,9 @@ export class DetailComponent implements OnInit, OnDestroy {
     this.loadData();
 
     this.intervalHandler = setInterval(() => {
-      this.getMetadata(this.id);
+      if (this.id) {
+        this.getMetadata(this.id);
+      }
     }, 10000);
   }
 
@@ -50,7 +52,7 @@ export class DetailComponent implements OnInit, OnDestroy {
     this.instanceService.getDeploymentConfiguration(id).subscribe((data: string) => {
       this.model = data;
       try {
-        this.modelYAML = yaml.safeLoad(data);
+        this.modelYAML = yaml.load(data, { schema: yaml.FAILSAFE_SCHEMA });
         this.annotations = Object.keys(this.modelYAML.metadata.annotations);
         this.loadedConfiguration = true;
       } catch (e) {
@@ -78,9 +80,11 @@ export class DetailComponent implements OnInit, OnDestroy {
   }
 
   loadData(): void {
-    this.getConfiguration(this.id);
-    this.getInstance(this.id);
-    this.getMetadata(this.id);
+    if (typeof this.id !== 'undefined') {
+      this.getConfiguration(this.id);
+      this.getInstance(this.id);
+      this.getMetadata(this.id);
+    }
   }
 
   isDarkTheme() {

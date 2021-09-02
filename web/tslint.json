@@ -144,5 +144,6 @@
   },
   "rulesDirectory": [
     "codelyzer"
-  ]
+  ],
+  "no-any": true
 }

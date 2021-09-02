@@ -14,7 +14,7 @@ export class ThemeService {
     constructor() { }
 
     getTheme(): string {
-        const savedThemeItem = localStorage.getItem(STORAGE_THEME_KEY);
+        const savedThemeItem = localStorage.getItem(STORAGE_THEME_KEY) ?? '';
         const savedThemeIndex = parseInt(savedThemeItem, 10);
 
         if (!isNaN(savedThemeIndex) && savedThemeIndex < this.themes.length) {

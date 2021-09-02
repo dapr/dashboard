@@ -12,12 +12,12 @@ import { Log } from 'src/app/types/types';
 
 export class LogsComponent implements OnInit, OnDestroy {
 
-  public id: string;
-  public containers: string[];
+  public id = '';
+  public containers: string[] = [];
   public showFiltered = true;
   public filterValue = '';
   public containerValue = 'daprd';
-  public since: number;
+  public since!: number;
   public sinceUnit = '';
   public logs: Map<string, Log[]> = new Map();
 

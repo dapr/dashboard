@@ -11,10 +11,10 @@ import { GlobalsService } from 'src/app/globals/globals.service';
 })
 export class ConfigurationComponent implements OnInit, OnDestroy {
 
-  public config: DaprConfiguration[];
+  public config: DaprConfiguration[] = [];
   public displayedColumns: string[] = [];
-  public configurationsLoaded: boolean;
-  private intervalHandler;
+  public configurationsLoaded = false;
+  private intervalHandler: any;
 
   constructor(
     private configurationService: ConfigurationsService,

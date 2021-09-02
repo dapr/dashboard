@@ -21,8 +21,9 @@ import { OverlayContainer } from '@angular/cdk/overlay';
   ],
   providers: [
     {
-      provide: MonacoProviderService,
-    },
+    provide: MonacoProviderService,
+    useValue: undefined
+},
   ],
   bootstrap: [AppComponent],
 })

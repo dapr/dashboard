@@ -1,9 +1,9 @@
-@import "~@angular/material/theming";
+@use '~@angular/material' as mat;
 @import "./app/theme/tables-theme.scss";
 @import "./app/theme/pages-theme.scss";
 @import "./app/theme/cards-theme.scss";
 @import "./app/pages/pages-component-theme.scss";
-@include mat-core();
+@include mat.core();
 
 $dapr-primary-color: (
     900: #0d2192,
@@ -71,17 +71,17 @@ $dapr-accent-color: (
     )
 );
 
-$dashboard-light-primary: mat-palette($dapr-primary-color, 900);
-$dashboard-dark-primary: mat-palette($dapr-primary-color, 300);
-$dashboard-light-accent: mat-palette($dapr-accent-color, 400);
-$dashboard-dark-accent: mat-palette($dapr-accent-color, 900);
-$dashboard-warn: mat-palette($mat-red);
+$dashboard-light-primary: mat.define-palette($dapr-primary-color, 900);
+$dashboard-dark-primary: mat.define-palette($dapr-primary-color, 300);
+$dashboard-light-accent: mat.define-palette($dapr-accent-color, 400);
+$dashboard-dark-accent: mat.define-palette($dapr-accent-color, 900);
+$dashboard-warn: mat.define-palette(mat.$red-palette);
 
-$dashboard-light-theme: mat-light-theme($dashboard-light-primary, $dashboard-light-accent, $dashboard-warn);
-$dashboard-dark-theme: mat-dark-theme($dashboard-dark-primary, $dashboard-dark-accent, $dashboard-warn);
+$dashboard-light-theme: mat.define-light-theme($dashboard-light-primary, $dashboard-light-accent, $dashboard-warn);
+$dashboard-dark-theme: mat.define-dark-theme($dashboard-dark-primary, $dashboard-dark-accent, $dashboard-warn);
 
 .dashboard-light-theme {
-    @include angular-material-theme($dashboard-light-theme);
+    @include mat.all-component-themes($dashboard-light-theme);
     @include tables-theme($dashboard-light-theme);
     @include pages-theme($dashboard-light-theme);
     @include cards-theme($dashboard-light-theme);
@@ -89,15 +89,15 @@ $dashboard-dark-theme: mat-dark-theme($dashboard-dark-primary, $dashboard-dark-a
 }
   
 .dashboard-dark-theme {
-    @include angular-material-theme($dashboard-dark-theme);
+    @include mat.all-component-themes($dashboard-dark-theme);
     @include tables-theme($dashboard-dark-theme);
     @include pages-theme($dashboard-dark-theme);
     @include cards-theme($dashboard-dark-theme);
     @include pages-component-theme($dashboard-dark-theme);
 }
 
-$dashboard-typography: mat-typography-config(
+$dashboard-typography: mat.define-typography-config(
   $font-family: 'Open Sans, sans-serif'
 );
 
-@include angular-material-typography($dashboard-typography);
+@include mat.all-component-typographies($dashboard-typography);

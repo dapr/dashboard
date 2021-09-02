@@ -21,17 +21,16 @@ export interface DialogData {
 })
 export class PagesComponent implements OnInit, OnDestroy {
 
-  @HostBinding('class') public componentCssClass: string;
+  @HostBinding('class') public componentCssClass!: string;
   @ViewChild('drawer', { static: false })
-  public drawer: MatSidenav;
+  public drawer!: MatSidenav;
   public menu: MenuItem[] = MENU_ITEMS;
   public isMenuOpen = false;
-  public themeSelectorEnabled: boolean;
   public scopeValue = 'All';
-  public scopes: string[];
-  public version: string;
-  public versionLoaded: boolean;
-  private intervalHandler;
+  public scopes: string[] = [];
+  public version: string | undefined;
+  public versionLoaded = false;
+  private intervalHandler: any;
 
   constructor(
     private featuresService: FeaturesService,
@@ -136,7 +135,7 @@ export class PagesComponent implements OnInit, OnDestroy {
   `]
 })
 export class AboutDialogComponent {
-  @ViewChild('info', { static: true }) public info: ElementRef;
+  @ViewChild('info', { static: true }) public info!: ElementRef;
   public version = VERSION;
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) { }
