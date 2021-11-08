@@ -50,8 +50,6 @@ jobs:
             target_arch: arm
           - os: windows-latest
             target_arch: arm64
-          - os: macOS-latest
-            target_arch: arm64
     steps:
       - name: Setup node ${{ env.NODE_VERSION }} and npm
         uses: actions/setup-node@v1

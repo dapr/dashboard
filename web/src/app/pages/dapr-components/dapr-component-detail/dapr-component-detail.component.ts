@@ -34,7 +34,7 @@ export class DaprComponentDetailComponent implements OnInit {
     this.componentsService.getComponent(name).subscribe((data: DaprComponent) => {
       this.component = data;
       this.componentManifest = (typeof data.manifest === 'string') ?
-        data.manifest : yaml.dump(data.manifest, { schema: yaml.FAILSAFE_SCHEMA });
+        data.manifest : yaml.dump(data.manifest);
       this.loadedComponent = true;
     });
   }
