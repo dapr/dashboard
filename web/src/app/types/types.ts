@@ -35,7 +35,7 @@ export interface Status {
 export interface Metadata {
     id: string;
     actors: MetadataActors[];
-    extended: Map<string, any>;
+    extended: {[key: string]: any};
 }
 
 // MetadataActors represents actor metadata: type and count
@@ -88,5 +88,5 @@ export interface YamlViewerOptions {
     theme: string;
     contextmenu?: boolean;
     scrollBeyondLastLine?: boolean;
-    lineNumbers?: boolean;
+    lineNumbers?: boolean | any;
 }

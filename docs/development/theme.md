@@ -1,10 +1,10 @@
 # Theming
 
 ## Angular Material Components
-https://v9.material.angular.io/guide/theming
+https://material.angular.io/guide/theming
 
 ## Custom Components
-https://v9.material.angular.io/guide/theming-your-components
+https://material.angular.io/guide/theming-your-components
 
 ## Theme
 
@@ -28,14 +28,14 @@ Additionally in this file, class definitions for the themes are available:
  
 ```scss
 // tables-theme.scss
-@import "~@angular/material/theming";
+@use '~@angular/material' as mat;
 
 @mixin tables-theme($theme) {
     $primary: map-get($theme, primary);
     $accent: map-get($theme, accent);
 
     a {
-        color: mat-color($primary);
+        color: mat.get-color-from-palette($primary, 'text');
         text-decoration: none;
     }
 }

@@ -1,4 +1,4 @@
-@import "~@angular/material/theming";
+@use '~@angular/material' as mat;
 
 @mixin pages-theme($theme) {
     $primary: map-get($theme, primary);
@@ -6,7 +6,7 @@
 
     .page-subheader {
         font-size: 20px;
-        color: mat-color($accent, default-contrast);
+        color: mat.get-color-from-palette($accent, default-contrast);
         margin-left: 2%;
         margin-top: 20px;
         margin-bottom: 12px;
@@ -14,6 +14,6 @@
 
     .highlighted {
         color: white;
-        background: mat-color($primary);
+        background: mat.get-color-from-palette($primary);
     }
 }

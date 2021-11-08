@@ -14,13 +14,13 @@ import { GlobalsService } from 'src/app/globals/globals.service';
 })
 export class ConfigurationDetailComponent implements OnInit {
 
-  private name: string;
+  private name: string | undefined;
   public configuration: any;
-  public configurationManifest: string;
-  public loadedConfiguration: boolean;
-  public loadedApps: boolean;
-  public configurationApps: Instance[];
-  public platform: string;
+  public configurationManifest!: string;
+  public loadedConfiguration = false;
+  public loadedApps = false;
+  public configurationApps: Instance[] = [];
+  public platform!: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -32,8 +32,10 @@ export class ConfigurationDetailComponent implements OnInit {
   ngOnInit(): void {
     this.name = this.route.snapshot.params.name;
     this.checkPlatform();
-    this.getConfiguration(this.name);
-    this.getConfigurationApps(this.name);
+    if (typeof this.name !== 'undefined') {
+      this.getConfiguration(this.name);
+      this.getConfigurationApps(this.name);
+    }
   }
 
   checkPlatform(): void {
@@ -43,7 +45,8 @@ export class ConfigurationDetailComponent implements OnInit {
   getConfiguration(name: string): void {
     this.configurationsService.getConfiguration(name).subscribe((data: DaprConfiguration) => {
       this.configuration = data;
-      this.configurationManifest = (typeof data.manifest === 'string') ? data.manifest : yaml.safeDump(data.manifest);
+      this.configurationManifest = (typeof data.manifest === 'string') ?
+        data.manifest : yaml.dump(data.manifest);
       this.loadedConfiguration = true;
     });
   }

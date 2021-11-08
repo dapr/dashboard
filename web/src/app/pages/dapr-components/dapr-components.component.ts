@@ -10,10 +10,10 @@ import { DaprComponent } from 'src/app/types/types';
 })
 export class DaprComponentsComponent implements OnInit, OnDestroy {
 
-  public components: DaprComponent[];
-  public componentsLoaded: boolean;
+  public components: DaprComponent[] = [];
+  public componentsLoaded = false;
   public displayedColumns: string[] = ['img', 'name', 'status', 'age', 'created'];
-  private intervalHandler;
+  private intervalHandler: any;
 
   constructor(
     private componentsService: ComponentsService,

@@ -9,6 +9,6 @@ export class FeaturesService {
   constructor(private http: HttpClient) { }
 
   get() {
-    return this.http.get('/api/features');
+    return this.http.get<string[]>('/api/features');
   }
 }
