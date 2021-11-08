@@ -2,6 +2,7 @@ package instances
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -28,15 +29,14 @@ const (
 	daprPortAnnotation    = "dapr.io/port"
 )
 
-var (
-	controlPlaneLabels = [...]string{
-		"dapr-operator",
-		"dapr-sentry",
-		"dapr-placement",
-		"dapr-placement-server",
-		"dapr-sidecar-injector",
-		"dapr-dashboard"}
-)
+var controlPlaneLabels = [...]string{
+	"dapr-operator",
+	"dapr-sentry",
+	"dapr-placement",
+	"dapr-placement-server",
+	"dapr-sidecar-injector",
+	"dapr-dashboard",
+}
 
 // Instances is an interface to interact with running Dapr instances in Kubernetes or Standalone modes
 type Instances interface {
@@ -93,8 +93,9 @@ func (i *instances) CheckPlatform() string {
 
 // GetContainers returns a list of containers for an app.
 func (i *instances) GetContainers(scope string, id string) []string {
+	ctx := context.Background()
 	if i.kubeClient != nil {
-		resp, err := i.kubeClient.AppsV1().Deployments(scope).List((meta_v1.ListOptions{}))
+		resp, err := i.kubeClient.AppsV1().Deployments(scope).List(ctx, (meta_v1.ListOptions{}))
 		if err != nil || len(resp.Items) == 0 {
 			return nil
 		}
@@ -103,7 +104,7 @@ func (i *instances) GetContainers(scope string, id string) []string {
 			if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
 				daprID := d.Spec.Template.Annotations[daprIDAnnotation]
 				if daprID == id {
-					pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(meta_v1.ListOptions{
+					pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(ctx, meta_v1.ListOptions{
 						LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
 					})
 					if err != nil {
@@ -128,8 +129,9 @@ func (i *instances) GetContainers(scope string, id string) []string {
 
 // GetLogStream returns a stream of bytes from K8s logs
 func (i *instances) GetLogStream(scope, id, containerName string) (io.ReadCloser, error) {
+	ctx := context.Background()
 	if i.kubeClient != nil {
-		resp, err := i.kubeClient.AppsV1().Deployments(scope).List((meta_v1.ListOptions{}))
+		resp, err := i.kubeClient.AppsV1().Deployments(scope).List(ctx, (meta_v1.ListOptions{}))
 		if err != nil {
 			return nil, err
 		}
@@ -138,7 +140,7 @@ func (i *instances) GetLogStream(scope, id, containerName string) (io.ReadCloser
 			if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
 				daprID := d.Spec.Template.Annotations[daprIDAnnotation]
 				if daprID == id {
-					pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(meta_v1.ListOptions{
+					pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(ctx, meta_v1.ListOptions{
 						LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
 					})
 					if err != nil {
@@ -159,7 +161,7 @@ func (i *instances) GetLogStream(scope, id, containerName string) (io.ReadCloser
 								options.Follow = true
 
 								res := i.kubeClient.CoreV1().Pods(p.ObjectMeta.Namespace).GetLogs(name, &options)
-								return res.Stream()
+								return res.Stream(ctx)
 							}
 						}
 					}
@@ -172,8 +174,9 @@ func (i *instances) GetLogStream(scope, id, containerName string) (io.ReadCloser
 
 // GetDeploymentConfiguration returns the metadata of a Dapr application in YAML format
 func (i *instances) GetDeploymentConfiguration(scope string, id string) string {
+	ctx := context.Background()
 	if i.kubeClient != nil {
-		resp, err := i.kubeClient.AppsV1().Deployments(scope).List((meta_v1.ListOptions{}))
+		resp, err := i.kubeClient.AppsV1().Deployments(scope).List(ctx, (meta_v1.ListOptions{}))
 		if err != nil || len(resp.Items) == 0 {
 			return ""
 		}
@@ -182,7 +185,7 @@ func (i *instances) GetDeploymentConfiguration(scope string, id string) string {
 			if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
 				daprID := d.Spec.Template.Annotations[daprIDAnnotation]
 				if daprID == id {
-					pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(meta_v1.ListOptions{
+					pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(ctx, meta_v1.ListOptions{
 						LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
 					})
 					if err != nil {
@@ -203,7 +206,7 @@ func (i *instances) GetDeploymentConfiguration(scope string, id string) string {
 						}
 
 						url := fmt.Sprintf("/api/v1/namespaces/%s/pods/%s", nspace, name)
-						data, err := restClient.Get().RequestURI(url).Stream()
+						data, err := restClient.Get().RequestURI(url).Stream(ctx)
 						if err != nil {
 							log.Println(err)
 							return ""
@@ -251,6 +254,7 @@ func (i *instances) GetInstance(scope string, id string) Instance {
 
 // GetControlPlaneStatus lists the status of each of the Dapr control plane services
 func (i *instances) GetControlPlaneStatus() []StatusOutput {
+	ctx := context.Background()
 	if i.kubeClient != nil {
 		var wg sync.WaitGroup
 		wg.Add(len(controlPlaneLabels))
@@ -266,7 +270,7 @@ func (i *instances) GetControlPlaneStatus() []StatusOutput {
 				}
 				options.LabelSelector = labels.FormatLabels(labelSelector)
 
-				p, err := i.kubeClient.CoreV1().Pods(v1.NamespaceAll).List(options)
+				p, err := i.kubeClient.CoreV1().Pods(v1.NamespaceAll).List(ctx, options)
 				if err == nil {
 					for _, pod := range p.Items {
 						name := pod.Name
@@ -318,10 +322,11 @@ func (i *instances) GetControlPlaneStatus() []StatusOutput {
 
 // GetMetadata returns the result from the /v1.0/metadata endpoint
 func (i *instances) GetMetadata(scope string, id string) MetadataOutput {
+	ctx := context.Background()
 	url := ""
 	secondaryUrl := ""
 	if i.kubeClient != nil {
-		resp, err := i.kubeClient.AppsV1().Deployments(scope).List((meta_v1.ListOptions{}))
+		resp, err := i.kubeClient.AppsV1().Deployments(scope).List(ctx, (meta_v1.ListOptions{}))
 		if err != nil || len(resp.Items) == 0 {
 			return MetadataOutput{}
 		}
@@ -330,7 +335,7 @@ func (i *instances) GetMetadata(scope string, id string) MetadataOutput {
 			if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
 				daprID := d.Spec.Template.Annotations[daprIDAnnotation]
 				if daprID == id {
-					pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(meta_v1.ListOptions{
+					pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(ctx, meta_v1.ListOptions{
 						LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
 					})
 					if err != nil {
@@ -386,8 +391,9 @@ func (i *instances) GetInstances(scope string) []Instance {
 
 // getKubernetesInstances gets the list of Dapr applications running in the Kubernetes environment
 func (i *instances) getKubernetesInstances(scope string) []Instance {
+	ctx := context.Background()
 	list := []Instance{}
-	resp, err := i.kubeClient.AppsV1().Deployments(scope).List((meta_v1.ListOptions{}))
+	resp, err := i.kubeClient.AppsV1().Deployments(scope).List(ctx, (meta_v1.ListOptions{}))
 	if err != nil {
 		log.Println(err)
 		return list
@@ -468,8 +474,9 @@ func (i *instances) getStandaloneInstances(scope string) []Instance {
 }
 
 func (i *instances) getKubernetesScopes() []string {
+	ctx := context.Background()
 	scopes := []string{"All"}
-	namespaces, err := i.kubeClient.CoreV1().Namespaces().List(meta_v1.ListOptions{})
+	namespaces, err := i.kubeClient.CoreV1().Namespaces().List(ctx, meta_v1.ListOptions{})
 	if err != nil {
 		log.Println(err)
 		return scopes
