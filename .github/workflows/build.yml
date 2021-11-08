@@ -62,7 +62,7 @@ jobs:
         with:
           go-version: ${{ env.GOVER }}
       - name: Install golangci-lint
-        if: matrix.target_arch != 'arm' && matrix.target_os != 'windows'
+        if: matrix.target_arch != 'arm' && matrix.target_arch != 'arm64' && matrix.target_os != 'windows'
         run: |
           curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "${{ env.GOROOT }}/bin" v${{ env.GOLANGCILINT_VER }}
       - name: Check out code into the Go module directory
@@ -70,7 +70,7 @@ jobs:
       - name: Parse release version and set REL_VERSION
         run: python ./.github/scripts/get_release_version.py
       - name: Run make lint
-        if: matrix.target_arch != 'arm' && matrix.target_os != 'windows'
+        if: matrix.target_arch != 'arm' && matrix.target_arch != 'arm64' && matrix.target_os != 'windows'
         run: make lint
       - name: Run make test
         env:
@@ -145,6 +145,11 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: dashboard_darwin_amd64
+          path: ${{ env.ARTIFACTS_DIR }}
+      - name: download artifacts - dapr_darwin_arm64
+        uses: actions/download-artifact@master
+        with:
+          name: dashboard_darwin_arm64
           path: ${{ env.ARTIFACTS_DIR }}
       - name: generate checksum files
         run: cd ${ARTIFACTS_DIR} && for i in *; do sha256sum -b $i > "$i.sha256"; done && cd -
