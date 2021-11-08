@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -117,21 +118,34 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// get the volume of the absolute path and remove it
 	volume := filepath.VolumeName(path)
-	path = strings.Replace(path, volume, "", 1)
+	resourcePath := strings.Replace(path, volume, "", 1)
 
 	// prepend the path with the path to the static directory
-	path = filepath.Join(h.staticPath, path)
+	resourcePath = filepath.Join(h.staticPath, resourcePath)
+
+	baseHref, hasCustomBaseHref := os.LookupEnv("SERVER_BASE_HREF")
 
 	// check whether a file exists at the given path
-	_, err = os.Stat(path)
+	_, err = os.Stat(resourcePath)
 	if os.IsNotExist(err) {
 		// file does not exist, serve index.html
-		http.ServeFile(w, r, filepath.Join(h.staticPath, h.indexPath))
+
+		if hasCustomBaseHref {
+			generateIndexFile(w, r, baseHref)
+		} else {
+			http.ServeFile(w, r, filepath.Join(h.staticPath, h.indexPath))
+		}
+
 		return
 	} else if err != nil {
 		// if we got an error (that wasn't that the file doesn't exist) stating the
 		// file, return a 500 internal server error and stop
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if hasCustomBaseHref && (strings.HasSuffix(path, "index.html") || strings.HasSuffix(path, "/")) {
+		generateIndexFile(w, r, baseHref)
 		return
 	}
 
@@ -335,6 +349,19 @@ func getVersionHandler(w http.ResponseWriter, r *http.Request) {
 	respondWithPlainString(w, 200, resp)
 }
 
+func generateIndexFile(w http.ResponseWriter, r *http.Request, baseHref string) {
+	path, _ := os.Getwd()
+	buf, err := ioutil.ReadFile(filepath.Join(path, "/web/dist/index.html"))
+	if err != nil {
+		respondWithError(w, 500, err.Error())
+		return
+	}
+
+	file := string(buf)
+	file = strings.Replace(file, `<base href="/">`, fmt.Sprintf(`<base href="%s">`, baseHref), 1)
+	respondWithHtml(w, 200, file)
+}
+
 func respondWithError(w http.ResponseWriter, code int, message string) {
 	respondWithJSON(w, code, map[string]string{"error": message})
 }
@@ -354,6 +381,16 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	_, err := w.Write(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func respondWithHtml(w http.ResponseWriter, code int, payload string) {
+	w.Header().Set("Content-Type", "text/html")
+	w.WriteHeader(code)
+	_, err := w.Write(([]byte(payload)))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

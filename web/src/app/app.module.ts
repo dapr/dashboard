@@ -1,11 +1,12 @@
+import { OverlayContainer } from '@angular/cdk/overlay';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
-import { AppComponent } from './app.component';
-import { AppRoutingModule } from './app-routing.module';
 import { MonacoEditorModule, MonacoProviderService } from 'ng-monaco-editor';
-import { OverlayContainer } from '@angular/cdk/overlay';
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { HttpInterceptorService } from './services/interceptor.service';
 
 @NgModule({
   declarations: [AppComponent],
@@ -20,10 +21,12 @@ import { OverlayContainer } from '@angular/cdk/overlay';
     }),
   ],
   providers: [
+    MonacoProviderService,
     {
-    provide: MonacoProviderService,
-    useValue: undefined
-},
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpInterceptorService,
+      multi: true
+    }
   ],
   bootstrap: [AppComponent],
 })
