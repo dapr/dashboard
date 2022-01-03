@@ -33,6 +33,7 @@
     "init": "^0.1.2",
     "js-yaml": "^4.1.0",
     "lodash-es": "^4.17.21",
+    "material-design-icons": "^3.0.1",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.33",
     "monaco-editor": "^0.27.0",

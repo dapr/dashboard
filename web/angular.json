@@ -35,6 +35,11 @@
                 "glob": "**/*",
                 "input": "node_modules/monaco-editor/min/vs",
                 "output": "/lib/vs"
+              },
+              {
+                "glob": "*",
+                "input": "./node_modules/material-design-icons/iconfont",
+                "output": "./assets"
               }
             ],
             "styles": [
