@@ -1,5 +1,5 @@
 <h2 class="page-header-left" *ngIf="loadedComponent">Component: {{ component.name }}</h2>
-<mat-tab-group>
+<mat-tab-group dynamicHeight>
   <mat-tab label="Summary">
     <mat-card class="card-large mat-elevation-z8" *ngIf="loadedComponent">
       <mat-card-header>
