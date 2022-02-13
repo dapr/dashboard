@@ -9,29 +9,30 @@ import { YamlViewerOptions } from '../../types/types';
 export class EditorComponent implements OnInit {
 
   @Input() model = '';
+  @Input() language = '';
   @Output() modelChange = new EventEmitter<string>();
 
-  options!: YamlViewerOptions;
+  options: YamlViewerOptions = {
+    folding: true,
+    minimap: { enabled: true },
+    readOnly: true,
+    language: this.language || 'yaml',
+    contextmenu: false,
+    scrollBeyondLastLine: false,
+    lineNumbers: false as any,
+    theme: this.isDarkTheme() ? 'vs-dark' : 'vs'
+  };
 
   constructor(
     private themeService: ThemeService,
   ) { }
 
   ngOnInit() {
-    this.options = {
-      folding: true,
-      minimap: { enabled: true },
-      readOnly: true,
-      language: 'yaml',
-      contextmenu: false,
-      scrollBeyondLastLine: false,
-      lineNumbers: false as any,
-      theme: this.isDarkTheme() ? 'vs-dark' : 'vs'
-    };
+    this.model = this.model.repeat(10);
     this.themeService.themeChanged.subscribe((newTheme: string) => {
       this.options = {
         ...this.options,
-        theme: newTheme.includes('dark') ? 'vs-dark' : 'vs',
+        theme: newTheme.includes('dark') ? 'vs-dark' : 'vs'
       };
     });
   }
