@@ -28,7 +28,6 @@ export class EditorComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.model = this.model.repeat(10);
     this.themeService.themeChanged.subscribe((newTheme: string) => {
       this.options = {
         ...this.options,
