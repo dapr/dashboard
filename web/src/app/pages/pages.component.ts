@@ -1,7 +1,6 @@
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { Component, ElementRef, HostBinding, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatSidenav } from '@angular/material/sidenav';
 import { Router } from '@angular/router';
 import { FeaturesService } from 'src/app/features/features.service';
 import { GlobalsService } from 'src/app/globals/globals.service';
@@ -22,8 +21,7 @@ export interface DialogData {
 export class PagesComponent implements OnInit, OnDestroy {
 
   @HostBinding('class') public componentCssClass!: string;
-  @ViewChild('drawer', { static: false })
-  public drawer!: MatSidenav;
+
   public menu: MenuItem[] = MENU_ITEMS;
   public isMenuOpen = false;
   public scopeValue = 'All';
