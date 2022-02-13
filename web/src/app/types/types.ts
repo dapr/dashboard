@@ -78,15 +78,3 @@ export interface DaprConfiguration {
     mtlsClockSkew: string;
     manifest: any;
 }
-
-// YamlViewerOptions describes an options object for the NgMonacoEditor component
-export interface YamlViewerOptions {
-    folding: boolean;
-    minimap: { enabled: boolean };
-    readOnly?: boolean;
-    language: string;
-    theme: string;
-    contextmenu?: boolean;
-    scrollBeyondLastLine?: boolean;
-    lineNumbers?: boolean | any;
-}

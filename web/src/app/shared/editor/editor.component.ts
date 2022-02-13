@@ -1,10 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { MonacoEditorOptions } from 'ng-monaco-editor';
 import { ThemeService } from '../../theme/theme.service';
-import { YamlViewerOptions } from '../../types/types';
 
 @Component({
   selector: 'app-editor',
-  templateUrl: 'editor.component.html'
+  templateUrl: 'editor.component.html',
+  styleUrls: ['editor.component.scss']
 })
 export class EditorComponent implements OnInit {
 
@@ -12,7 +13,7 @@ export class EditorComponent implements OnInit {
   @Input() language = '';
   @Output() modelChange = new EventEmitter<string>();
 
-  options: YamlViewerOptions = {
+  options: MonacoEditorOptions = {
     folding: true,
     minimap: { enabled: true },
     readOnly: true,
@@ -20,7 +21,8 @@ export class EditorComponent implements OnInit {
     contextmenu: false,
     scrollBeyondLastLine: false,
     lineNumbers: false as any,
-    theme: this.isDarkTheme() ? 'vs-dark' : 'vs'
+    theme: this.isDarkTheme() ? 'vs-dark' : 'vs',
+    automaticLayout: true
   };
 
   constructor(
