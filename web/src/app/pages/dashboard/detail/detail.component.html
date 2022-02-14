@@ -104,7 +104,7 @@
         <mat-card-title>Actors</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <table *ngIf="metadata && metadata.actors.length > 0; else noActors">
+        <table *ngIf="metadata && metadata.actors && metadata.actors.length > 0; else noActors">
           <tbody>
             <tr *ngFor="let item of metadata.actors">
               <td class="table-label">{{ item.type }}</td>
