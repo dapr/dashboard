@@ -136,6 +136,8 @@ export class AboutDialogComponent {
   @ViewChild('info', { static: true }) public info!: ElementRef;
   public version = VERSION;
 
+  dashboardVersion = this.version.semver?.version || this.version.version;
+
   constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) { }
 
   copyInfo(data?: string) {
