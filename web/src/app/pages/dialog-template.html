@@ -19,7 +19,7 @@
         Dapr Dashboard
       </td>
       <td>
-        : <strong>{{ version.version }}</strong> (<i>{{ version.hash }}</i>)
+        : <strong>{{ version.semver.version }}</strong> (<i>{{ version.hash }}</i>)
         <button mat-icon-button aria-label="Copy" (click)="copyInfo(version.version + ' (' + version.hash + ')')">
           <mat-icon>content_copy</mat-icon>
         </button>
