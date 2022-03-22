@@ -1,0 +1,13 @@
+$toolbar-height: 4rem;
+$card-title-height: 2rem;
+$card-tab-height: 3rem;
+$card-margin-height: 6rem;
+
+$occupied: $toolbar-height + $card-title-height + $card-tab-height + ($card-margin-height * 2);
+
+::ng-deep .ng-monaco-editor-container,
+ng-monaco-editor {
+    min-height: 300px;
+    max-height: calc(100vh - #{$occupied});
+    height: calc(100vh - #{$occupied});
+}
