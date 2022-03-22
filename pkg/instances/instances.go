@@ -428,8 +428,8 @@ func (i *instances) getKubernetesInstances(scope string) []Instance {
 				SupportsLogs:     true,
 				Address:          fmt.Sprintf("%s-dapr:80", id),
 				Status:           fmt.Sprintf("%d/%d", d.Status.ReadyReplicas, d.Status.Replicas),
-				Labels:           "app:" + d.Labels["app"],
-				Selector:         "app:" + d.Labels["app"],
+				Labels:           getAppLabelValue(d.Labels["app"]),
+				Selector:         getAppLabelValue(d.Spec.Selector.MatchLabels["app"]),
 				Config:           d.Spec.Template.Annotations["dapr.io/config"],
 			}
 
@@ -502,4 +502,12 @@ func (i *instances) getKubernetesScopes() []string {
 
 func (i *instances) getStandaloneScopes() []string {
 	return []string{"All"}
+}
+
+func getAppLabelValue(value string) string {
+	if value != "" {
+		return "app:" + value
+	}
+
+	return ""
 }

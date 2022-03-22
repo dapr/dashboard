@@ -47,18 +47,27 @@ export class DaprComponentsComponent implements OnInit, OnDestroy {
   }
 
   getIconPath(type: string): string {
-    if (type.includes('bindings')) {
-      return 'assets/images/bindings.png';
-    } else if (type.includes('secretstores')) {
-      return 'assets/images/secretstores.png';
-    } else if (type.includes('state')) {
-      return 'assets/images/statestores.png';
-    } else if (type.includes('pubsub')) {
-      return 'assets/images/pubsub.png';
-    } else if (type.includes('exporters')) {
-      return 'assets/images/tracing.png';
-    } else {
-      return 'assets/images/secretstores.png';
+    // Each component has a type field with the following format:
+    //  <component_type>.<variable_part>
+    // So we can determine which type of component we are handling based 
+    // on the first part of the "type" field. 
+    const componentType = type.split(".").shift();
+
+    switch (componentType) {
+      case 'bindings':
+        return 'cloud';
+      case 'secretstores':
+        return 'lock';
+      case 'state':
+        return 'storage';
+      case 'pubsub':
+        return 'send';
+      case 'exporters':
+        return 'account_tree';
+
+      default:
+        console.warn("Unknown component type:", componentType);
+        return 'question_mark';
     }
   }
 }
