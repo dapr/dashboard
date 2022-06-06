@@ -186,8 +186,19 @@ jobs:
       - name: docker login
         run: |
           docker login -u ${{ secrets.DOCKER_REGISTRY_ID }} -p ${{ secrets.DOCKER_REGISTRY_PASS }}
-      - name: Build and push docker multiarch manifest
+      - name: Build and push docker multiarch manifest to Docker Hub
         if: matrix.target_os != 'darwin'
         run: |
           echo "Build docker multiarch image manifest and push it"
           make docker-publish DAPR_REGISTRY=${{ secrets.DOCKER_DAPRIO_REGISTRY }} DAPR_TAG=${{ env.REL_VERSION }}
+      - name: GitHub container registry login
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push docker multiarch manifest to ghcr
+        if: matrix.target_os != 'darwin'
+        run: |
+          echo "Build docker multiarch image manifest and push it"
+          make docker-publish DAPR_REGISTRY=ghcr.io/${{ github.repository_owner }} DAPR_TAG=${{ env.REL_VERSION }}
