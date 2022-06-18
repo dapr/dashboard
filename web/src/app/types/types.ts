@@ -78,3 +78,10 @@ export interface DaprConfiguration {
     mtlsClockSkew: string;
     manifest: any;
 }
+
+// Dapr version
+export interface DaprVersion {
+  version: string;
+  runtimeVersion: string;
+}
+

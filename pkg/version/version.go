@@ -13,10 +13,20 @@ limitations under the License.
 
 package version
 
+import (
+	"github.com/dapr/cli/pkg/standalone"
+	"strings"
+)
+
 // version is the current Dapr dashboard version
 var version = "edge"
 
 // GetVersion returns the current dashboard version
 func GetVersion() string {
 	return version
+}
+
+// GetRuntimeVersion returns the current runtime version
+func GetRuntimeVersion() string {
+	return strings.ReplaceAll(standalone.GetRuntimeVersion(), "\n", "")
 }
