@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {DaprVersion} from "../types/types";
+import { DaprVersion } from "../types/types";
 
 @Injectable({
   providedIn: 'root'
