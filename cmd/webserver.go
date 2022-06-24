@@ -363,7 +363,11 @@ func getScopesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getVersionHandler(w http.ResponseWriter, r *http.Request) {
-	runtimeVersion, _ := version.GetRuntimeVersion()
+	runtimeVersion, err := version.GetRuntimeVersion()
+	if err != nil {
+		respondWithError(w, 500, err.Error())
+		return
+	}
 	resp := DaprVersion{version.GetVersion(), runtimeVersion}
 	respondWithJSON(w, 200, resp)
 }

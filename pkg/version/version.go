@@ -14,10 +14,11 @@ limitations under the License.
 package version
 
 import (
-	"errors"
-	"github.com/dapr/cli/pkg/kubernetes"
+	"context"
 	"github.com/dapr/cli/pkg/standalone"
 	"github.com/dapr/dashboard/pkg/kube"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"strings"
 )
 
@@ -35,30 +36,23 @@ func GetVersion() string {
 func GetRuntimeVersion() (string, error) {
 	kubeClient, _, _ := kube.Clients()
 	if kubeClient != nil {
+		ctx := context.Background()
 		// kubernetes
-		sc, err := kubernetes.NewStatusClient()
+		options := metav1.ListOptions{}
+		deployments, err := kubeClient.AppsV1().Deployments(v1.NamespaceAll).List(ctx, options)
 		if err != nil {
 			return "", err
 		}
-
-		status, err := sc.Status()
-		if err != nil {
-			return "", err
-		}
-
-		if len(status) == 0 {
-			return "", errors.New("Dapr is not installed in your cluster")
-		}
-
-		var daprVersion string
-		for _, s := range status {
-			if s.Name == operatorName {
-				daprVersion = s.Version
+		for _, deployment := range deployments.Items {
+			if deployment.Name == operatorName {
+				image := deployment.Spec.Template.Spec.Containers[0].Image
+				daprVersion := image[strings.IndexAny(image, ":")+1:]
+				return daprVersion, nil
 			}
 		}
-		return daprVersion, nil
 	} else {
 		// standalone
 		return strings.ReplaceAll(standalone.GetRuntimeVersion(), "\n", ""), nil
 	}
+	return "", nil
 }
