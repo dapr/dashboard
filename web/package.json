@@ -34,7 +34,7 @@
     "init": "^0.1.2",
     "js-yaml": "^4.1.0",
     "lodash-es": "^4.17.21",
-    "moment": "^2.29.1",
+    "moment": "^2.29.2",
     "moment-timezone": "^0.5.33",
     "monaco-editor": "^0.27.0",
     "ng-monaco-editor": "^4.0.3",
