@@ -51,7 +51,7 @@
     "@types/js-yaml": "^4.0.3",
     "@types/node": "^12.11.1",
     "codelyzer": "^6.0.0",
-    "electron": "^13.2.3",
+    "electron": "^15.5.5",
     "electron-builder": "^22.11.7",
     "fs-extra": "^10.0.0",
     "git-describe": "^4.1.0",
