@@ -96,6 +96,5 @@ func TestControlPlaneServices(t *testing.T) {
 
 	k8s := newTestSimpleK8s(runtimeObj...)
 	status := k8s.GetControlPlaneStatus()
-
 	assert.Equal(t, 12, len(status), "Expected status list length to match")
 }

@@ -17,6 +17,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"github.com/dapr/dashboard/pkg/version"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -30,7 +31,6 @@ import (
 	instances "github.com/dapr/dashboard/pkg/instances"
 	kube "github.com/dapr/dashboard/pkg/kube"
 	dashboard_log "github.com/dapr/dashboard/pkg/log"
-	"github.com/dapr/dashboard/pkg/version"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 )
@@ -62,6 +62,11 @@ var upgrader = websocket.Upgrader{} // use default options
 type spaHandler struct {
 	staticPath string
 	indexPath  string
+}
+
+type DaprVersion struct {
+	Version        string `json:"version"`
+	RuntimeVersion string `json:"runtimeVersion"`
 }
 
 var inst instances.Instances
@@ -358,8 +363,13 @@ func getScopesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getVersionHandler(w http.ResponseWriter, r *http.Request) {
-	resp := version.GetVersion()
-	respondWithPlainString(w, 200, resp)
+	runtimeVersion, err := version.GetRuntimeVersion()
+	if err != nil {
+		respondWithError(w, 500, err.Error())
+		return
+	}
+	resp := DaprVersion{version.GetVersion(), runtimeVersion}
+	respondWithJSON(w, 200, resp)
 }
 
 func generateIndexFile(w http.ResponseWriter, r *http.Request, baseHref string) {
