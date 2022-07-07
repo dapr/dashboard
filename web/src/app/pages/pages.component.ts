@@ -8,9 +8,11 @@ import { ThemeService } from 'src/app/theme/theme.service';
 import { VERSION } from '../../environments/version';
 import { ScopesService } from '../scopes/scopes.service';
 import { COMPONENTS_MENU_ITEM, CONFIGURATIONS_MENU_ITEM, CONTROLPLANE_MENU_ITEM, MenuItem, MENU_ITEMS } from './pages-menu';
+import {DaprVersion} from "../types/types";
 
 export interface DialogData {
   version: string;
+  runtimeVersion: string;
 }
 
 @Component({
@@ -27,6 +29,7 @@ export class PagesComponent implements OnInit, OnDestroy {
   public scopeValue = 'All';
   public scopes: string[] = [];
   public version: string | undefined;
+  public runtimeVersion: string | undefined;
   public versionLoaded = false;
   private intervalHandler: any;
 
@@ -56,8 +59,9 @@ export class PagesComponent implements OnInit, OnDestroy {
   }
 
   getVersion(): void {
-    this.globals.getVersion().subscribe(version => {
-      this.version = version;
+    this.globals.getVersion().subscribe((version: DaprVersion) => {
+      this.version = version.version;
+      this.runtimeVersion = version.runtimeVersion;
       this.versionLoaded = true;
     });
   }
@@ -109,7 +113,8 @@ export class PagesComponent implements OnInit, OnDestroy {
   openDialog() {
     this.dialog.open(AboutDialogComponent, {
       data: {
-        version: this.version
+        version: this.version,
+        runtimeVersion: this.runtimeVersion
       } as DialogData
     });
   }
