@@ -17,7 +17,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/dapr/dashboard/pkg/version"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -26,11 +25,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dapr/dashboard/pkg/version"
+
 	components "github.com/dapr/dashboard/pkg/components"
 	configurations "github.com/dapr/dashboard/pkg/configurations"
 	instances "github.com/dapr/dashboard/pkg/instances"
 	kube "github.com/dapr/dashboard/pkg/kube"
 	dashboard_log "github.com/dapr/dashboard/pkg/log"
+	"github.com/dapr/dashboard/pkg/platforms"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 )
@@ -74,18 +76,18 @@ var comps components.Components
 var configs configurations.Configurations
 
 // RunWebServer starts the web server that serves the Dapr UI dashboard and the API
-func RunWebServer(port int) {
-	platform := ""
+func RunWebServer(port int, isDockerCompose bool, componentsPath string, configPath string, dockerComposePath string) {
+	platform := platforms.Standalone
 	kubeClient, daprClient, _ := kube.Clients()
 	if kubeClient != nil {
-		platform = "kubernetes"
-	} else {
-		platform = "standalone"
+		platform = platforms.Kubernetes
+	} else if isDockerCompose {
+		platform = platforms.DockerCompose
 	}
 
-	inst = instances.NewInstances(platform, kubeClient)
-	comps = components.NewComponents(platform, daprClient)
-	configs = configurations.NewConfigurations(platform, daprClient)
+	inst = instances.NewInstances(platform, kubeClient, dockerComposePath)
+	comps = components.NewComponents(platform, daprClient, componentsPath)
+	configs = configurations.NewConfigurations(platform, daprClient, configPath)
 
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api/").Subrouter()
@@ -210,7 +212,7 @@ func getFeaturesHandler(w http.ResponseWriter, r *http.Request) {
 	if configs.Supported() {
 		features = append(features, "configurations")
 	}
-	if inst.CheckPlatform() == "kubernetes" {
+	if inst.CheckPlatform() == platforms.Kubernetes {
 		features = append(features, "status")
 	}
 	respondWithJSON(w, 200, features)
@@ -218,7 +220,7 @@ func getFeaturesHandler(w http.ResponseWriter, r *http.Request) {
 
 func getPlatformHandler(w http.ResponseWriter, r *http.Request) {
 	resp := inst.CheckPlatform()
-	respondWithPlainString(w, 200, resp)
+	respondWithPlainString(w, 200, string(resp))
 }
 
 func getContainersHandler(w http.ResponseWriter, r *http.Request) {

@@ -23,6 +23,7 @@ import (
 	v1alpha1 "github.com/dapr/dapr/pkg/apis/components/v1alpha1"
 	scheme "github.com/dapr/dapr/pkg/client/clientset/versioned"
 	"github.com/dapr/dashboard/pkg/age"
+	"github.com/dapr/dashboard/pkg/platforms"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/yaml"
 )
@@ -35,21 +36,25 @@ type Components interface {
 }
 
 type components struct {
-	platform        string
+	platform        platforms.Platform
 	daprClient      scheme.Interface
 	getComponentsFn func(scope string) []Component
+	componentsPath  string
 }
 
 // NewComponents returns a new Components instance
-func NewComponents(platform string, daprClient scheme.Interface) Components {
+func NewComponents(platform platforms.Platform, daprClient scheme.Interface, componentsPath string) Components {
 	c := components{}
 	c.platform = platform
 
-	if platform == "kubernetes" {
+	if platform == platforms.Kubernetes {
 		c.getComponentsFn = c.getKubernetesComponents
 		c.daprClient = daprClient
-	} else if platform == "standalone" {
+	} else if platform == platforms.Standalone {
 		c.getComponentsFn = c.getStandaloneComponents
+	} else if platform == platforms.DockerCompose {
+		c.getComponentsFn = c.getDockerComposeComponents
+		c.componentsPath = componentsPath
 	}
 	return &c
 }
@@ -67,7 +72,7 @@ type Component struct {
 
 // Supported checks whether or not the supplied platform is able to access Dapr components
 func (c *components) Supported() bool {
-	return c.platform == "kubernetes" || c.platform == "standalone"
+	return c.platform == platforms.Kubernetes || c.platform == platforms.Standalone || c.platform == platforms.DockerCompose
 }
 
 // GetComponent returns a specific component based on a supplied component name
@@ -155,4 +160,52 @@ func (c *components) getStandaloneComponents(scope string) []Component {
 		return []Component{}
 	}
 	return standaloneComponents
+}
+
+// getDockerComposeComponents returns the list of all docker-compose Dapr components
+func (c *components) getDockerComposeComponents(scope string) []Component {
+	componentsDirectory := c.componentsPath
+	dockerComposeComponents := []Component{}
+	err := filepath.Walk(componentsDirectory, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			log.Printf("Failure accessing path %s: %v\n", path, err)
+			return err
+		}
+		if info.IsDir() && info.Name() != filepath.Base(componentsDirectory) {
+			return filepath.SkipDir
+		} else if !info.IsDir() && filepath.Ext(path) == ".yaml" {
+			content, err := ioutil.ReadFile(path)
+			if err != nil {
+				log.Printf("Failure reading file %s: %v\n", path, err)
+				return err
+			}
+
+			comp := v1alpha1.Component{}
+			err = yaml.Unmarshal(content, &comp)
+			if err != nil {
+				log.Printf("Failure unmarshalling %s into Component: %s\n", path, err.Error())
+			}
+
+			newComponent := Component{
+				Name:     comp.Name,
+				Kind:     comp.Kind,
+				Type:     comp.Spec.Type,
+				Created:  info.ModTime().Format("2006-01-02 15:04.05"),
+				Age:      age.GetAge(info.ModTime()),
+				Scopes:   comp.Scopes,
+				Manifest: string(content),
+			}
+
+			if newComponent.Kind == "Component" {
+				dockerComposeComponents = append(dockerComposeComponents, newComponent)
+			}
+			return nil
+		}
+		return nil
+	})
+	if err != nil {
+		log.Printf("error walking the path %q: %v\n", componentsDirectory, err)
+		return []Component{}
+	}
+	return dockerComposeComponents
 }

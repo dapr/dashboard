@@ -22,12 +22,21 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
+	"github.com/compose-spec/compose-go/loader"
+	"github.com/compose-spec/compose-go/types"
 	"github.com/dapr/cli/pkg/standalone"
+	"github.com/dapr/components-contrib/nameresolution"
+	"github.com/dapr/components-contrib/nameresolution/mdns"
 	"github.com/dapr/dashboard/pkg/age"
+	"github.com/dapr/dashboard/pkg/platforms"
+	"github.com/dapr/kit/logger"
+	process "github.com/shirou/gopsutil/process"
 	v1 "k8s.io/api/core/v1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -63,35 +72,46 @@ type Instances interface {
 	GetControlPlaneStatus() []StatusOutput
 	GetMetadata(scope string, id string) MetadataOutput
 	GetScopes() []string
-	CheckPlatform() string
+	CheckPlatform() platforms.Platform
 }
 
 type instances struct {
-	platform       string
-	kubeClient     kubernetes.Interface
-	getInstancesFn func(string) []Instance
-	getScopesFn    func() []string
+	platform          platforms.Platform
+	kubeClient        kubernetes.Interface
+	getInstancesFn    func(string) []Instance
+	getScopesFn       func() []string
+	dockerComposePath string
+	resolver          *mdns.Resolver
+	metadataClient    http.Client
+	daprApiToken      string
 }
 
 // NewInstances returns an Instances instance
-func NewInstances(platform string, kubeClient *kubernetes.Clientset) Instances {
+func NewInstances(platform platforms.Platform, kubeClient *kubernetes.Clientset, dockerComposePath string) Instances {
 	i := instances{}
 	i.platform = platform
+	i.metadataClient = http.Client{}
+	i.daprApiToken = os.Getenv("DAPR_API_TOKEN")
 
-	if i.platform == "kubernetes" {
+	if i.platform == platforms.Kubernetes {
 		i.getInstancesFn = i.getKubernetesInstances
 		i.getScopesFn = i.getKubernetesScopes
 		i.kubeClient = kubeClient
-	} else if i.platform == "standalone" {
+	} else if i.platform == platforms.Standalone {
 		i.getInstancesFn = i.getStandaloneInstances
 		i.getScopesFn = i.getStandaloneScopes
+	} else if i.platform == platforms.DockerCompose {
+		i.getInstancesFn = i.getDockerComposeInstances
+		i.getScopesFn = i.getDockerComposeScopes
+		i.dockerComposePath = dockerComposePath
+		i.resolver = mdns.NewResolver(logger.NewLogger("mdns"))
 	}
 	return &i
 }
 
 // Supported checks if the current platform supports Dapr instances
 func (i *instances) Supported() bool {
-	return i.platform == "kubernetes" || i.platform == "standalone"
+	return i.platform == platforms.Kubernetes || i.platform == platforms.Standalone || i.platform == platforms.DockerCompose
 }
 
 // GetScopes returns the result of the appropriate environment's GetScopes function
@@ -100,7 +120,7 @@ func (i *instances) GetScopes() []string {
 }
 
 // CheckPlatform returns the current environment dashboard is running in
-func (i *instances) CheckPlatform() string {
+func (i *instances) CheckPlatform() platforms.Platform {
 	return i.platform
 }
 
@@ -254,7 +274,7 @@ func (i *instances) DeleteInstance(scope string, id string) error {
 	return standalone.Stop(id)
 }
 
-// GetInstance uses the appropriate getInstance function (kubernetes, standalone, etc.) and returns the given instance from its id
+// GetInstance uses the appropriate getInstance function (kubernetes, standalone, docker-compose etc.) and returns the given instance from its id
 func (i *instances) GetInstance(scope string, id string) Instance {
 	instanceList := i.getInstancesFn(scope)
 	for _, instance := range instanceList {
@@ -365,19 +385,45 @@ func (i *instances) GetMetadata(scope string, id string) MetadataOutput {
 			}
 		}
 
+	} else if i.platform == platforms.DockerCompose {
+		appId := i.GetInstance(scope, id).AppID
+		port := i.GetInstance(scope, id).HTTPPort
+		address, err := i.resolver.ResolveID(nameresolution.ResolveRequest{ID: appId})
+		if err != nil {
+			log.Println(err)
+			return MetadataOutput{}
+		}
+		url = fmt.Sprintf("http://%s:%v/v1.0/metadata", strings.Split(address, ":")[0], port)
+
 	} else {
 		port := i.GetInstance(scope, id).HTTPPort
 		url = fmt.Sprintf("http://localhost:%v/v1.0/metadata", port)
 	}
+
 	if url != "" {
-		resp, err := http.Get(url)
+		req, err := http.NewRequest("GET", url, nil)
+
+		if len(i.daprApiToken) > 0 {
+			req.Header.Add("dapr-api-token", i.daprApiToken)
+		}
+
+		resp, err := i.metadataClient.Do(req)
 		if err != nil && secondaryUrl != "" {
 			log.Println(err)
-			resp, err = http.Get(secondaryUrl)
+			secondaryReq, err := http.NewRequest("GET", secondaryUrl, nil)
+			if len(i.daprApiToken) > 0 {
+				secondaryReq.Header.Add("dapr-api-token", i.daprApiToken)
+			}
+			resp, err = i.metadataClient.Do(secondaryReq)
 			if err != nil {
 				log.Println(err)
 				return MetadataOutput{}
 			}
+		}
+
+		if err != nil {
+			log.Println(err)
+			return MetadataOutput{}
 		}
 
 		defer resp.Body.Close()
@@ -486,6 +532,110 @@ func (i *instances) getStandaloneInstances(scope string) []Instance {
 	return list
 }
 
+// getDockerComposeInstances returns the Dapr instances running in the docker compose environment
+func (i *instances) getDockerComposeInstances(scope string) []Instance {
+	list := []Instance{}
+
+	composeFile, err := os.ReadFile(i.dockerComposePath)
+	if err != nil {
+		log.Println(err)
+		return list
+	}
+
+	workingDir, err := os.Getwd()
+	if err != nil {
+		log.Println(err)
+		return list
+	}
+
+	configFiles := []types.ConfigFile{}
+	configFiles = append(configFiles, types.ConfigFile{
+		Filename: "docker-compose.yml",
+		Content:  composeFile,
+	})
+
+	configDetails := types.ConfigDetails{
+		WorkingDir:  workingDir,
+		ConfigFiles: configFiles,
+		Environment: nil,
+	}
+
+	// Can't get creation time and age of daprd services so approximate from dashboard process
+	dashboardPID := os.Getpid()
+	procDetails, err := process.NewProcess(int32(dashboardPID))
+	if err != nil {
+		log.Println(err)
+		return list
+	}
+
+	createUnixTimeMilliseconds, err := procDetails.CreateTime()
+	if err != nil {
+		log.Println(err)
+		return list
+	}
+
+	createTime := time.Unix(createUnixTimeMilliseconds/1000, 0)
+
+	project, err := loader.Load(configDetails)
+
+	if err != nil {
+		log.Println(err)
+	} else {
+		for _, service := range project.Services {
+			if !strings.Contains(service.Image, "daprd") {
+				continue
+			}
+
+			appId := ""
+			appPort := 80
+			foundAppId := false
+			foundAppPort := false
+			for _, cmdArg := range service.Command {
+				if strings.Contains(cmdArg, "app-id") {
+					foundAppId = true
+					continue
+				}
+
+				if strings.Contains(cmdArg, "app-port") {
+					foundAppPort = true
+					continue
+				}
+
+				if foundAppId {
+					appId = cmdArg
+					foundAppId = false
+					continue
+				}
+
+				if foundAppPort {
+					parsedPort, err := strconv.ParseInt(cmdArg, 10, 0)
+					if err == nil {
+						appPort = int(parsedPort)
+					}
+					foundAppId = false
+					continue
+				}
+			}
+
+			list = append(list, Instance{
+				AppID:            appId,
+				HTTPPort:         3500,
+				GRPCPort:         50001,
+				AppPort:          appPort,
+				Command:          "",
+				Age:              age.GetAge(createTime),
+				Created:          createTime.Format("2006-01-02 15:04.05"),
+				PID:              -1,
+				Replicas:         1,
+				SupportsDeletion: false,
+				SupportsLogs:     false,
+				Address:          fmt.Sprintf("%s:3500", appId),
+			})
+		}
+	}
+	return list
+}
+
 func (i *instances) getKubernetesScopes() []string {
 	ctx := context.Background()
 	scopes := []string{"All"}
@@ -501,6 +651,10 @@ func (i *instances) getKubernetesScopes() []string {
 }
 
 func (i *instances) getStandaloneScopes() []string {
+	return []string{"All"}
+}
+
+func (i *instances) getDockerComposeScopes() []string {
 	return []string{"All"}
 }
 
