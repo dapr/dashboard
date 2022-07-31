@@ -40,7 +40,7 @@ Run `dapr dashboard -k`, or if you installed Dapr in a non-default namespace, `d
 Run `dapr dashboard`, and navigate to http://localhost:8080.
 
 #### Docker Compose
-Construct a docker compose file that references the specific Dapr pieces that you want to use. The following example defines an application and its corresponding daprd sidecar, the Dapr Placement service, and the Darp Dashboard.
+Construct a docker compose file that references the specific Dapr pieces that you want to use. The following example defines an application and its corresponding daprd sidecar, the Dapr Placement service, and the Dapr Dashboard.
 
 When running inside docker compose, the dashboard needs access to the component and configuration files that are passed to the daprd services. It also needs to know about all daprd services running inside the docker compose network - it retrieves this by parsing the docker-compose.yml file. To achieve this, you define docker bind mounts to these files/directories and pass them as command args to the dashboard process. In addition, you must specify the command arg `--docker-compose=true` to tell the dashboard to use the docker compose platform type.
 
