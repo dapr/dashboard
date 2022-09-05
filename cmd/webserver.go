@@ -17,6 +17,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -71,9 +72,11 @@ type DaprVersion struct {
 	RuntimeVersion string `json:"runtimeVersion"`
 }
 
-var inst instances.Instances
-var comps components.Components
-var configs configurations.Configurations
+var (
+	inst    instances.Instances
+	comps   components.Components
+	configs configurations.Configurations
+)
 
 // RunWebServer starts the web server that serves the Dapr UI dashboard and the API
 func RunWebServer(port int, isDockerCompose bool, componentsPath string, configPath string, dockerComposePath string) {
@@ -248,12 +251,18 @@ func getLogStreamsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer c.Close()
-	reader, err := inst.GetLogStream(scope, id, container)
+	streams, err := inst.GetLogStream(scope, id, container)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer reader.Close()
+
+	var readStreams []io.Reader
+	for _, stream := range streams {
+		defer stream.Close()
+		readStreams = append(readStreams, stream)
+	}
+	reader := io.MultiReader(readStreams...)
 
 	lineReader := bufio.NewReader(reader)
 	logReader := dashboard_log.NewReader(container, lineReader)
