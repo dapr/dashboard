@@ -17,6 +17,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -25,12 +26,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dapr/dashboard/pkg/version"
+
 	components "github.com/dapr/dashboard/pkg/components"
 	configurations "github.com/dapr/dashboard/pkg/configurations"
 	instances "github.com/dapr/dashboard/pkg/instances"
 	kube "github.com/dapr/dashboard/pkg/kube"
 	dashboard_log "github.com/dapr/dashboard/pkg/log"
-	"github.com/dapr/dashboard/pkg/version"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 )
@@ -64,9 +66,16 @@ type spaHandler struct {
 	indexPath  string
 }
 
-var inst instances.Instances
-var comps components.Components
-var configs configurations.Configurations
+type DaprVersion struct {
+	Version        string `json:"version"`
+	RuntimeVersion string `json:"runtimeVersion"`
+}
+
+var (
+	inst    instances.Instances
+	comps   components.Components
+	configs configurations.Configurations
+)
 
 // RunWebServer starts the web server that serves the Dapr UI dashboard and the API
 func RunWebServer(port int) {
@@ -241,12 +250,18 @@ func getLogStreamsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer c.Close()
-	reader, err := inst.GetLogStream(scope, id, container)
+	streams, err := inst.GetLogStream(scope, id, container)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer reader.Close()
+
+	var readStreams []io.Reader
+	for _, stream := range streams {
+		defer stream.Close()
+		readStreams = append(readStreams, stream)
+	}
+	reader := io.MultiReader(readStreams...)
 
 	lineReader := bufio.NewReader(reader)
 	logReader := dashboard_log.NewReader(container, lineReader)
@@ -358,8 +373,13 @@ func getScopesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getVersionHandler(w http.ResponseWriter, r *http.Request) {
-	resp := version.GetVersion()
-	respondWithPlainString(w, 200, resp)
+	runtimeVersion, err := version.GetRuntimeVersion()
+	if err != nil {
+		respondWithError(w, 500, err.Error())
+		return
+	}
+	resp := DaprVersion{version.GetVersion(), runtimeVersion}
+	respondWithJSON(w, 200, resp)
 }
 
 func generateIndexFile(w http.ResponseWriter, r *http.Request, baseHref string) {
