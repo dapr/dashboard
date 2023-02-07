@@ -19,7 +19,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -58,7 +57,7 @@ type Instances interface {
 	GetInstance(scope string, id string) Instance
 	DeleteInstance(scope string, id string) error
 	GetContainers(scope string, id string) []string
-	GetLogStream(scope, id, containerName string) (io.ReadCloser, error)
+	GetLogStream(scope, id, containerName string) ([]io.ReadCloser, error)
 	GetDeploymentConfiguration(scope string, id string) string
 	GetControlPlaneStatus() []StatusOutput
 	GetMetadata(scope string, id string) MetadataOutput
@@ -141,7 +140,7 @@ func (i *instances) GetContainers(scope string, id string) []string {
 }
 
 // GetLogStream returns a stream of bytes from K8s logs
-func (i *instances) GetLogStream(scope, id, containerName string) (io.ReadCloser, error) {
+func (i *instances) GetLogStream(scope, id, containerName string) ([]io.ReadCloser, error) {
 	ctx := context.Background()
 	if i.kubeClient != nil {
 		resp, err := i.kubeClient.AppsV1().Deployments(scope).List(ctx, (meta_v1.ListOptions{}))
@@ -160,8 +159,9 @@ func (i *instances) GetLogStream(scope, id, containerName string) (io.ReadCloser
 						return nil, err
 					}
 
-					if len(pods.Items) > 0 {
-						p := pods.Items[0]
+					var logstreams []io.ReadCloser
+
+					for _, p := range pods.Items {
 						name := p.ObjectMeta.Name
 
 						for _, container := range p.Spec.Containers {
@@ -171,13 +171,21 @@ func (i *instances) GetLogStream(scope, id, containerName string) (io.ReadCloser
 								options.Container = container.Name
 								options.Timestamps = true
 								options.TailLines = &tailLines
-								options.Follow = true
+								if len(pods.Items) == 1 {
+									options.Follow = true
+								} else {
+									options.Follow = false // this is necessary to show logs from multiple replicas
+								}
 
 								res := i.kubeClient.CoreV1().Pods(p.ObjectMeta.Namespace).GetLogs(name, &options)
-								return res.Stream(ctx)
+								stream, streamErr := res.Stream(ctx)
+								if streamErr == nil {
+									logstreams = append(logstreams, stream)
+								}
 							}
 						}
 					}
+					return logstreams, nil
 				}
 			}
 		}
@@ -333,11 +341,11 @@ func (i *instances) GetControlPlaneStatus() []StatusOutput {
 	return []StatusOutput{}
 }
 
-// GetMetadata returns the result from the /v1.0/metadata endpoint
+// GetMetadata returns the result from the /v1.0/metadata endpoint from all replicas
 func (i *instances) GetMetadata(scope string, id string) MetadataOutput {
 	ctx := context.Background()
-	url := ""
-	secondaryUrl := ""
+	var url []string
+	var secondaryUrl []string
 	if i.kubeClient != nil {
 		resp, err := i.kubeClient.AppsV1().Deployments(scope).List(ctx, (meta_v1.ListOptions{}))
 		if err != nil || len(resp.Items) == 0 {
@@ -358,8 +366,8 @@ func (i *instances) GetMetadata(scope string, id string) MetadataOutput {
 
 					if len(pods.Items) > 0 {
 						p := pods.Items[0]
-						url = fmt.Sprintf("http://%v:%v/v1.0/metadata", p.Status.PodIP, 3501)
-						secondaryUrl = fmt.Sprintf("http://%v:%v/v1.0/metadata", p.Status.PodIP, 3500)
+						url = append(url, fmt.Sprintf("http://%v:%v/v1.0/metadata", p.Status.PodIP, 3501))
+						secondaryUrl = append(secondaryUrl, fmt.Sprintf("http://%v:%v/v1.0/metadata", p.Status.PodIP, 3500))
 					}
 				}
 			}
@@ -367,34 +375,64 @@ func (i *instances) GetMetadata(scope string, id string) MetadataOutput {
 
 	} else {
 		port := i.GetInstance(scope, id).HTTPPort
-		url = fmt.Sprintf("http://localhost:%v/v1.0/metadata", port)
+		url = append(url, fmt.Sprintf("http://localhost:%v/v1.0/metadata", port))
 	}
-	if url != "" {
-		resp, err := http.Get(url)
-		if err != nil && secondaryUrl != "" {
-			log.Println(err)
-			resp, err = http.Get(secondaryUrl)
-			if err != nil {
-				log.Println(err)
-				return MetadataOutput{}
+	if len(url) != 0 {
+		data := getMetadataOutputFromURLs(url[0], "")
+		if len(url) > 1 {
+			// merge the actor metadata from the other replicas
+
+			for i := range url[1:] {
+				replicaData := getMetadataOutputFromURLs(url[i+1], secondaryUrl[i+1])
+
+				for _, actor := range replicaData.Actors {
+					// check if this actor type is already in the list
+					found := false
+
+					for _, knownActor := range data.Actors {
+						if knownActor.Type == actor.Type {
+							found = true
+							knownActor.Count += actor.Count
+							break
+						}
+					}
+
+					if !found {
+						data.Actors = append(data.Actors, actor)
+					}
+				}
 			}
 		}
 
-		defer resp.Body.Close()
-		body, err := ioutil.ReadAll(resp.Body)
+		return data
+	}
+	return MetadataOutput{}
+}
+
+func getMetadataOutputFromURLs(primaryURL string, secondaryURL string) MetadataOutput {
+	resp, err := http.Get(primaryURL)
+	if err != nil && len(secondaryURL) != 0 {
+		log.Println(err)
+		resp, err = http.Get(secondaryURL)
 		if err != nil {
 			log.Println(err)
 			return MetadataOutput{}
 		}
-
-		var data MetadataOutput
-		if err := json.Unmarshal(body, &data); err != nil {
-			log.Println(err)
-			return MetadataOutput{}
-		}
-		return data
 	}
-	return MetadataOutput{}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Println(err)
+		return MetadataOutput{}
+	}
+
+	var data MetadataOutput
+	if err := json.Unmarshal(body, &data); err != nil {
+		log.Println(err)
+		return MetadataOutput{}
+	}
+
+	return data
 }
 
 // GetInstances returns the result of the appropriate environment's GetInstance function
