@@ -14,7 +14,6 @@ limitations under the License.
 package components
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -97,7 +96,7 @@ func (c *components) getKubernetesComponents(scope string) []Component {
 	for _, comp := range comps.Items {
 		newComponent := Component{
 			Name:     comp.Name,
-			Kind:     comp.Kind,
+			Kind:     comp.Kind(),
 			Type:     comp.Spec.Type,
 			Created:  comp.CreationTimestamp.Format("2006-01-02 15:04.05"),
 			Age:      age.GetAge(comp.CreationTimestamp.Time),
@@ -111,9 +110,17 @@ func (c *components) getKubernetesComponents(scope string) []Component {
 
 // getStandaloneComponents returns the list of all locally-hosted Dapr components
 func (c *components) getStandaloneComponents(scope string) []Component {
-	componentsDirectory := standalone.DefaultComponentsDirPath()
 	standaloneComponents := []Component{}
-	err := filepath.Walk(componentsDirectory, func(path string, info os.FileInfo, err error) error {
+
+	daprDir, err := standalone.GetDaprRuntimePath("")
+	if err != nil {
+		log.Printf("Failure findinf Dapr's runtime path: %v\n", err)
+		return standaloneComponents
+	}
+
+	componentsDirectory := standalone.GetDaprComponentsPath(daprDir)
+
+	err = filepath.Walk(componentsDirectory, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			log.Printf("Failure accessing path %s: %v\n", path, err)
 			return err
@@ -121,7 +128,7 @@ func (c *components) getStandaloneComponents(scope string) []Component {
 		if info.IsDir() && info.Name() != filepath.Base(componentsDirectory) {
 			return filepath.SkipDir
 		} else if !info.IsDir() && filepath.Ext(path) == ".yaml" {
-			content, err := ioutil.ReadFile(path)
+			content, err := os.ReadFile(path)
 			if err != nil {
 				log.Printf("Failure reading file %s: %v\n", path, err)
 				return err
@@ -135,7 +142,7 @@ func (c *components) getStandaloneComponents(scope string) []Component {
 
 			newComponent := Component{
 				Name:     comp.Name,
-				Kind:     comp.Kind,
+				Kind:     comp.Kind(),
 				Type:     comp.Spec.Type,
 				Created:  info.ModTime().Format("2006-01-02 15:04.05"),
 				Age:      age.GetAge(info.ModTime()),
