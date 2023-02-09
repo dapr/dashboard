@@ -119,9 +119,17 @@ func (c *configurations) getKubernetesConfigurations(scope string) []Configurati
 
 // getStandaloneConfigurations returns the list of Dapr Configurations Statuses
 func (c *configurations) getStandaloneConfigurations(scope string) []Configuration {
-	configurationsDirectory := filepath.Dir(standalone.DefaultConfigFilePath())
 	standaloneConfigurations := []Configuration{}
-	err := filepath.Walk(configurationsDirectory, func(path string, info os.FileInfo, err error) error {
+
+	daprDir, err := standalone.GetDaprRuntimePath("")
+	if err != nil {
+		log.Printf("Failure findinf Dapr's runtime path: %v\n", err)
+		return standaloneConfigurations
+	}
+
+	defaultConfigFilePath := standalone.GetDaprConfigPath(daprDir)
+	configurationsDirectory := filepath.Dir(defaultConfigFilePath)
+	err = filepath.Walk(configurationsDirectory, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			log.Printf("Failure accessing path %s: %v\n", path, err)
 			return err
