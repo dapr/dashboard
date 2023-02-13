@@ -77,7 +77,7 @@ var (
 )
 
 // RunWebServer starts the web server that serves the Dapr UI dashboard and the API
-func RunWebServer(port int) {
+func RunWebServer(address string, port int) {
 	platform := ""
 	kubeClient, daprClient, _ := kube.Clients()
 	if kubeClient != nil {
@@ -115,11 +115,11 @@ func RunWebServer(port int) {
 
 	srv := &http.Server{
 		Handler:      r,
-		Addr:         fmt.Sprintf("0.0.0.0:%v", port),
+		Addr:         fmt.Sprintf("%v:%v", address, port),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
-	fmt.Printf("Dapr Dashboard running on http://localhost:%v\n", port)
+	fmt.Printf("Dapr Dashboard running on http://%v:%v\n", address, port)
 	log.Fatal(srv.ListenAndServe())
 }
 
