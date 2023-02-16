@@ -28,7 +28,7 @@ require (
 	github.com/briandowns/spinner v1.21.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
-	github.com/containerd/containerd v1.6.16 // indirect
+	github.com/containerd/containerd v1.6.18 // indirect
 	github.com/dapr/components-contrib v1.10.0-rc.4 // indirect
 	github.com/dapr/kit v0.0.4 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
