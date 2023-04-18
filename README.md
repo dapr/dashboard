@@ -32,6 +32,12 @@ Dapr Dashboard comes pre-packaged with the Dapr CLI. To learn more about the das
 If you intend to run in the Docker Compose platform mode, you don't need to install anything. Instead you specify Dapr docker images to use.
 
 ### Installation
+If you want to install via Helm, run:
+```sh
+helm repo add dapr https://dapr.github.io/helm-charts/
+helm repo update
+helm install dapr-dashboard dapr/dapr-dashboard
+```
 
 #### Kubernetes
 Run `dapr dashboard -k`, or if you installed Dapr in a non-default namespace, `dapr dashboard -k -n <your-namespace>`.
