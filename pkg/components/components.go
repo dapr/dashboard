@@ -14,6 +14,7 @@ limitations under the License.
 package components
 
 import (
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -195,7 +196,7 @@ func (c *components) getDockerComposeComponents(scope string) []Component {
 
 			newComponent := Component{
 				Name:     comp.Name,
-				Kind:     comp.Kind,
+				Kind:     comp.Kind(),
 				Type:     comp.Spec.Type,
 				Created:  info.ModTime().Format("2006-01-02 15:04.05"),
 				Age:      age.GetAge(info.ModTime()),

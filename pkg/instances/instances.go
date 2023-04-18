@@ -80,7 +80,7 @@ type instances struct {
 	getInstancesFn    func(string) []Instance
 	getScopesFn       func() []string
 	dockerComposePath string
-	resolver          *mdns.Resolver
+	resolver          nameresolution.Resolver
 	metadataClient    http.Client
 	daprApiToken      string
 }
