@@ -1,6 +1,6 @@
 # Adding a new platform
 
-Dashboard currently supports 3 platforms: Kubernetes, self-hosted and docker-compose (August 2022).
+Dashboard currently supports 3 platforms: Kubernetes, self-hosted and docker-compose (April 2023).
 
 
 ## Backend
