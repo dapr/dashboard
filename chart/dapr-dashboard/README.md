@@ -1,4 +1,12 @@
-## Dapr Dashboard options
+## Install
+
+```sh
+helm repo add dapr https://dapr.github.io/helm-charts/
+helm repo update
+helm install dapr-dashboard dapr/dapr-dashboard
+```
+
+## Chart Options
 
 | Parameter                               | Description                                                                                                                                                            | Default            |
 |-----------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|
