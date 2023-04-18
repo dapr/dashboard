@@ -413,7 +413,7 @@ func (i *instances) GetMetadata(scope string, id string) MetadataOutput {
 		url = append(url, fmt.Sprintf("http://localhost:%v/v1.0/metadata", port))
 	}
 	if len(url) != 0 {
-		data := i.getMetadataOutputFromURLs(url[0], secondaryUrl[0])
+		data := i.getMetadataOutputFromURLs(url[0], "")
 
 		if len(url) > 1 {
 			// merge the actor metadata from the other replicas
