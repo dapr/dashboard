@@ -24,6 +24,13 @@ Dapr Dashboard provides information about Dapr applications, components, configu
 
 Dapr Dashboard comes pre-packaged with the Dapr CLI. To learn more about the dashboard command, use the CLI command `dapr dashboard -h`.
 
+If you want to install via Helm, run:
+```sh
+helm repo add dapr https://dapr.github.io/helm-charts/
+helm repo update
+helm install dapr-dashboard dapr/dapr-dashboard
+```
+
 #### Kubernetes
 Run `dapr dashboard -k`, or if you installed Dapr in a non-default namespace, `dapr dashboard -k -n <your-namespace>`.
 

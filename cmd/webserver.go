@@ -18,7 +18,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -384,7 +383,7 @@ func getVersionHandler(w http.ResponseWriter, r *http.Request) {
 
 func generateIndexFile(w http.ResponseWriter, r *http.Request, baseHref string) {
 	path, _ := os.Getwd()
-	buf, err := ioutil.ReadFile(filepath.Join(path, "/web/dist/index.html"))
+	buf, err := os.ReadFile(filepath.Join(path, "/web/dist/index.html"))
 	if err != nil {
 		respondWithError(w, 500, err.Error())
 		return

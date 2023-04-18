@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dapr-dashboard
+  labels:
+    app: dapr-dashboard
+    {{- range $key, $value := .Values.k8sLabels }}
+    {{ $key }}: {{ tpl $value $ }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: dapr-dashboard
+  template:
+    metadata:
+      labels:
+        app: dapr-dashboard
+        {{- range $key, $value := .Values.k8sLabels }}
+        {{ $key }}: {{ tpl $value $ }}
+        {{- end }}
+        {{- with .Values.labels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: dapr-dashboard
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+             nodeSelectorTerms:
+                - matchExpressions:
+                  - key: kubernetes.io/os
+                    operator: In
+                    values:
+                    - {{ .Values.daprControlPlaneOs }}
+{{- if .Values.daprControlPlaneArch }}
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values:
+                    - {{ .Values.daprControlPlaneArch }}
+{{- end }}
+{{- if eq .Values.ha.enabled true }}
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - dapr-dashboard
+            topologyKey: "kubernetes.io/hostname"
+{{- end }}
+      containers:
+      - name: dapr-dashboard
+        image: "{{ .Values.image.registry }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+{{- if eq .Values.daprControlPlaneOs "linux" }}
+        securityContext:
+          runAsNonRoot: {{ .Values.runAsNonRoot }}
+{{- end }}
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        ports:
+        - containerPort: 8080
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+{{- if .Values.image.imagePullSecrets }}
+      imagePullSecrets:
+        - name: {{ .Values.image.imagePullSecrets }}
+{{- end }}
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}
+{{- if .Values.tolerations }}
+      tolerations:
+{{ toYaml .Values.tolerations | indent 8 }}
+{{- end }}

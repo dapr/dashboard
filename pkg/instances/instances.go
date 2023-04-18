@@ -259,7 +259,12 @@ func (i *instances) GetDeploymentConfiguration(scope string, id string) string {
 
 // DeleteInstance deletes the local Dapr sidecar instance
 func (i *instances) DeleteInstance(scope string, id string) error {
-	return standalone.Stop(id)
+	apps, err := standalone.List()
+	if err != nil {
+		return err
+	}
+	cliPIDToNoOfApps := standalone.GetCLIPIDCountMap(apps)
+	return standalone.Stop(id, cliPIDToNoOfApps, apps)
 }
 
 // GetInstance uses the appropriate getInstance function (kubernetes, standalone, etc.) and returns the given instance from its id
@@ -513,7 +518,7 @@ func (i *instances) getStandaloneInstances(scope string) []Instance {
 				Command:          o.Command,
 				Age:              o.Age,
 				Created:          o.Created,
-				PID:              o.PID,
+				PID:              o.DaprdPID,
 				Replicas:         1,
 				SupportsDeletion: true,
 				SupportsLogs:     false,
