@@ -447,6 +447,10 @@ func (i *instances) GetMetadata(scope string, id string) MetadataOutput {
 
 func (i *instances) getMetadataOutputFromURLs(primaryURL string, secondaryURL string) MetadataOutput {
 	req, err := http.NewRequest("GET", primaryURL, nil)
+	if err != nil {
+		log.Println(err)
+		return MetadataOutput{}
+	}
 
 	if len(i.daprApiToken) > 0 {
 		req.Header.Add("dapr-api-token", i.daprApiToken)
@@ -456,6 +460,11 @@ func (i *instances) getMetadataOutputFromURLs(primaryURL string, secondaryURL st
 	if err != nil && len(secondaryURL) != 0 {
 		log.Println(err)
 		secondaryReq, err := http.NewRequest("GET", secondaryURL, nil)
+		if err != nil {
+			log.Println(err)
+			return MetadataOutput{}
+		}
+
 		if len(i.daprApiToken) > 0 {
 			secondaryReq.Header.Add("dapr-api-token", i.daprApiToken)
 		}

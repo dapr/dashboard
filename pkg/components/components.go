@@ -14,7 +14,6 @@ limitations under the License.
 package components
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -182,7 +181,7 @@ func (c *components) getDockerComposeComponents(scope string) []Component {
 		if info.IsDir() && info.Name() != filepath.Base(componentsDirectory) {
 			return filepath.SkipDir
 		} else if !info.IsDir() && filepath.Ext(path) == ".yaml" {
-			content, err := ioutil.ReadFile(path)
+			content, err := os.ReadFile(path)
 			if err != nil {
 				log.Printf("Failure reading file %s: %v\n", path, err)
 				return err
