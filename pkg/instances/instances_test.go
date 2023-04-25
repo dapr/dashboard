@@ -3,7 +3,9 @@ Copyright 2021 The Dapr Authors
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,9 +15,11 @@ limitations under the License.
 package instances
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
+	"github.com/dapr/dashboard/pkg/platforms"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -97,4 +101,59 @@ func TestControlPlaneServices(t *testing.T) {
 	k8s := newTestSimpleK8s(runtimeObj...)
 	status := k8s.GetControlPlaneStatus()
 	assert.Equal(t, 12, len(status), "Expected status list length to match")
+}
+
+func TestSupported(t *testing.T) {
+	var scenarios = []struct {
+		platform platforms.Platform
+		want     bool
+	}{
+		{platforms.Kubernetes, true},
+		{platforms.Standalone, true},
+		{platforms.DockerCompose, true},
+	}
+
+	for _, scenario := range scenarios {
+		t.Run(fmt.Sprintf("Platform %s should be supported", scenario.platform), func(t *testing.T) {
+			target := NewInstances(scenario.platform, nil, "")
+			isSupported := target.Supported()
+			assert.Equal(t, scenario.want, isSupported)
+		})
+	}
+}
+
+func TestDockerComposeGetInstances(t *testing.T) {
+	target := NewInstances(platforms.DockerCompose, nil, "testdata/docker-compose.yml")
+	instances := target.GetInstances("")
+	assert.Equal(t, 1, len(instances), "Should parse docker compose file and detect one instance")
+}
+
+func TestDockerComposeGetInstance(t *testing.T) {
+	var scenarios = []struct {
+		id   string
+		want bool
+	}{
+		{"MyApplication.DaprSidecar", true},
+		{"does_not_exist", false},
+	}
+
+	target := NewInstances(platforms.DockerCompose, nil, "testdata/docker-compose.yml")
+
+	for _, scenario := range scenarios {
+		t.Run(fmt.Sprintf("Should load valid instance data - %t", scenario.want), func(t *testing.T) {
+			instance := target.GetInstance("", scenario.id)
+			assert.NotNil(t, instance, "Should always return something")
+
+			if scenario.want {
+				assert.Equal(t, scenario.id, instance.AppID, "Should return the correct instance")
+				assert.Equal(t, 3500, instance.HTTPPort, "Port should be set")
+				assert.Equal(t, false, instance.SupportsLogs, "Logs are not supported")
+				assert.Equal(t, false, instance.SupportsDeletion, "Delegation is not supported")
+				assert.Equal(t, "MyApplication.DaprSidecar:3500", instance.Address, "Address should be set")
+				assert.Equal(t, 80, instance.AppPort, "AppPort should be set")
+			} else {
+				assert.Empty(t, instance.AppID, "When instance not valid, AppID is not set")
+			}
+		})
+	}
 }

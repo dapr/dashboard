@@ -611,7 +611,7 @@ func (i *instances) getDockerComposeInstances(scope string) []Instance {
 	configDetails := types.ConfigDetails{
 		WorkingDir:  workingDir,
 		ConfigFiles: configFiles,
-		Environment: nil,
+		Environment: map[string]string{},
 	}
 
 	// Can't get creation time and age of daprd services so approximate from dashboard process
@@ -630,7 +630,9 @@ func (i *instances) getDockerComposeInstances(scope string) []Instance {
 
 	createTime := time.Unix(createUnixTimeMilliseconds/1000, 0)
 
-	project, err := loader.Load(configDetails)
+	project, err := loader.Load(configDetails, func(options *loader.Options) {
+		options.SetProjectName("dashboard", true)
+	})
 
 	if err != nil {
 		log.Println(err)
