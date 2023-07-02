@@ -12,6 +12,7 @@ rules:
         "components",
         "configurations",
         "namespaces",
+        "statefulsets",
       ]
     verbs: ["get", "list"]
 ---
