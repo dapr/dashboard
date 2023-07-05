@@ -47,7 +47,7 @@ import (
 const (
 	daprEnabledAnnotation = "dapr.io/enabled"
 	daprIDAnnotation      = "dapr.io/app-id"
-	daprPortAnnotation    = "dapr.io/port"
+	daprPortAnnotation    = "dapr.io/app-port"
 )
 
 var controlPlaneLabels = [...]string{
