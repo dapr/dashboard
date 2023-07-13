@@ -47,7 +47,7 @@ import (
 const (
 	daprEnabledAnnotation = "dapr.io/enabled"
 	daprIDAnnotation      = "dapr.io/app-id"
-	daprPortAnnotation    = "dapr.io/port"
+	daprPortAnnotation    = "dapr.io/app-port"
 )
 
 var controlPlaneLabels = [...]string{
@@ -128,11 +128,41 @@ func (i *instances) GetContainers(scope string, id string) []string {
 	ctx := context.Background()
 	if i.kubeClient != nil {
 		resp, err := i.kubeClient.AppsV1().Deployments(scope).List(ctx, (meta_v1.ListOptions{}))
-		if err != nil || len(resp.Items) == 0 {
+		if err != nil {
 			return nil
 		}
+		if len(resp.Items) > 0 {
+			for _, d := range resp.Items {
+				if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
+					daprID := d.Spec.Template.Annotations[daprIDAnnotation]
+					if daprID == id {
+						pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(ctx, meta_v1.ListOptions{
+							LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
+						})
+						if err != nil {
+							log.Println(err)
+							return nil
+						}
 
-		for _, d := range resp.Items {
+						if len(pods.Items) > 0 {
+							p := pods.Items[0]
+							out := []string{}
+							for _, container := range p.Spec.Containers {
+								out = append(out, container.Name)
+							}
+							return out
+						}
+					}
+				}
+			}
+		}
+
+		respSts, errSts := i.kubeClient.AppsV1().StatefulSets(scope).List(ctx, (meta_v1.ListOptions{}))
+
+		if errSts != nil || len(resp.Items) == 0 {
+			return nil
+		}
+		for _, d := range respSts.Items {
 			if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
 				daprID := d.Spec.Template.Annotations[daprIDAnnotation]
 				if daprID == id {
@@ -155,6 +185,7 @@ func (i *instances) GetContainers(scope string, id string) []string {
 				}
 			}
 		}
+
 	}
 	return nil
 }
@@ -209,6 +240,51 @@ func (i *instances) GetLogStream(scope, id, containerName string) ([]io.ReadClos
 				}
 			}
 		}
+		respSts, errSts := i.kubeClient.AppsV1().StatefulSets(scope).List(ctx, (meta_v1.ListOptions{}))
+		if errSts != nil {
+			return nil, errSts
+		}
+		for _, d := range respSts.Items {
+			if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
+				daprID := d.Spec.Template.Annotations[daprIDAnnotation]
+				if daprID == id {
+					pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(ctx, meta_v1.ListOptions{
+						LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
+					})
+					if err != nil {
+						return nil, err
+					}
+
+					var logstreams []io.ReadCloser
+
+					for _, p := range pods.Items {
+						name := p.ObjectMeta.Name
+
+						for _, container := range p.Spec.Containers {
+							if container.Name == containerName {
+								var tailLines int64 = 100
+								options := v1.PodLogOptions{}
+								options.Container = container.Name
+								options.Timestamps = true
+								options.TailLines = &tailLines
+								if len(pods.Items) == 1 {
+									options.Follow = true
+								} else {
+									options.Follow = false // this is necessary to show logs from multiple replicas
+								}
+
+								res := i.kubeClient.CoreV1().Pods(p.ObjectMeta.Namespace).GetLogs(name, &options)
+								stream, streamErr := res.Stream(ctx)
+								if streamErr == nil {
+									logstreams = append(logstreams, stream)
+								}
+							}
+						}
+					}
+					return logstreams, nil
+				}
+			}
+		}
 	}
 	return nil, fmt.Errorf("could not find logstream for %v, %v, %v", scope, id, containerName)
 }
@@ -218,11 +294,69 @@ func (i *instances) GetDeploymentConfiguration(scope string, id string) string {
 	ctx := context.Background()
 	if i.kubeClient != nil {
 		resp, err := i.kubeClient.AppsV1().Deployments(scope).List(ctx, (meta_v1.ListOptions{}))
-		if err != nil || len(resp.Items) == 0 {
+		if err != nil {
+			return ""
+		}
+		if len(resp.Items) > 0 {
+			for _, d := range resp.Items {
+				if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
+					daprID := d.Spec.Template.Annotations[daprIDAnnotation]
+					if daprID == id {
+						pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(ctx, meta_v1.ListOptions{
+							LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
+						})
+						if err != nil {
+							log.Println(err)
+							return ""
+						}
+
+						if len(pods.Items) > 0 {
+							p := pods.Items[0]
+
+							name := p.ObjectMeta.Name
+							nspace := p.ObjectMeta.Namespace
+
+							restClient := i.kubeClient.CoreV1().RESTClient()
+							if err != nil {
+								log.Println(err)
+								return ""
+							}
+
+							url := fmt.Sprintf("/api/v1/namespaces/%s/pods/%s", nspace, name)
+							data, err := restClient.Get().RequestURI(url).Stream(ctx)
+							if err != nil {
+								log.Println(err)
+								return ""
+							}
+
+							buf := new(bytes.Buffer)
+							_, err = buf.ReadFrom(data)
+							if err != nil {
+								log.Println(err)
+								return ""
+							}
+							dataStr := buf.String()
+							j := []byte(dataStr)
+							y, err := yaml.JSONToYAML(j)
+							if err != nil {
+								log.Println(err)
+								return ""
+							}
+
+							return string(y)
+						}
+					}
+				}
+			}
+		}
+
+		respSts, errSts := i.kubeClient.AppsV1().StatefulSets(scope).List(ctx, (meta_v1.ListOptions{}))
+
+		if errSts != nil || len(respSts.Items) == 0 {
 			return ""
 		}
 
-		for _, d := range resp.Items {
+		for _, d := range respSts.Items {
 			if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
 				daprID := d.Spec.Template.Annotations[daprIDAnnotation]
 				if daprID == id {
@@ -272,7 +406,6 @@ func (i *instances) GetDeploymentConfiguration(scope string, id string) string {
 				}
 			}
 		}
-
 	}
 	return ""
 }
@@ -373,11 +506,38 @@ func (i *instances) GetMetadata(scope string, id string) MetadataOutput {
 	var secondaryUrl []string
 	if i.kubeClient != nil {
 		resp, err := i.kubeClient.AppsV1().Deployments(scope).List(ctx, (meta_v1.ListOptions{}))
-		if err != nil || len(resp.Items) == 0 {
+		if err != nil {
 			return MetadataOutput{}
 		}
+		if len(resp.Items) > 0 {
+			for _, d := range resp.Items {
+				if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
+					daprID := d.Spec.Template.Annotations[daprIDAnnotation]
+					if daprID == id {
+						pods, err := i.kubeClient.CoreV1().Pods(d.GetNamespace()).List(ctx, meta_v1.ListOptions{
+							LabelSelector: labels.SelectorFromSet(d.Spec.Selector.MatchLabels).String(),
+						})
+						if err != nil {
+							log.Println(err)
+							return MetadataOutput{}
+						}
 
-		for _, d := range resp.Items {
+						if len(pods.Items) > 0 {
+							p := pods.Items[0]
+							url = append(url, fmt.Sprintf("http://%v:%v/v1.0/metadata", p.Status.PodIP, 3501))
+							secondaryUrl = append(secondaryUrl, fmt.Sprintf("http://%v:%v/v1.0/metadata", p.Status.PodIP, 3500))
+						}
+					}
+				}
+			}
+		}
+
+		respSts, errSts := i.kubeClient.AppsV1().StatefulSets(scope).List(ctx, (meta_v1.ListOptions{}))
+
+		if errSts != nil || len(respSts.Items) == 0 {
+			return MetadataOutput{}
+		}
+		for _, d := range respSts.Items {
 			if d.Spec.Template.Annotations[daprEnabledAnnotation] != "" {
 				daprID := d.Spec.Template.Annotations[daprIDAnnotation]
 				if daprID == id {
@@ -507,8 +667,14 @@ func (i *instances) getKubernetesInstances(scope string) []Instance {
 	ctx := context.Background()
 	list := []Instance{}
 	resp, err := i.kubeClient.AppsV1().Deployments(scope).List(ctx, (meta_v1.ListOptions{}))
+	respSts, errSts := i.kubeClient.AppsV1().StatefulSets(scope).List(ctx, (meta_v1.ListOptions{}))
 	if err != nil {
 		log.Println(err)
+		return list
+	}
+
+	if errSts != nil {
+		log.Println(errSts)
 		return list
 	}
 
@@ -553,6 +719,47 @@ func (i *instances) getKubernetesInstances(scope string) []Instance {
 			list = append(list, i)
 		}
 	}
+	for _, d := range respSts.Items {
+		if d.Spec.Template.Annotations[daprIDAnnotation] != "" {
+			id := d.Spec.Template.Annotations[daprIDAnnotation]
+			i := Instance{
+				AppID:            id,
+				HTTPPort:         3500,
+				GRPCPort:         50001,
+				Command:          "",
+				Age:              age.GetAge(d.CreationTimestamp.Time),
+				Created:          d.GetCreationTimestamp().String(),
+				PID:              -1,
+				Replicas:         int(*d.Spec.Replicas),
+				SupportsDeletion: false,
+				SupportsLogs:     true,
+				Address:          fmt.Sprintf("%s-dapr:80", id),
+				Status:           fmt.Sprintf("%d/%d", d.Status.ReadyReplicas, d.Status.Replicas),
+				Labels:           getAppLabelValue(d.Labels["app"]),
+				Selector:         getAppLabelValue(d.Spec.Selector.MatchLabels["app"]),
+				Config:           d.Spec.Template.Annotations["dapr.io/config"],
+			}
+			if val, ok := d.Spec.Template.Annotations[daprPortAnnotation]; ok {
+				appPort, err := strconv.Atoi(val)
+				if err == nil {
+					i.AppPort = appPort
+				}
+			}
+
+			s := json_serializer.NewYAMLSerializer(json_serializer.DefaultMetaFactory, nil, nil)
+			buf := new(bytes.Buffer)
+			err := s.Encode(&d, buf)
+			if err != nil {
+				log.Println(err)
+				return list
+			}
+
+			i.Manifest = buf.String()
+
+			list = append(list, i)
+		}
+	}
+
 	return list
 }
 
