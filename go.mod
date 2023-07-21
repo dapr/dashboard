@@ -5,9 +5,9 @@ go 1.19
 require (
 	github.com/compose-spec/compose-go v1.13.3
 	github.com/dapr/cli v1.10.0-rc.3
-	github.com/dapr/components-contrib v1.10.0-rc.4
-	github.com/dapr/dapr v1.10.0-rc.5
-	github.com/dapr/kit v0.0.4
+	github.com/dapr/components-contrib v1.10.10
+	github.com/dapr/dapr v1.10.9
+	github.com/dapr/kit v0.0.5-0.20230307192505-b5bafe889a81
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/shirou/gopsutil v3.21.11+incompatible
@@ -27,7 +27,6 @@ require (
 	github.com/PuerkitoBio/purell v1.2.0 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr v1.4.10 // indirect
-	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/briandowns/spinner v1.21.0 // indirect
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
@@ -40,7 +39,7 @@ require (
 	github.com/docker/docker v23.0.0+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
-	github.com/emicklei/go-restful/v3 v3.10.1 // indirect
+	github.com/emicklei/go-restful/v3 v3.10.2 // indirect
 	github.com/evanphx/json-patch v5.6.0+incompatible // indirect
 	github.com/evanphx/json-patch/v5 v5.6.0 // indirect
 	github.com/fasthttp/router v1.4.16 // indirect
@@ -124,6 +123,7 @@ require (
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
+	go.mongodb.org/mongo-driver v1.11.6 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/otel v1.13.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.13.0 // indirect
@@ -134,7 +134,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.13.0 // indirect
 	go.opentelemetry.io/otel/trace v1.13.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.19.0 // indirect
-	golang.org/x/exp v0.0.0-20230206171751-46f607a40771 // indirect
+	golang.org/x/exp v0.0.0-20230224173230-c95f2b4c22f2 // indirect
 	golang.org/x/mod v0.8.0 // indirect
 	golang.org/x/net v0.6.0 // indirect
 	golang.org/x/oauth2 v0.5.0 // indirect
