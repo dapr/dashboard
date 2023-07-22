@@ -191,6 +191,7 @@ func (c *components) getDockerComposeComponents(scope string) []Component {
 			err = yaml.Unmarshal(content, &comp)
 			if err != nil {
 				log.Printf("Failure unmarshalling %s into Component: %s\n", path, err.Error())
+				return nil
 			}
 
 			newComponent := Component{
