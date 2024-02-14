@@ -18,7 +18,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -34,6 +33,7 @@ import (
 	instances "github.com/dapr/dashboard/pkg/instances"
 	kube "github.com/dapr/dashboard/pkg/kube"
 	dashboard_log "github.com/dapr/dashboard/pkg/log"
+	"github.com/dapr/dashboard/pkg/platforms"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 )
@@ -79,18 +79,18 @@ var (
 )
 
 // RunWebServer starts the web server that serves the Dapr UI dashboard and the API
-func RunWebServer(port int) {
-	platform := ""
+func RunWebServer(port int, isDockerCompose bool, componentsPath string, configPath string, dockerComposePath string) {
+	platform := platforms.Standalone
 	kubeClient, daprClient, _ := kube.Clients()
 	if kubeClient != nil {
-		platform = "kubernetes"
-	} else {
-		platform = "standalone"
+		platform = platforms.Kubernetes
+	} else if isDockerCompose {
+		platform = platforms.DockerCompose
 	}
 
-	inst = instances.NewInstances(platform, kubeClient)
-	comps = components.NewComponents(platform, daprClient)
-	configs = configurations.NewConfigurations(platform, daprClient)
+	inst = instances.NewInstances(platform, kubeClient, dockerComposePath)
+	comps = components.NewComponents(platform, daprClient, componentsPath)
+	configs = configurations.NewConfigurations(platform, daprClient, configPath)
 
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api/").Subrouter()
@@ -219,7 +219,7 @@ func getFeaturesHandler(w http.ResponseWriter, r *http.Request) {
 	if configs.Supported() {
 		features = append(features, "configurations")
 	}
-	if inst.CheckPlatform() == "kubernetes" {
+	if inst.CheckPlatform() == platforms.Kubernetes {
 		features = append(features, "status")
 	}
 	respondWithJSON(w, 200, features)
@@ -227,7 +227,7 @@ func getFeaturesHandler(w http.ResponseWriter, r *http.Request) {
 
 func getPlatformHandler(w http.ResponseWriter, r *http.Request) {
 	resp := inst.CheckPlatform()
-	respondWithPlainString(w, 200, resp)
+	respondWithPlainString(w, 200, string(resp))
 }
 
 func getContainersHandler(w http.ResponseWriter, r *http.Request) {
@@ -389,7 +389,7 @@ func getVersionHandler(w http.ResponseWriter, r *http.Request) {
 
 func generateIndexFile(w http.ResponseWriter, r *http.Request, baseHref string) {
 	path, _ := os.Getwd()
-	buf, err := ioutil.ReadFile(filepath.Join(path, "/web/dist/index.html"))
+	buf, err := os.ReadFile(filepath.Join(path, "/web/dist/index.html"))
 	if err != nil {
 		respondWithError(w, 500, err.Error())
 		return

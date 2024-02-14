@@ -15,11 +15,12 @@ package version
 
 import (
 	"context"
+	"strings"
+
 	"github.com/dapr/cli/pkg/standalone"
 	"github.com/dapr/dashboard/pkg/kube"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"strings"
 )
 
 // version is the current Dapr dashboard version
@@ -52,7 +53,11 @@ func GetRuntimeVersion() (string, error) {
 		}
 	} else {
 		// standalone
-		return strings.ReplaceAll(standalone.GetRuntimeVersion(), "\n", ""), nil
+		version, err := standalone.GetRuntimeVersion("")
+		if err != nil {
+			return "", err
+		}
+		return strings.ReplaceAll(version, "\n", ""), nil
 	}
 	return "", nil
 }

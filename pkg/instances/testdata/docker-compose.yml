@@ -1,0 +1,53 @@
+version: '3.8'
+services:
+
+  my-application-webhost:
+    build:
+      context: .
+      dockerfile: src/My.Application.WebHost/Dockerfile
+    ports:
+      - "5002:80"
+    networks:
+      - my-network
+
+  my-application-webhost-dapr:
+    image: "daprio/daprd:1.8.0"
+    command: [ "./daprd",
+               "-app-id", "MyApplication.DaprSidecar",
+               "-app-port", "80",
+               "-placement-host-address", "dapr-placement:50000",
+               "-components-path", "/components",
+               "-config", "/configuration/config.yaml" ]
+    volumes:
+      - "./dockercompose/dapr/components/:/components"
+      - "./dockercompose/dapr/config/:/configuration"
+    depends_on:
+      - my-application-webhost
+      - dapr-placement
+    network_mode: "service:my-application-webhost"
+
+  dapr-placement:
+    image: "daprio/dapr:1.8.0"
+    command: [ "./placement", "-port", "50000" ]
+    ports:
+      - "50000:50000"
+    networks:
+      - my-network
+
+  dapr-dashboard:
+    image: "daprio/dashboard:latest"
+    command: [ "--docker-compose=true",
+               "--components-path=/home/nonroot/components",
+               "--config-path=/home/nonroot/configuration",
+               "--docker-compose-path=/home/nonroot/docker-compose.yml" ]
+    ports:
+      - "8080:8080"
+    volumes:
+      - "./dockercompose/dapr/components/:/home/nonroot/components"
+      - "./dockercompose/dapr/config/:/home/nonroot/configuration"
+      - ./docker-compose.yml:/home/nonroot/docker-compose.yml
+    networks:
+      - my-network
+
+networks:
+  my-network:
