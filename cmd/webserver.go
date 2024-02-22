@@ -17,8 +17,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/dapr/dashboard/pkg/version"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -26,11 +25,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dapr/dashboard/pkg/version"
+
 	components "github.com/dapr/dashboard/pkg/components"
 	configurations "github.com/dapr/dashboard/pkg/configurations"
 	instances "github.com/dapr/dashboard/pkg/instances"
 	kube "github.com/dapr/dashboard/pkg/kube"
 	dashboard_log "github.com/dapr/dashboard/pkg/log"
+	"github.com/dapr/dashboard/pkg/platforms"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 )
@@ -69,23 +71,25 @@ type DaprVersion struct {
 	RuntimeVersion string `json:"runtimeVersion"`
 }
 
-var inst instances.Instances
-var comps components.Components
-var configs configurations.Configurations
+var (
+	inst    instances.Instances
+	comps   components.Components
+	configs configurations.Configurations
+)
 
 // RunWebServer starts the web server that serves the Dapr UI dashboard and the API
-func RunWebServer(port int) {
-	platform := ""
+func RunWebServer(port int, isDockerCompose bool, componentsPath string, configPath string, dockerComposePath string) {
+	platform := platforms.Standalone
 	kubeClient, daprClient, _ := kube.Clients()
 	if kubeClient != nil {
-		platform = "kubernetes"
-	} else {
-		platform = "standalone"
+		platform = platforms.Kubernetes
+	} else if isDockerCompose {
+		platform = platforms.DockerCompose
 	}
 
-	inst = instances.NewInstances(platform, kubeClient)
-	comps = components.NewComponents(platform, daprClient)
-	configs = configurations.NewConfigurations(platform, daprClient)
+	inst = instances.NewInstances(platform, kubeClient, dockerComposePath)
+	comps = components.NewComponents(platform, daprClient, componentsPath)
+	configs = configurations.NewConfigurations(platform, daprClient, configPath)
 
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api/").Subrouter()
@@ -210,7 +214,7 @@ func getFeaturesHandler(w http.ResponseWriter, r *http.Request) {
 	if configs.Supported() {
 		features = append(features, "configurations")
 	}
-	if inst.CheckPlatform() == "kubernetes" {
+	if inst.CheckPlatform() == platforms.Kubernetes {
 		features = append(features, "status")
 	}
 	respondWithJSON(w, 200, features)
@@ -218,7 +222,7 @@ func getFeaturesHandler(w http.ResponseWriter, r *http.Request) {
 
 func getPlatformHandler(w http.ResponseWriter, r *http.Request) {
 	resp := inst.CheckPlatform()
-	respondWithPlainString(w, 200, resp)
+	respondWithPlainString(w, 200, string(resp))
 }
 
 func getContainersHandler(w http.ResponseWriter, r *http.Request) {
@@ -246,12 +250,18 @@ func getLogStreamsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer c.Close()
-	reader, err := inst.GetLogStream(scope, id, container)
+	streams, err := inst.GetLogStream(scope, id, container)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer reader.Close()
+
+	var readStreams []io.Reader
+	for _, stream := range streams {
+		defer stream.Close()
+		readStreams = append(readStreams, stream)
+	}
+	reader := io.MultiReader(readStreams...)
 
 	lineReader := bufio.NewReader(reader)
 	logReader := dashboard_log.NewReader(container, lineReader)
@@ -374,7 +384,7 @@ func getVersionHandler(w http.ResponseWriter, r *http.Request) {
 
 func generateIndexFile(w http.ResponseWriter, r *http.Request, baseHref string) {
 	path, _ := os.Getwd()
-	buf, err := ioutil.ReadFile(filepath.Join(path, "/web/dist/index.html"))
+	buf, err := os.ReadFile(filepath.Join(path, "/web/dist/index.html"))
 	if err != nil {
 		respondWithError(w, 500, err.Error())
 		return

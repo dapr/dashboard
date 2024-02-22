@@ -28,6 +28,8 @@ export class ConfigurationComponent implements OnInit, OnDestroy {
         this.displayedColumns = ['name', 'tracing-enabled', 'mtls-enabled', 'mtls-workload-ttl', 'mtls-clock-skew', 'age', 'created'];
       } else if (platform === 'standalone') {
         this.displayedColumns = ['name', 'tracing-enabled', 'mtls-enabled', 'age', 'created'];
+      } else if (platform === 'docker-compose') {
+        this.displayedColumns = ['name', 'tracing-enabled', 'mtls-enabled', 'age', 'created'];
       }
     });
 

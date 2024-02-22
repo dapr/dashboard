@@ -79,7 +79,7 @@ docker push <your-image-name>
 ```
 
 #### Apply new deployment
-Create a new deployment file with your image name (see `deploy/dashboard.yaml` for reference):
+Create a new deployment file with your image name (see [deploy/dashboard.yaml](https://github.com/dapr/dashboard/blob/master/deploy/dashboard.yaml) for reference):
 ```yaml
 ...
     spec:

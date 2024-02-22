@@ -33,8 +33,8 @@ jobs:
     name: Build ${{ matrix.target_os }}_${{ matrix.target_arch }} binaries
     runs-on: ${{ matrix.os }}
     env:
-      GOVER: 1.17
-      GOLANGCILINT_VER: 1.26.0
+      GOVER: 1.19
+      GOLANGCILINT_VER: 1.50.1
       GOOS: ${{ matrix.target_os }}
       GOARCH: ${{ matrix.target_arch }}
       GOPROXY: https://proxy.golang.org
@@ -214,3 +214,115 @@ jobs:
         run: |
           echo "Build docker multiarch image manifest and push it"
           make docker-publish DAPR_REGISTRY=ghcr.io/${{ github.repository_owner }} DAPR_TAG=${{ env.REL_VERSION }}
+  helm-build:
+    name: Builds Helm chart
+    env:
+      HELM_PACKAGE_DIR: helm
+      HELMVER: v3.7.2
+      DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+      ARTIFACT_DIR: ./helm_release
+      DAPR_VERSION_ARTIFACT: dapr_version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Helm ${{ env.HELMVER }}
+        uses: azure/setup-helm@v1
+        with:
+          version: ${{ env.HELMVER }}
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v3
+      - name: Parse release version and set REL_VERSION and LATEST_RELEASE
+        run: python ./.github/scripts/get_release_version.py ${{ github.event_name }}
+      - name: Set REPO_OWNER
+        shell: bash
+        run: |
+          REPO_OWNER=${{ github.repository_owner }}
+          # Lowercase the value
+          echo "REPO_OWNER=${REPO_OWNER,,}" >>${GITHUB_ENV}
+      - name: Update Helm chart files for release version ${{ env.REL_VERSION }}
+        run: ./.github/scripts/set_helm_dapr_version.sh
+      - name: Generate Helm chart manifest
+        if: env.DOCKER_REGISTRY != ''
+        env:
+          DAPR_REGISTRY: ${{ env.DOCKER_REGISTRY }}
+          DAPR_TAG: ${{ env.REL_VERSION }}
+        run: |
+          make manifest-gen
+        shell: bash
+      - name: Move Helm chart manifest to artifact
+        if: env.DOCKER_REGISTRY != ''
+        run: |
+          mkdir -p ${{ env.ARTIFACT_DIR }}
+          mv ./release/install/dapr-dashboard.yaml ${{ env.ARTIFACT_DIR }}/dapr-dashboard.yaml
+      - name: Save release version
+        run: |
+          mkdir -p ${{ env.ARTIFACT_DIR }}/${{ env.HELM_PACKAGE_DIR }}
+          echo ${REL_VERSION} > ${{ env.ARTIFACT_DIR }}/${{ env.HELM_PACKAGE_DIR }}/${{ env.DAPR_VERSION_ARTIFACT }}
+      - name: Package Helm chart
+        if: ${{ env.LATEST_RELEASE }} == "true" && env.DOCKER_REGISTRY != ''
+        env:
+          HELM_CHARTS_DIR: chart/dapr-dashboard
+        run: |
+          mkdir -p ${{ env.ARTIFACT_DIR }}/${{ env.HELM_PACKAGE_DIR }}
+          helm package ${{ env.HELM_CHARTS_DIR }} --destination ${{ env.ARTIFACT_DIR }}/${{ env.HELM_PACKAGE_DIR }}
+      - name: Upload Helm charts package to artifacts
+        if: ${{ env.LATEST_RELEASE }} == "true" && env.DOCKER_REGISTRY != ''
+        uses: actions/upload-artifact@master
+        with:
+          name: dapr_helm_charts_package
+          path: ${{ env.ARTIFACT_DIR }}/${{ env.HELM_PACKAGE_DIR }}
+  # This job downloads the helm charts package artifact uploaded by the publish job,
+  # checks out the helm charts git hub pages repo and commits the latest version of
+  # helm charts package.
+  # This does not run on forks
+  helm-publish:
+    name: Publish Helm charts to Helm github pages repo
+    needs: helm-build
+    if: startswith(github.ref, 'refs/tags/v') && github.repository_owner == 'dapr'
+    env:
+      ARTIFACT_DIR: ./helm_release
+      DAPR_VERSION_ARTIFACT: dapr_version
+      HELM_PACKAGE_DIR: helm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Helm charts directory
+        run: |
+          mkdir -p ${{ env.ARTIFACT_DIR }}/${{ env.HELM_PACKAGE_DIR }}
+      - name: download artifacts - dapr_helm_charts_package
+        uses: actions/download-artifact@master
+        with:
+          name: dapr_helm_charts_package
+          path: ${{ env.ARTIFACT_DIR }}/${{ env.HELM_PACKAGE_DIR }}
+      - name: Checkout Helm Charts Repo
+        uses: actions/checkout@v3
+        env:
+          DAPR_HELM_REPO: dapr/helm-charts
+          DAPR_HELM_REPO_CODE_PATH: helm-charts
+        with:
+          repository: ${{ env.DAPR_HELM_REPO }}
+          ref: refs/heads/master
+          token: ${{ secrets.DAPR_BOT_TOKEN }}
+          path: ${{ env.DAPR_HELM_REPO_CODE_PATH }}
+      - name: Upload helm charts to Helm Repo
+        env:
+          DAPR_HELM_REPO_CODE_PATH: helm-charts
+          DAPR_HELM_REPO: https://dapr.github.io/helm-charts/
+        run: |
+          daprVersion=`cat ${{ env.ARTIFACT_DIR }}/${{ env.HELM_PACKAGE_DIR }}/${{ env.DAPR_VERSION_ARTIFACT }}`
+          cd ${{ env.ARTIFACT_DIR }}/${{ env.HELM_PACKAGE_DIR }}
+          cp -r `ls -A | grep -v ${{ env.DAPR_VERSION_ARTIFACT }}` $GITHUB_WORKSPACE/${{ env.DAPR_HELM_REPO_CODE_PATH }}
+          cd $GITHUB_WORKSPACE/${{ env.DAPR_HELM_REPO_CODE_PATH }}
+          helm repo index --url ${{ env.DAPR_HELM_REPO }} --merge index.yaml .
+          git config --global user.email "daprweb@microsoft.com"
+          git config --global user.name "dapr-bot"
+          git add --all
+          # Check if the dapr-dashboard-${daprVersion}.tgz file is modified.
+          if git diff --name-only --staged | grep -q ${daprVersion}; then
+            # If it is, we update the Helm chart, since this is an intentional update.
+            git commit -m "Release - $daprVersion"
+            git push
+          else
+            # This check is here because the automation can fail, but the manual step is no longer required.
+            # If not, this update was accidentally triggered by tagging a release before updating the Helm chart.
+            echo "::error::There is no change for ${daprVersion} Helm chart. Did you forget to update the chart version before tagging?"
+            exit -1
+          fi

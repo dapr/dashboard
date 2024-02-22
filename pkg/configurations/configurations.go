@@ -23,6 +23,7 @@ import (
 	scheme "github.com/dapr/dapr/pkg/client/clientset/versioned"
 	"github.com/dapr/dapr/pkg/config"
 	"github.com/dapr/dashboard/pkg/age"
+	"github.com/dapr/dashboard/pkg/platforms"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -34,21 +35,25 @@ type Configurations interface {
 }
 
 type configurations struct {
-	platform            string
+	platform            platforms.Platform
 	daprClient          scheme.Interface
 	getConfigurationsFn func(scope string) []Configuration
+	configPath          string
 }
 
 // NewConfigurations returns a new Configurations instance
-func NewConfigurations(platform string, daprClient scheme.Interface) Configurations {
+func NewConfigurations(platform platforms.Platform, daprClient scheme.Interface, configPath string) Configurations {
 	c := configurations{}
 	c.platform = platform
 
-	if platform == "kubernetes" {
+	if platform == platforms.Kubernetes {
 		c.getConfigurationsFn = c.getKubernetesConfigurations
 		c.daprClient = daprClient
-	} else if platform == "standalone" {
+	} else if platform == platforms.Standalone {
 		c.getConfigurationsFn = c.getStandaloneConfigurations
+	} else if platform == platforms.DockerCompose {
+		c.getConfigurationsFn = c.getDockerComposeConfigurations
+		c.configPath = configPath
 	}
 	return &c
 }
@@ -70,7 +75,7 @@ type Configuration struct {
 
 // Supported checks whether or not the supplied platform is able to access Dapr configurations
 func (c *configurations) Supported() bool {
-	return c.platform == "kubernetes" || c.platform == "standalone"
+	return c.platform == platforms.Kubernetes || c.platform == platforms.Standalone || c.platform == platforms.DockerCompose
 }
 
 // GetConfiguration returns the Dapr configuration specified by name
@@ -119,9 +124,17 @@ func (c *configurations) getKubernetesConfigurations(scope string) []Configurati
 
 // getStandaloneConfigurations returns the list of Dapr Configurations Statuses
 func (c *configurations) getStandaloneConfigurations(scope string) []Configuration {
-	configurationsDirectory := filepath.Dir(standalone.DefaultConfigFilePath())
 	standaloneConfigurations := []Configuration{}
-	err := filepath.Walk(configurationsDirectory, func(path string, info os.FileInfo, err error) error {
+
+	daprDir, err := standalone.GetDaprRuntimePath("")
+	if err != nil {
+		log.Printf("Failure findinf Dapr's runtime path: %v\n", err)
+		return standaloneConfigurations
+	}
+
+	defaultConfigFilePath := standalone.GetDaprConfigPath(daprDir)
+	configurationsDirectory := filepath.Dir(defaultConfigFilePath)
+	err = filepath.Walk(configurationsDirectory, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			log.Printf("Failure accessing path %s: %v\n", path, err)
 			return err
@@ -161,6 +174,52 @@ func (c *configurations) getStandaloneConfigurations(scope string) []Configurati
 		return []Configuration{}
 	}
 	return standaloneConfigurations
+}
+
+// getDockerComposeConfigurations returns the list of docker-compose Dapr Configurations Statuses
+func (c *configurations) getDockerComposeConfigurations(scope string) []Configuration {
+	configurationsDirectory := c.configPath
+	dockerComposeConfigurations := []Configuration{}
+	err := filepath.Walk(configurationsDirectory, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			log.Printf("Failure accessing path %s: %v\n", path, err)
+			return err
+		}
+		if info.IsDir() && info.Name() != filepath.Base(configurationsDirectory) {
+			return filepath.SkipDir
+		} else if !info.IsDir() && filepath.Ext(path) == ".yaml" {
+			comp, content, err := config.LoadStandaloneConfiguration(path)
+			if err != nil {
+				log.Printf("Failure reading configuration file %s: %v\n", path, err)
+				return err
+			}
+
+			newConfiguration := Configuration{
+				Name:            comp.Name,
+				Kind:            comp.Kind,
+				Created:         info.ModTime().Format("2006-01-02 15:04.05"),
+				Age:             age.GetAge(info.ModTime()),
+				TracingEnabled:  tracingEnabled(comp.Spec.TracingSpec.SamplingRate),
+				SamplingRate:    comp.Spec.TracingSpec.SamplingRate,
+				MetricsEnabled:  comp.Spec.MetricSpec.Enabled,
+				MTLSEnabled:     comp.Spec.MTLSSpec.Enabled,
+				WorkloadCertTTL: comp.Spec.MTLSSpec.WorkloadCertTTL,
+				ClockSkew:       comp.Spec.MTLSSpec.AllowedClockSkew,
+				Manifest:        content,
+			}
+
+			if newConfiguration.Kind == "Configuration" {
+				dockerComposeConfigurations = append(dockerComposeConfigurations, newConfiguration)
+			}
+			return nil
+		}
+		return nil
+	})
+	if err != nil {
+		log.Printf("error walking the path %q: %v\n", configurationsDirectory, err)
+		return []Configuration{}
+	}
+	return dockerComposeConfigurations
 }
 
 // tracingEnabled checks if tracing is enabled for a configuration
