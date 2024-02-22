@@ -20,7 +20,6 @@
     "postinstall": "node scripts/version.js && ngcc"
   },
   "dependencies": {
-    "@angular-builders/custom-webpack": "^12.1.3",
     "@angular/animations": "~12.2.3",
     "@angular/cdk": "^12.2.3",
     "@angular/common": "~12.2.3",
