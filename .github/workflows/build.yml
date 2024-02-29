@@ -20,25 +20,25 @@ on:
       - release-*
     tags:
       - v*
-    paths-ignore: 
-      - '**.md'
+    paths-ignore:
+      - "**.md"
   pull_request:
     branches:
       - master
       - release-*
-    paths-ignore: 
-      - '**.md'
+    paths-ignore:
+      - "**.md"
 jobs:
   build:
     name: Build ${{ matrix.target_os }}_${{ matrix.target_arch }} binaries
     runs-on: ${{ matrix.os }}
     env:
-      GOVER: 1.19
-      GOLANGCILINT_VER: 1.50.1
+      GOVER: 1.21
+      GOLANGCILINT_VER: 1.56.2
       GOOS: ${{ matrix.target_os }}
       GOARCH: ${{ matrix.target_arch }}
       GOPROXY: https://proxy.golang.org
-      NODE_VERSION: 16.x
+      NODE_VERSION: 18.x
       ARTIFACTS_DIR: release/artifacts
     strategy:
       matrix:
