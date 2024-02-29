@@ -118,6 +118,87 @@
       </mat-card-content>
     </mat-card>
   </mat-tab>
+  <mat-tab label="Components">
+    <mat-card class="card-large mat-elevation-z8">
+      <mat-card-header>
+        <mat-card-title>Components</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <table *ngIf="metadata && metadata.components && metadata.components.length > 0; else noComponents">
+          <thead>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Version</th>
+            <th>Capabilities</th>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of metadata.components">
+              <td class="table-label">{{ item.name }}</td>
+              <td class="table-data">{{ item.type }}</td>
+              <td class="table-data">{{ item.version }}</td>
+              <td class="table-data">
+                <span *ngFor="let capability of item.capabilities">{{ capability }}<br /></span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ng-template #noComponents>
+          <p class="page-text">No registered Dapr Components</p>
+        </ng-template>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+  <mat-tab label="Subscriptions">
+    <mat-card class="card-large mat-elevation-z8">
+      <mat-card-header>
+        <mat-card-title>Subscriptions</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <table *ngIf="metadata && metadata.subscriptions && metadata.subscriptions.length > 0; else noSubscriptions">
+          <thead>
+            <th>Pubsubname</th>
+            <th>Topic</th>
+            <th>Dead letter topic</th>
+            <th>Metadata</th>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of metadata.subscriptions">
+              <td class="table-label">{{ item.pubsubName }}</td>
+              <td class="table-data">{{ item.topic }}</td>
+              <td class="table-data">{{ item.deadLetterTopic }}</td>
+              <td class="table-data">
+                <table *ngIf="item.metadata">
+                  <tbody>
+                    <tr *ngFor="let metaItem of item.metadata | keyvalue">
+                      <td class="table-label">{{ metaItem.key }}</td>
+                      <td class="table-data">{{ metaItem.value }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+              <td class="table-data">
+                <table *ngIf="item.rules">
+                  <thead>
+                    <th>Match</th>
+                    <th>Path</th>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let rule of item.rules">
+                      <td class="table-data">{{rule.match}}</td>
+                      <td class="table-data">{{rule.path}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ng-template #noSubscriptions>
+          <p class="page-text">No registered Dapr Subscriptions</p>
+        </ng-template>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
   <mat-tab *ngIf="platform === 'kubernetes'" label="Logs">
     <app-logs></app-logs>
   </mat-tab>
