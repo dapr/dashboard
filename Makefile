@@ -139,7 +139,7 @@ $(5)/$(1):
 	-o $(5)/$(1) \
 	./main.go;
 	mkdir -p $(5)/web/dist
-	cd web && npm i && ng build --outputPath=../$(5)/web/dist
+	cd web && npm i && NODE_OPTIONS=--openssl-legacy-provider ng build --outputPath=../$(5)/web/dist
 endef
 
 # Generate binary targets
