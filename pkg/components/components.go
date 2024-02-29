@@ -17,6 +17,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"slices"
 
 	"github.com/dapr/cli/pkg/standalone"
 	v1alpha1 "github.com/dapr/dapr/pkg/apis/components/v1alpha1"
@@ -132,7 +133,7 @@ func (c *components) getStandaloneComponents(scope string) []Component {
 		}
 		if info.IsDir() && info.Name() != filepath.Base(componentsDirectory) {
 			return filepath.SkipDir
-		} else if !info.IsDir() && filepath.Ext(path) == ".yaml" {
+		} else if !info.IsDir() && isYamlFile(path) {
 			content, err := os.ReadFile(path)
 			if err != nil {
 				log.Printf("Failure reading file %s: %v\n", path, err)
@@ -180,7 +181,7 @@ func (c *components) getDockerComposeComponents(scope string) []Component {
 		}
 		if info.IsDir() && info.Name() != filepath.Base(componentsDirectory) {
 			return filepath.SkipDir
-		} else if !info.IsDir() && filepath.Ext(path) == ".yaml" {
+		} else if !info.IsDir() && isYamlFile(path) {
 			content, err := os.ReadFile(path)
 			if err != nil {
 				log.Printf("Failure reading file %s: %v\n", path, err)
@@ -216,4 +217,11 @@ func (c *components) getDockerComposeComponents(scope string) []Component {
 		return []Component{}
 	}
 	return dockerComposeComponents
+}
+
+func isYamlFile(path string) bool {
+	actualExtension := filepath.Ext(path)
+	validExtensions := []string{".yaml", ".yml"}
+
+	return slices.Contains(validExtensions, actualExtension)
 }
