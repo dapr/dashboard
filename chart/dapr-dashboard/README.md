@@ -25,6 +25,7 @@ helm install dapr-dashboard dapr/dapr-dashboard
 | `ingress.host`           | Fully qualified hostname of the dashboard URL (e.g `dashboard.dapr.local`) | ``                 |
 | `ingress.tls.enabled`    | If true, enables TLS on the ingress for the Dashboard                                                                                                                      | `false`            |
 | `ingress.tls.secretName` | Name of the Kubernetes secret containing the TLS certificate (key/certificate) for the Dashboard. Ignored if `dapr_dashboard.ingress.tls.enabled` is `false`. | ``                 |
+| `ingress.annotations` | Annotations for the ingress resource | `{}`                 |
 | `registry`                         | Docker image registry                                                   | `docker.io/daprio`      |
 | `tag`                              | Docker image version tag                                                | latest release          |
 | `logAsJson`                        | Json log format for control plane services                              | `false`                 |

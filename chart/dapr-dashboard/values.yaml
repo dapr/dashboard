@@ -24,6 +24,7 @@ ingress:
   tls:
     enabled: false
     secretName:
+  annotations: {}
 
 runAsNonRoot: true
 serviceType: ClusterIP
