@@ -78,3 +78,22 @@ func TestDockerComposeGetComponent(t *testing.T) {
 		})
 	}
 }
+
+func TestIsYamlFile(t *testing.T) {
+	var scenarios = []struct {
+		path string
+		want bool
+	}{
+		{"pubsub.yaml", true},
+		{"pubsub.yml", true},
+		{"pubsub.txt", false},
+		{"pubsub", false},
+	}
+
+	for _, scenario := range scenarios {
+		t.Run(fmt.Sprintf("Should return valid yaml file - %t", scenario.want), func(t *testing.T) {
+			actual := isYamlFile(scenario.path)
+			assert.Equal(t, scenario.want, actual)
+		})
+	}
+}
