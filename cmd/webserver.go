@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -114,14 +115,18 @@ func RunWebServer(port int, isDockerCompose bool, componentsPath string, configP
 	spa := spaHandler{staticPath: "web/dist", indexPath: "index.html"}
 	r.PathPrefix("/").Handler(spa)
 
+	listener, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%v", port))
+	if err != nil {
+		log.Fatal(err)
+	}
+	port = listener.Addr().(*net.TCPAddr).Port
 	srv := &http.Server{
 		Handler:      r,
-		Addr:         fmt.Sprintf("0.0.0.0:%v", port),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
 	fmt.Printf("Dapr Dashboard running on http://localhost:%v\n", port)
-	log.Fatal(srv.ListenAndServe())
+	log.Fatal(srv.Serve(listener))
 }
 
 // ServeHTTP inspects the URL path to locate a file within the static dir
