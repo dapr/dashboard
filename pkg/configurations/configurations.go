@@ -111,10 +111,10 @@ func (c *configurations) getKubernetesConfigurations(scope string) []Configurati
 			Age:             age.GetAge(comp.CreationTimestamp.Time),
 			TracingEnabled:  tracingEnabled(comp.Spec.TracingSpec.SamplingRate),
 			SamplingRate:    comp.Spec.TracingSpec.SamplingRate,
-			MetricsEnabled:  comp.Spec.MetricSpec.Enabled,
-			MTLSEnabled:     comp.Spec.MTLSSpec.Enabled,
-			WorkloadCertTTL: comp.Spec.MTLSSpec.WorkloadCertTTL,
-			ClockSkew:       comp.Spec.MTLSSpec.AllowedClockSkew,
+			MetricsEnabled:  *comp.Spec.MetricSpec.Enabled,
+			MTLSEnabled:     *comp.Spec.MTLSSpec.Enabled,
+			WorkloadCertTTL: *comp.Spec.MTLSSpec.WorkloadCertTTL,
+			ClockSkew:       *comp.Spec.MTLSSpec.AllowedClockSkew,
 			Manifest:        comp,
 		}
 		out = append(out, newConfiguration)
@@ -142,7 +142,7 @@ func (c *configurations) getStandaloneConfigurations(scope string) []Configurati
 		if info.IsDir() && info.Name() != filepath.Base(configurationsDirectory) {
 			return filepath.SkipDir
 		} else if !info.IsDir() && filepath.Ext(path) == ".yaml" {
-			comp, content, err := config.LoadStandaloneConfiguration(path)
+			comp, err := config.LoadStandaloneConfiguration(path)
 			if err != nil {
 				log.Printf("Failure reading configuration file %s: %v\n", path, err)
 				return err
@@ -155,11 +155,11 @@ func (c *configurations) getStandaloneConfigurations(scope string) []Configurati
 				Age:             age.GetAge(info.ModTime()),
 				TracingEnabled:  tracingEnabled(comp.Spec.TracingSpec.SamplingRate),
 				SamplingRate:    comp.Spec.TracingSpec.SamplingRate,
-				MetricsEnabled:  comp.Spec.MetricSpec.Enabled,
+				MetricsEnabled:  *comp.Spec.MetricSpec.Enabled,
 				MTLSEnabled:     comp.Spec.MTLSSpec.Enabled,
 				WorkloadCertTTL: comp.Spec.MTLSSpec.WorkloadCertTTL,
 				ClockSkew:       comp.Spec.MTLSSpec.AllowedClockSkew,
-				Manifest:        content,
+				Manifest:        comp.String(),
 			}
 
 			if newConfiguration.Kind == "Configuration" {
@@ -188,7 +188,8 @@ func (c *configurations) getDockerComposeConfigurations(scope string) []Configur
 		if info.IsDir() && info.Name() != filepath.Base(configurationsDirectory) {
 			return filepath.SkipDir
 		} else if !info.IsDir() && filepath.Ext(path) == ".yaml" {
-			comp, content, err := config.LoadStandaloneConfiguration(path)
+			comp, err := config.LoadStandaloneConfiguration(path)
+			comp.Spec.MTLSSpec = new(config.MTLSSpec)
 			if err != nil {
 				log.Printf("Failure reading configuration file %s: %v\n", path, err)
 				return err
@@ -201,11 +202,11 @@ func (c *configurations) getDockerComposeConfigurations(scope string) []Configur
 				Age:             age.GetAge(info.ModTime()),
 				TracingEnabled:  tracingEnabled(comp.Spec.TracingSpec.SamplingRate),
 				SamplingRate:    comp.Spec.TracingSpec.SamplingRate,
-				MetricsEnabled:  comp.Spec.MetricSpec.Enabled,
+				MetricsEnabled:  *comp.Spec.MetricSpec.Enabled,
 				MTLSEnabled:     comp.Spec.MTLSSpec.Enabled,
 				WorkloadCertTTL: comp.Spec.MTLSSpec.WorkloadCertTTL,
 				ClockSkew:       comp.Spec.MTLSSpec.AllowedClockSkew,
-				Manifest:        content,
+				Manifest:        comp.String(),
 			}
 
 			if newConfiguration.Kind == "Configuration" {
