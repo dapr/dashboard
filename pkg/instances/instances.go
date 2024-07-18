@@ -561,7 +561,7 @@ func (i *instances) GetMetadata(scope string, id string) MetadataOutput {
 	} else if i.platform == platforms.DockerCompose {
 		appId := i.GetInstance(scope, id).AppID
 		port := i.GetInstance(scope, id).HTTPPort
-		address, err := i.resolver.ResolveID(nameresolution.ResolveRequest{ID: appId})
+		address, err := i.resolver.ResolveID(ctx, nameresolution.ResolveRequest{ID: appId})
 		if err != nil {
 			log.Println(err)
 			return MetadataOutput{}
