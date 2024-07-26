@@ -48,13 +48,34 @@ type StatusOutput struct {
 
 // MetadataOutput represents a metadata api call response
 type MetadataOutput struct {
-	ID       string                      `json:"id"`
-	Actors   []MetadataActiveActorsCount `json:"actors"`
-	Extended map[string]interface{}      `json:"extended"`
+	ID              string                      `json:"id"`
+	RuntimeVersion  string                      `json:"runtimeVersion"`
+	EnabledFeatures []string                    `json:"enabledFeatures"`
+	Actors          []MetadataActiveActorsCount `json:"actors"`
+	Components      []MetadataComponents        `json:"components"`
+	Subscriptions   []MetadataSubscriptions     `json:"subscriptions"`
+	Extended        map[string]interface{}      `json:"extended"`
 }
 
 // MetadataActiveActorsCount represents actor metadata: type and count
 type MetadataActiveActorsCount struct {
 	Type  string `json:"type"`
 	Count int    `json:"count"`
+}
+
+// MetadataComponents represents component metadata: name, type, version an capabilities
+type MetadataComponents struct {
+	Name         string   `json:"name"`
+	Type         string   `json:"type"`
+	Version      string   `json:"version"`
+	Capabilities []string `json:"capabilities"`
+}
+
+// MetadataSubscriptions represents subscriptions
+type MetadataSubscriptions struct {
+	PubsubName      string                   `json:"pubsubname"`
+	Topic           string                   `json:"topic"`
+	DeadLetterTopic string                   `json:"deadLetterTopic"`
+	Metadata        map[string]interface{}   `json:"metadata"`
+	Rules           []map[string]interface{} `json:"rules"`
 }
