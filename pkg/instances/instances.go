@@ -55,6 +55,7 @@ var controlPlaneLabels = [...]string{
 	"dapr-sentry",
 	"dapr-placement",
 	"dapr-placement-server",
+	"dapr-scheduler-server",
 	"dapr-sidecar-injector",
 	"dapr-dashboard",
 }
