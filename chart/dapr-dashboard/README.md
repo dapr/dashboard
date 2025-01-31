@@ -40,3 +40,4 @@ helm install dapr-dashboard dapr/dapr-dashboard
 | `labels`                           | Custom pod labels                                                                  | `{}`         |
 | `k8sLabels`                        | Custom metadata labels                                                             | `{}`         |
 | `rbac.namespaced`                  | Removes cluster wide permissions where applicable  | `false` |
+| `extraEnv`                         | Additional environment variables to pass to the dapr-dashboard container | `[]` |
