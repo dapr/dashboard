@@ -105,17 +105,29 @@ func (c *configurations) getKubernetesConfigurations(scope string) []Configurati
 	out := []Configuration{}
 	for _, comp := range confs.Items {
 		newConfiguration := Configuration{
-			Name:            comp.Name,
-			Kind:            comp.Kind,
-			Created:         comp.CreationTimestamp.Format("2006-01-02 15:04.05"),
-			Age:             age.GetAge(comp.CreationTimestamp.Time),
-			TracingEnabled:  tracingEnabled(comp.Spec.TracingSpec.SamplingRate),
-			SamplingRate:    comp.Spec.TracingSpec.SamplingRate,
-			MetricsEnabled:  *comp.Spec.MetricSpec.Enabled,
-			MTLSEnabled:     *comp.Spec.MTLSSpec.Enabled,
-			WorkloadCertTTL: *comp.Spec.MTLSSpec.WorkloadCertTTL,
-			ClockSkew:       *comp.Spec.MTLSSpec.AllowedClockSkew,
-			Manifest:        comp,
+			Name:           comp.Name,
+			Kind:           comp.Kind,
+			Created:        comp.CreationTimestamp.Format("2006-01-02 15:04.05"),
+			Age:            age.GetAge(comp.CreationTimestamp.Time),
+			TracingEnabled: tracingEnabled(comp.Spec.TracingSpec.SamplingRate),
+			SamplingRate:   comp.Spec.TracingSpec.SamplingRate,
+			Manifest:       comp,
+		}
+		if metricSpec := comp.Spec.MetricSpec; metricSpec != nil {
+			if enabled := metricSpec.Enabled; enabled != nil {
+				newConfiguration.MetricsEnabled = *enabled
+			}
+		}
+		if mtlsSpec := comp.Spec.MTLSSpec; mtlsSpec != nil {
+			if enabled := mtlsSpec.Enabled; enabled != nil {
+				newConfiguration.MTLSEnabled = *enabled
+			}
+			if ttl := mtlsSpec.WorkloadCertTTL; ttl != nil {
+				newConfiguration.WorkloadCertTTL = *ttl
+			}
+			if skew := mtlsSpec.AllowedClockSkew; skew != nil {
+				newConfiguration.ClockSkew = *skew
+			}
 		}
 		out = append(out, newConfiguration)
 	}
