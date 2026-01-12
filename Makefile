@@ -24,6 +24,7 @@ GIT_VERSION = $(shell git describe --always --abbrev=7 --dirty)
 # By default, disable CGO_ENABLED. See the details on https://golang.org/cmd/cgo
 CGO         ?= 0
 BINARIES    ?= dashboard
+HA_MODE     ?= false
 
 # Add latest tag if LATEST_RELEASE is true
 LATEST_RELEASE ?=
@@ -106,6 +107,17 @@ DAPR_ARTIFACTS := $(OUT_DIR)/artifacts
 DAPR_OUT_DIR := $(OUT_DIR)/$(GOOS)_$(GOARCH)
 DAPR_LINUX_OUT_DIR := $(OUT_DIR)/linux_$(GOARCH)
 
+# Helm template and install setting
+HELM:=helm
+HELM_RELEASE_NAME?=dapr-dashboard
+DAPR_NAMESPACE?=dapr-system
+DAPR_MTLS_ENABLED?=true
+HELM_CHART_ROOT:=./chart
+HELM_CHART_DIR:=$(HELM_CHART_ROOT)/dapr-dashboard
+HELM_OUT_DIR:=$(OUT_DIR)/install
+HELM_MANIFEST_FILE:=$(HELM_OUT_DIR)/$(HELM_RELEASE_NAME).yaml
+HELM_REGISTRY?=daprio.azurecr.io
+
 ################################################################################
 # Target: build                                                                #
 ################################################################################
@@ -127,7 +139,7 @@ $(5)/$(1):
 	-o $(5)/$(1) \
 	./main.go;
 	mkdir -p $(5)/web/dist
-	cd web && npm i && ng build --outputPath=../$(5)/web/dist
+	cd web && npm i && NODE_OPTIONS=--openssl-legacy-provider ng build --outputPath=../$(5)/web/dist
 endef
 
 # Generate binary targets
@@ -214,3 +226,26 @@ run-backend-standalone:
 
 run-backend-kubernetes:
 	DAPR_DASHBOARD_KUBECONFIG=~/.kube/config $(DAPR_OUT_DIR)/dashboard$(BINARY_EXT)
+
+################################################################################
+# Target: manifest-gen                                                         #
+################################################################################
+
+# Generate helm chart manifest
+manifest-gen: dapr-dashboard.yaml
+
+dapr-dashboard.yaml: check-docker-env
+	$(info Generating helm manifest $(HELM_MANIFEST_FILE)...)
+	@mkdir -p $(HELM_OUT_DIR)
+	$(HELM) template \
+		--include-crds=true  --set ha.enabled=$(HA_MODE) --set-string tag=$(DAPR_TAG) --set-string registry=$(DAPR_REGISTRY) $(HELM_CHART_DIR) > $(HELM_MANIFEST_FILE)
+
+################################################################################
+# Target: upload-helmchart
+################################################################################
+
+# Upload helm charts to Helm Registry
+upload-helmchart:
+	export HELM_EXPERIMENTAL_OCI=1; \
+	$(HELM) chart save ${HELM_CHART_ROOT}/${HELM_RELEASE_NAME} ${HELM_REGISTRY}/${HELM}/${HELM_RELEASE_NAME}:${DAPR_VERSION}; \
+	$(HELM) chart push ${HELM_REGISTRY}/${HELM}/${HELM_RELEASE_NAME}:${DAPR_VERSION}

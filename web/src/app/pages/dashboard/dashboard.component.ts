@@ -55,6 +55,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       else if (platform === 'standalone') {
         this.displayedColumns = ['name', 'age', 'actions'];
       }
+      else if (platform === 'docker-compose') {
+        this.displayedColumns = ['name', 'age'];
+      }
     });
   }
 

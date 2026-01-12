@@ -1,0 +1,52 @@
+replicaCount: 1
+logLevel: info
+component: dashboard
+
+image:
+  registry: docker.io/daprio
+  name: dashboard
+  tag: 'edge'
+  imagePullPolicy: IfNotPresent
+  imagePullSecrets: ""
+
+nameOverride: ""
+fullnameOverride: ""
+
+ports:
+  protocol: TCP
+  port: 8080
+  targetPort: 8080
+
+ingress:
+  enabled: false
+  className:
+  host:
+  tls:
+    enabled: false
+    secretName:
+  annotations: {}
+
+runAsNonRoot: true
+serviceType: ClusterIP
+resources: {}
+serviceAnnotations: {}
+rbac:
+  namespaced: false
+ha:
+  enabled: false
+  replicaCount: 3
+  disruption:
+    minimumAvailable: ""
+    maximumUnavailable: "25%"
+
+nodeSelector: {}
+tolerations: []
+
+daprControlPlaneOs: linux
+labels: {}
+
+k8sLabels:
+  app.kubernetes.io/name: "dapr-dashboard"
+  app.kubernetes.io/version: "{{ .Values.image.tag }}"
+  app.kubernetes.io/part-of: "dapr"
+  app.kubernetes.io/managed-by: "helm"

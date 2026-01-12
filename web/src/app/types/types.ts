@@ -34,7 +34,11 @@ export interface Status {
 // Metadata represents metadata from dapr sidecar.
 export interface Metadata {
     id: string;
+    runtimeVersion: string;
+    enabledFeatures: string[];
     actors: MetadataActors[];
+    components: MetadataComponents[];
+    subscriptions: MetadataSubscriptions[];
     extended: {[key: string]: any};
 }
 
@@ -42,6 +46,23 @@ export interface Metadata {
 export interface MetadataActors {
     type: string;
     count: number;
+}
+
+// MetadataComponents represents component metadata: name, type, version an capabilities
+export interface MetadataComponents {
+    name: string;
+    type: string;
+    version: string;
+    capabilities: string[];
+}
+
+// MetadataSubscriptions represents subscriptions
+export interface MetadataSubscriptions {
+    pubsubName: string;
+    topic: string;
+    deadLetterTopic: string;
+    metadata: {[key: string]: any};
+    rules: {[key: string]: any}[];
 }
 
 // Log represents a log object supporting log metadata
