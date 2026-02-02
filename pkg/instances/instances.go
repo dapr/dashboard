@@ -643,7 +643,11 @@ func (i *instances) getMetadataOutputFromURLs(primaryURL string, secondaryURL st
 		return MetadataOutput{}
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Println("failed to close response body:", err)
+		}
+	}()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Println(err)

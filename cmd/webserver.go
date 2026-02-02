@@ -249,7 +249,11 @@ func getLogStreamsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer c.Close()
+	defer func() {
+		if err := c.Close(); err != nil {
+			log.Println("websocket close:", err)
+		}
+	}()
 	streams, err := inst.GetLogStream(scope, id, container)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -258,7 +262,11 @@ func getLogStreamsHandler(w http.ResponseWriter, r *http.Request) {
 
 	var readStreams []io.Reader
 	for _, stream := range streams {
-		defer stream.Close()
+		defer func(s io.Closer) {
+			if err := s.Close(); err != nil {
+				log.Println("fail to close stream:", err)
+			}
+		}(stream)
 		readStreams = append(readStreams, stream)
 	}
 	reader := io.MultiReader(readStreams...)
