@@ -29,7 +29,7 @@ import (
 
 func newTestSimpleK8s(objects ...runtime.Object) instances {
 	client := instances{}
-	client.kubeClient = fake.NewSimpleClientset(objects...)
+	client.kubeClient = fake.NewSimpleClientset(objects...) //nolint:staticcheck
 	return client
 }
 

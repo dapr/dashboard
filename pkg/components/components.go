@@ -47,12 +47,13 @@ func NewComponents(platform platforms.Platform, daprClient scheme.Interface, com
 	c := components{}
 	c.platform = platform
 
-	if platform == platforms.Kubernetes {
+	switch platform {
+	case platforms.Kubernetes:
 		c.getComponentsFn = c.getKubernetesComponents
 		c.daprClient = daprClient
-	} else if platform == platforms.Standalone {
+	case platforms.Standalone:
 		c.getComponentsFn = c.getStandaloneComponents
-	} else if platform == platforms.DockerCompose {
+	case platforms.DockerCompose:
 		c.getComponentsFn = c.getDockerComposeComponents
 		c.componentsPath = componentsPath
 	}
