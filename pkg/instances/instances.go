@@ -93,14 +93,15 @@ func NewInstances(platform platforms.Platform, kubeClient *kubernetes.Clientset,
 	i.metadataClient = http.Client{}
 	i.daprApiToken = os.Getenv("DAPR_API_TOKEN")
 
-	if i.platform == platforms.Kubernetes {
+	switch i.platform {
+	case platforms.Kubernetes:
 		i.getInstancesFn = i.getKubernetesInstances
 		i.getScopesFn = i.getKubernetesScopes
 		i.kubeClient = kubeClient
-	} else if i.platform == platforms.Standalone {
+	case platforms.Standalone:
 		i.getInstancesFn = i.getStandaloneInstances
 		i.getScopesFn = i.getStandaloneScopes
-	} else if i.platform == platforms.DockerCompose {
+	case platforms.DockerCompose:
 		i.getInstancesFn = i.getDockerComposeInstances
 		i.getScopesFn = i.getDockerComposeScopes
 		i.dockerComposePath = dockerComposePath
@@ -214,7 +215,7 @@ func (i *instances) GetLogStream(scope, id, containerName string) ([]io.ReadClos
 					var logstreams []io.ReadCloser
 
 					for _, p := range pods.Items {
-						name := p.ObjectMeta.Name
+						name := p.Name
 
 						for _, container := range p.Spec.Containers {
 							if container.Name == containerName {
@@ -259,7 +260,7 @@ func (i *instances) GetLogStream(scope, id, containerName string) ([]io.ReadClos
 					var logstreams []io.ReadCloser
 
 					for _, p := range pods.Items {
-						name := p.ObjectMeta.Name
+						name := p.Name
 
 						for _, container := range p.Spec.Containers {
 							if container.Name == containerName {
@@ -314,8 +315,8 @@ func (i *instances) GetDeploymentConfiguration(scope string, id string) string {
 						if len(pods.Items) > 0 {
 							p := pods.Items[0]
 
-							name := p.ObjectMeta.Name
-							nspace := p.ObjectMeta.Namespace
+							name := p.Name
+							nspace := p.Namespace
 
 							restClient := i.kubeClient.CoreV1().RESTClient()
 							if err != nil {
@@ -372,8 +373,8 @@ func (i *instances) GetDeploymentConfiguration(scope string, id string) string {
 					if len(pods.Items) > 0 {
 						p := pods.Items[0]
 
-						name := p.ObjectMeta.Name
-						nspace := p.ObjectMeta.Namespace
+						name := p.Name
+						nspace := p.Namespace
 
 						restClient := i.kubeClient.CoreV1().RESTClient()
 						if err != nil {
@@ -642,7 +643,11 @@ func (i *instances) getMetadataOutputFromURLs(primaryURL string, secondaryURL st
 		return MetadataOutput{}
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Println("failed to close response body:", err)
+		}
+	}()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Println(err)

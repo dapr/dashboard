@@ -46,12 +46,13 @@ func NewConfigurations(platform platforms.Platform, daprClient scheme.Interface,
 	c := configurations{}
 	c.platform = platform
 
-	if platform == platforms.Kubernetes {
+	switch platform {
+	case platforms.Kubernetes:
 		c.getConfigurationsFn = c.getKubernetesConfigurations
 		c.daprClient = daprClient
-	} else if platform == platforms.Standalone {
+	case platforms.Standalone:
 		c.getConfigurationsFn = c.getStandaloneConfigurations
-	} else if platform == platforms.DockerCompose {
+	case platforms.DockerCompose:
 		c.getConfigurationsFn = c.getDockerComposeConfigurations
 		c.configPath = configPath
 	}

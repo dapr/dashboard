@@ -33,8 +33,7 @@ jobs:
     name: Build ${{ matrix.target_os }}_${{ matrix.target_arch }} binaries
     runs-on: ${{ matrix.os }}
     env:
-      GOVER: 1.21
-      GOLANGCILINT_VER: 1.56.2
+      GOLANGCILINT_VER: 'v2.7.1'
       GOOS: ${{ matrix.target_os }}
       GOARCH: ${{ matrix.target_arch }}
       GOPROXY: https://proxy.golang.org
@@ -59,22 +58,23 @@ jobs:
           - os: windows-latest
             target_arch: arm64
     steps:
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v6
       - name: Setup node ${{ env.NODE_VERSION }} and npm
         uses: actions/setup-node@v1
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install angular cli
         run: npm install -g @angular/cli
-      - name: Set up Go ${{ env.GOVER }}
-        uses: actions/setup-go@v2
+      - name: Set up Go (using root 'go.mod' version)
+        uses: actions/setup-go@v6
         with:
-          go-version: ${{ env.GOVER }}
-      - name: Install golangci-lint
-        if: matrix.target_arch == 'amd64' && matrix.target_os == 'linux'
-        run: |
-          curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "${{ env.GOROOT }}/bin" v${{ env.GOLANGCILINT_VER }}
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
+          go-version-file: 'go.mod'
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: ${{ env.GOLANGCILINT_VER }}
+          skip-cache: true
       - name: Parse release version and set REL_VERSION
         run: python ./.github/scripts/get_release_version.py
       - name: Run make lint
