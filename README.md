@@ -1,7 +1,9 @@
-# Dapr Dashboard
+# Dapr Dashboard - ARCHIVED
 
 [![codecov](https://codecov.io/gh/dapr/dashboard/branch/master/graph/badge.svg)](https://codecov.io/gh/dapr/dashboard)
 [![FOSSA Status](https://app.fossa.com/api/projects/custom%2B162%2Fgithub.com%2Fdapr%2Fdashboard.svg?type=shield)](https://app.fossa.com/projects/custom%2B162%2Fgithub.com%2Fdapr%2Fdashboard?ref=badge_shield)
+
+*The Dapr Dashboard has been archived. As an alternative, check out the Diagrid Dashboard here: https://docs.diagrid.io/develop/local-development/dev-dashboard/.*
 
 Dapr Dashboard is a web-based UI for Dapr, allowing users to see information, view logs and more for the Dapr applications, components, and configurations running on a supported Dapr Dashboard platform.
 
